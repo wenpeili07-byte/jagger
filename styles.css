@@ -280,6 +280,7 @@ h1 span {
   cursor: pointer;
   isolation: isolate;
   filter: saturate(0.72) brightness(0.72);
+  text-align: left;
   transition: min-height 220ms ease, border-color 220ms ease, filter 220ms ease, transform 220ms ease;
 }
 
@@ -387,12 +388,13 @@ h1 span {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(8px, 1.4vw, 16px);
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 .service-tile {
   aspect-ratio: 1 / 1;
   min-height: 0;
-  max-height: 260px;
   padding: clamp(14px, 2vw, 22px);
 }
 
