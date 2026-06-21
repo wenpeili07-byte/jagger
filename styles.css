@@ -388,13 +388,10 @@ h1 span {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(8px, 1.4vw, 16px);
-  max-width: 960px;
-  margin: 0 auto;
 }
 
 .service-tile {
-  aspect-ratio: 1 / 1;
-  min-height: 0;
+  min-height: clamp(150px, 18vw, 230px);
   padding: clamp(14px, 2vw, 22px);
 }
 
@@ -546,6 +543,7 @@ h1 span {
   }
 
   .service-tile {
+    min-height: 150px;
     padding: 12px;
   }
 }
