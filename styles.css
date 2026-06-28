@@ -299,9 +299,9 @@ h1 span {
 
 .roll-row.is-active {
   padding-inline: 8px;
-  border-bottom-color: rgba(255, 99, 71, 0.7);
-  color: var(--hot);
-  background: linear-gradient(90deg, rgba(255, 99, 71, 0.2), rgba(255, 99, 71, 0.02));
+  border-bottom-color: rgba(28, 105, 212, 0.78);
+  color: var(--bmw-blue);
+  background: linear-gradient(90deg, rgba(28, 105, 212, 0.24), rgba(28, 105, 212, 0.03));
 }
 
 .enter-button {
@@ -320,8 +320,8 @@ h1 span {
 }
 
 .enter-button:hover {
-  border-color: var(--hot);
-  color: var(--hot);
+  border-color: var(--bmw-blue);
+  color: var(--bmw-blue);
 }
 
 .spine {
@@ -401,9 +401,9 @@ h1 span {
 
 .film-card.is-active,
 .service-tile.is-active {
-  border-color: rgba(255, 99, 71, 0.8);
+  border-color: rgba(28, 105, 212, 0.88);
   filter: saturate(1.08) brightness(1);
-  box-shadow: 0 0 0 1px rgba(255, 99, 71, 0.32), 0 18px 42px rgba(0, 0, 0, 0.34);
+  box-shadow: 0 0 0 1px rgba(28, 105, 212, 0.36), 0 18px 42px rgba(0, 0, 0, 0.34);
 }
 
 .film-card.is-active {
@@ -418,7 +418,7 @@ h1 span {
 .film-card.is-active::after,
 .service-tile.is-active::after {
   border-width: 2px;
-  border-color: rgba(255, 99, 71, 0.72);
+  border-color: rgba(28, 105, 212, 0.78);
 }
 
 .number,
@@ -534,7 +534,7 @@ h1 span {
 
 .status {
   margin: 0 0 10px;
-  color: var(--hot);
+  color: var(--bmw-blue);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -554,7 +554,7 @@ h1 span {
 
 .detail-panel a {
   color: var(--ink);
-  text-decoration-color: var(--hot);
+  text-decoration-color: var(--bmw-blue);
   text-underline-offset: 5px;
 }
 
