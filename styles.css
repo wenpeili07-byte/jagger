@@ -140,8 +140,7 @@ a {
   transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
 }
 
-.lang-toggle::before,
-.lang-toggle::after {
+.lang-toggle::before {
   position: absolute;
   content: "";
   pointer-events: none;
@@ -151,21 +150,6 @@ a {
   inset: 6px;
   border-radius: inherit;
   border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.lang-toggle::after {
-  left: 50%;
-  bottom: 7px;
-  width: 31px;
-  height: 5px;
-  border-radius: 999px;
-  background: var(--bmw-blue);
-  box-shadow:
-    0 0 8px var(--bmw-blue),
-    0 0 18px rgba(28, 105, 212, 0.82),
-    0 0 30px rgba(28, 105, 212, 0.48);
-  transform: translateX(-50%) scaleX(0.62);
-  transition: transform 260ms ease, background 260ms ease, box-shadow 260ms ease;
 }
 
 .lang-toggle:hover,
@@ -179,13 +163,8 @@ a {
   outline: 0;
 }
 
-.lang-toggle:active,
-.lang-toggle.is-switching {
+.lang-toggle:active {
   transform: translateY(1px) scale(0.98);
-}
-
-.lang-toggle.is-switching::after {
-  animation: langPulse 420ms ease;
 }
 
 .lang-option {
@@ -210,20 +189,6 @@ a {
     0 0 14px var(--bmw-blue),
     0 0 26px rgba(28, 105, 212, 0.74);
   transform: translateY(-1px);
-}
-
-@keyframes langPulse {
-  0% {
-    transform: translateX(-50%) scaleX(0.62);
-  }
-
-  45% {
-    transform: translateX(-50%) scaleX(1.18);
-  }
-
-  100% {
-    transform: translateX(-50%) scaleX(0.82);
-  }
 }
 
 .cover {
