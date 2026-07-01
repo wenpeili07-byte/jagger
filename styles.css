@@ -52,8 +52,33 @@ a {
 }
 
 .site-shell {
+  position: relative;
   min-height: 100vh;
   border: 1px solid var(--line);
+  isolation: isolate;
+}
+
+.site-shell::before,
+.site-shell::after {
+  position: fixed;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.site-shell::before {
+  z-index: -2;
+  background-image: url("./assets/images/网页/首页背景.jpg");
+  background-position: center top;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.site-shell::after {
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(17, 19, 21, 0.88) 0%, rgba(17, 19, 21, 0.64) 44%, rgba(17, 19, 21, 0.78) 100%),
+    linear-gradient(180deg, rgba(17, 19, 21, 0.62) 0%, rgba(17, 19, 21, 0.2) 38%, rgba(17, 19, 21, 0.92) 100%);
 }
 
 .topbar {
