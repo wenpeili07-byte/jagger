@@ -8,14 +8,14 @@ const translations = {
     "pager.label": "页面切换",
     "pager.prev": "← PREV",
     "pager.next": "NEXT →",
-    "hero.kicker": "ROLL 01 · PERFORMANCE GARAGE · 05 CASES",
+    "hero.kicker": "ROLL 01 · PERFORMANCE GARAGE · 06 CASES",
     "hero.deck": "AUTO TUNING · PARTS · PHOTO · ECU CALIBRATION",
-    "hero.cnName": "龙马动态 · 二〇二六",
-    "hero.note": "5 台改装车案例作为主展示，下面承接 LONMA DYNAMIC 的核心业务能力。",
+    "hero.cnName": "龙马态度 · 二〇二六",
+    "hero.note": "6 台改装车案例作为主展示，下面承接 LONMA DYNAMIC 的核心业务能力。",
     "hero.cta": "→ VIEW SERVICES",
     "cases.listLabel": "改装车案例列表",
     "cases.panelLabel": "改装车案例模块",
-    "cases.heading": "LONMA-26-R1 · MODIFIED CAR CASES · 05 OF 36",
+    "cases.heading": "LONMA-26-R1 · MODIFIED CAR CASES · 06 OF 36",
     "detail.status": "● NOW HOVERING",
     "services.sectionLabel": "业务展示模块",
     "services.heading": "BUSINESS MODULES",
@@ -31,14 +31,14 @@ const translations = {
     "pager.label": "Page controls",
     "pager.prev": "← PREV",
     "pager.next": "NEXT →",
-    "hero.kicker": "ROLL 01 · PERFORMANCE GARAGE · 05 CASES",
+    "hero.kicker": "ROLL 01 · PERFORMANCE GARAGE · 06 CASES",
     "hero.deck": "AUTO TUNING · PARTS · PHOTOGRAPHY · ECU CALIBRATION",
     "hero.cnName": "LONMA DYNAMIC · 2026",
-    "hero.note": "Five modified-car case studies lead the page, followed by LONMA DYNAMIC's core service capabilities.",
+    "hero.note": "Six modified-car case studies lead the page, followed by LONMA DYNAMIC's core service capabilities.",
     "hero.cta": "→ VIEW SERVICES",
     "cases.listLabel": "Modified car case list",
     "cases.panelLabel": "Modified car case modules",
-    "cases.heading": "LONMA-26-R1 · MODIFIED CAR CASES · 05 OF 36",
+    "cases.heading": "LONMA-26-R1 · MODIFIED CAR CASES · 06 OF 36",
     "detail.status": "● NOW HOVERING",
     "services.sectionLabel": "Business service modules",
     "services.heading": "BUSINESS MODULES",
@@ -146,6 +146,26 @@ const details = [
     text: {
       zh: "以拍摄呈现为目标规划外观细节、灯光质感和成片风格，让改装成果更适合社媒传播。",
       en: "Exterior details, lighting character, and final visual style are planned around content creation and social presentation."
+    }
+  },
+  {
+    label: "CAR 06",
+    counter: "06",
+    subtitle: {
+      zh: "CASE 06 · BLUE PERFORMANCE",
+      en: "CASE 06 · BLUE PERFORMANCE"
+    },
+    rowName: {
+      zh: "蓝色性能车",
+      en: "Blue performance"
+    },
+    title: {
+      zh: "蓝色性能车案例",
+      en: "Blue Performance Case"
+    },
+    text: {
+      zh: "以 BMW 风格蓝色作为视觉线索，结合外观细节、动力响应和拍摄呈现，做出更统一的性能车态度。",
+      en: "BMW-inspired blue cues tie together exterior details, power response, and photo presentation for a more unified performance attitude."
     }
   },
   {
