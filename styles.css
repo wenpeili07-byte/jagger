@@ -563,6 +563,30 @@ h1 span {
   --scene: linear-gradient(135deg, #111315 0%, #1C5D99 48%, #171A1D 100%);
 }
 
+.film-card[data-index="0"] {
+  --scene: url("./assets/images/网页/案例1/首页背景.jpg");
+}
+
+.film-card[data-index="1"] {
+  --scene: url("./assets/images/网页/案例2/DSC00889.jpg");
+}
+
+.film-card[data-index="2"] {
+  --scene: url("./assets/images/网页/案例3/DSC00702.jpg");
+}
+
+.film-card[data-index="3"] {
+  --scene: url("./assets/images/网页/案例4/DSC00969.jpg");
+}
+
+.film-card[data-index="4"] {
+  --scene: url("./assets/images/网页/案例5/DSC00552.jpg");
+}
+
+.film-card[data-index="5"] {
+  --scene: url("./assets/images/网页/案例6/WechatIMG2477.jpg");
+}
+
 .detail-panel {
   align-self: end;
   width: min(520px, 100%);
