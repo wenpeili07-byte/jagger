@@ -297,7 +297,7 @@ h1 span {
 .note {
   max-width: 360px;
   margin: 0 0 28px;
-  color: var(--accent);
+  color: var(--ink);
   font-size: 15px;
   font-weight: 700;
   line-height: 1.7;
