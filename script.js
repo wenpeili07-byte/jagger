@@ -393,12 +393,20 @@ function resetCaseBackground() {
 
 cards.forEach((card) => {
   const index = Number(card.dataset.index);
+  const activateCard = () => setActive(index);
+
+  card.addEventListener("pointerenter", activateCard);
+  card.addEventListener("pointermove", activateCard);
   card.addEventListener("mouseenter", () => setActive(index));
   card.addEventListener("focus", () => setActive(index));
   card.addEventListener("click", () => setActive(index));
 });
 
 filmCards.forEach((card) => {
+  const previewCard = () => previewCaseBackground(card);
+
+  card.addEventListener("pointerenter", previewCard);
+  card.addEventListener("pointermove", previewCard);
   card.addEventListener("mouseenter", () => previewCaseBackground(card));
   card.addEventListener("mouseleave", resetCaseBackground);
   card.addEventListener("focus", () => previewCaseBackground(card));
