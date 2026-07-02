@@ -5,9 +5,6 @@ const translations = {
     "nav.services": "SERVICES",
     "nav.cases": "CASES",
     "nav.contact": "CONTACT",
-    "pager.label": "页面切换",
-    "pager.prev": "← PREV",
-    "pager.next": "NEXT →",
     "hero.kicker": "PERFORMANCE GARAGE · 06 CASES",
     "hero.deck": "AUTO TUNING · PARTS · PHOTO · ECU CALIBRATION",
     "hero.cnName": "龙马态度 · 二〇二六",
@@ -28,9 +25,6 @@ const translations = {
     "nav.services": "SERVICES",
     "nav.cases": "CASES",
     "nav.contact": "CONTACT",
-    "pager.label": "Page controls",
-    "pager.prev": "← PREV",
-    "pager.next": "NEXT →",
     "hero.kicker": "PERFORMANCE GARAGE · 06 CASES",
     "hero.deck": "AUTO TUNING · PARTS · PHOTOGRAPHY · ECU CALIBRATION",
     "hero.cnName": "LONMA DYNAMIC · 2026",
@@ -416,10 +410,6 @@ filmCards.forEach((card) => {
 
 rows.forEach((row) => {
   row.addEventListener("click", () => setActive(Number(row.dataset.index)));
-});
-
-document.querySelectorAll("[data-step]").forEach((button) => {
-  button.addEventListener("click", () => setActive(activeIndex + Number(button.dataset.step)));
 });
 
 if (langToggle) {
