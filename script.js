@@ -280,6 +280,17 @@ const supportedLanguages = ["zh", "en"];
 let activeIndex = 0;
 let currentLanguage = getInitialLanguage();
 
+function installCaseBackgroundOverride() {
+  if (!shell || document.querySelector("[data-case-background-override]")) {
+    return;
+  }
+
+  const style = document.createElement("style");
+  style.dataset.caseBackgroundOverride = "true";
+  style.textContent = ".site-shell::before{background-image:var(--active-case-scene)!important;}";
+  document.head.append(style);
+}
+
 function getInitialLanguage() {
   const savedLanguage = localStorage.getItem("lonma-language");
   if (supportedLanguages.includes(savedLanguage)) {
@@ -410,4 +421,5 @@ if (langToggle) {
   });
 }
 
+installCaseBackgroundOverride();
 setLanguage(currentLanguage);
