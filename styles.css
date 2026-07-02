@@ -397,12 +397,16 @@ h1 span {
   isolation: isolate;
   filter: saturate(0.72) brightness(0.72);
   text-align: left;
-  transition: min-height 220ms ease, border-color 220ms ease, filter 220ms ease, transform 220ms ease;
+  transition: border-color 220ms ease, filter 220ms ease, transform 220ms ease, box-shadow 220ms ease;
 }
 
 .film-card {
-  min-height: clamp(78px, 10vh, 116px);
+  height: 96px;
+  min-height: 96px;
   padding: 18px 24px;
+  background:
+    linear-gradient(90deg, rgba(17, 19, 21, 0.96), rgba(23, 26, 29, 0.82) 58%, rgba(17, 19, 21, 0.96)),
+    var(--bg-soft);
 }
 
 .film-card::before,
@@ -421,6 +425,13 @@ h1 span {
     linear-gradient(90deg, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.08) 52%, rgba(0, 0, 0, 0.56)),
     var(--scene);
   background-size: cover;
+  background-position: center;
+}
+
+.film-card::before {
+  opacity: 0;
+  transform: scale(1.035);
+  transition: opacity 260ms ease, transform 320ms ease;
 }
 
 .film-card::after,
@@ -431,7 +442,13 @@ h1 span {
 
 .film-card:hover {
   border-color: rgba(28, 93, 153, 0.62);
-  filter: saturate(0.9) brightness(0.86);
+  filter: saturate(1) brightness(0.98);
+}
+
+.film-card:hover::before,
+.film-card:focus-visible::before {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .service-tile:hover {
@@ -447,8 +464,7 @@ h1 span {
 }
 
 .film-card.is-active {
-  min-height: clamp(108px, 13vh, 150px);
-  transform: translateX(-10px);
+  transform: translateX(-6px);
 }
 
 .service-tile.is-active {
@@ -682,7 +698,8 @@ h1 span {
   }
 
   .film-card {
-    min-height: 88px;
+    height: 86px;
+    min-height: 86px;
     padding: 14px 16px;
   }
 
