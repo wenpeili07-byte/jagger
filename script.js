@@ -14,10 +14,10 @@ document.querySelectorAll(".site-shell").forEach((shell, index) => {
 const translations = {
   zh: {
     "brand.home": "回到首页",
-    "nav.about": "ABOUT",
-    "nav.services": "SERVICES",
-    "nav.cases": "CASES",
-    "nav.contact": "CONTACT",
+    "nav.about": "关于",
+    "nav.services": "业务",
+    "nav.cases": "案例",
+    "nav.contact": "联系",
     "hero.kicker": "性能车库 · 06 个案例",
     "hero.deck": "汽车改装 · 汽车配件 · 汽车摄影 · ECU 特调",
     "hero.cnName": "龙马态度 · 二〇二六",
