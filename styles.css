@@ -85,7 +85,7 @@ a {
 
 .topbar {
   display: grid;
-  grid-template-columns: minmax(210px, 0.8fr) auto minmax(260px, 0.9fr) minmax(210px, 1fr);
+  grid-template-columns: minmax(210px, 1fr) auto minmax(210px, 1fr);
   align-items: center;
   min-height: 76px;
   padding: 0 clamp(18px, 3vw, 54px);
@@ -111,6 +111,7 @@ a {
 }
 
 .nav {
+  justify-self: center;
   display: flex;
   gap: clamp(14px, 2vw, 28px);
   color: var(--muted);
@@ -125,14 +126,6 @@ a {
   display: flex;
   align-items: center;
   gap: 18px;
-}
-
-.header-meta {
-  justify-self: center;
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-  text-align: center;
 }
 
 .pager {
@@ -633,7 +626,6 @@ h1 span {
   }
 
   .nav,
-  .header-meta,
   .top-actions {
     justify-self: start;
     flex-wrap: wrap;
