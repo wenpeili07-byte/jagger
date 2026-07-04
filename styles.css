@@ -375,8 +375,7 @@ h1 span {
 
 .film-stack {
   display: grid;
-  width: clamp(80%, 72vw, 100%);
-  max-width: 980px;
+  width: 80%;
   margin-left: auto;
   gap: 4px;
 }
