@@ -298,6 +298,10 @@ const langToggle = document.querySelector("[data-lang-toggle]");
 const languageOptions = [...document.querySelectorAll("[data-lang-option]")];
 const shell = document.querySelector(".site-shell");
 const supportedLanguages = ["zh", "en"];
+const serviceCtaText = {
+  zh: "咨询详情 →",
+  en: "REQUEST DETAILS →"
+};
 let activeIndex = 0;
 let currentLanguage = getInitialLanguage();
 
@@ -342,6 +346,8 @@ function updateCardCopy(language) {
     const detail = details[Number(card.dataset.index)];
     const subtitle = card.querySelector("[data-card-subtitle]");
     const title = card.querySelector("[data-card-title]");
+    const text = card.querySelector("[data-card-text]");
+    const serviceCta = card.querySelector("[data-service-cta]");
 
     if (subtitle) {
       subtitle.textContent = detail.subtitle[language];
@@ -349,6 +355,14 @@ function updateCardCopy(language) {
 
     if (title && detail.title) {
       title.textContent = detail.title[language];
+    }
+
+    if (text && detail.text) {
+      text.textContent = detail.text[language];
+    }
+
+    if (serviceCta) {
+      serviceCta.textContent = serviceCtaText[language];
     }
   });
 
