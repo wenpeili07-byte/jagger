@@ -201,7 +201,7 @@ const details = [
       en: "Custom Builds"
     },
     text: {
-      zh: "从外观姿态、轮毂刹车到底盘和动力升级，为每台车制定兼顾审美、可靠性和驾驶感的改装方案。",
+      zh: "外观、轮毂、避震、刹车与整车风格升级方案。",
       en: "From stance, wheels, and brakes to chassis and power upgrades, each build is planned around style, reliability, and feel."
     }
   },
@@ -217,7 +217,7 @@ const details = [
       en: "Performance Parts"
     },
     text: {
-      zh: "精选进气、排气、轮毂、刹车、避震和车身套件，按车型和使用场景推荐更匹配的升级组合。",
+      zh: "性能件、外观件、轮毂、避震与品牌配件选型供应。",
       en: "Selected intake, exhaust, wheel, brake, suspension, and body-kit options matched to the car and how it will be used."
     }
   },
@@ -233,7 +233,7 @@ const details = [
       en: "Automotive Photo"
     },
     text: {
-      zh: "提供静态棚拍、街景跟拍、活动记录和成片调色，让改装成果被看见，也被记住。",
+      zh: "静态拍摄、Rolling Shot、短视频与社交媒体内容制作。",
       en: "Studio shoots, rolling street shots, event coverage, and color finishing that make the build visible and memorable."
     }
   },
@@ -249,7 +249,7 @@ const details = [
       en: "ECU Calibration"
     },
     text: {
-      zh: "基于车辆硬件状态和驾驶需求做定制标定，优化动力响应、扭矩输出和日常可控性。",
+      zh: "动力程序、数据记录、道路优化与 Stage 方案规划。",
       en: "Custom calibration based on hardware condition and driving goals, improving response, torque delivery, and daily control."
     }
   },
@@ -265,7 +265,7 @@ const details = [
       en: "Chassis Setup"
     },
     text: {
-      zh: "针对街道、山路或赛道使用，调整避震、定位和制动脚感，让车更稳、更准、更听话。",
+      zh: "车高、轮毂数据、定位与街道 / 赛道驾驶设定。",
       en: "Suspension, alignment, and brake feel are tuned for street, canyon, or track use so the car feels stable, precise, and responsive."
     }
   },
@@ -281,7 +281,7 @@ const details = [
       en: "Intake & Exhaust"
     },
     text: {
-      zh: "围绕声浪、流量和法规友好度选择方案，兼顾性能释放、质感和长期使用体验。",
+      zh: "进气、头段、中尾段、声浪与动力响应升级。",
       en: "Intake and exhaust choices balance sound, flow, road compliance, performance release, and long-term usability."
     }
   }
