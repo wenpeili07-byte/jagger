@@ -90,7 +90,7 @@ a {
   min-height: 76px;
   padding: 0 clamp(18px, 3vw, 54px);
   border-bottom: 1px solid var(--line);
-  background: rgba(17, 19, 21, 0.6);
+  background: rgba(17, 19, 21, 0.3);
   backdrop-filter: blur(14px);
   font-family: var(--mono);
   letter-spacing: 0.18em;
@@ -118,6 +118,7 @@ a {
 }
 
 .nav a {
+  color: var(--ink);
   font-size: 15.6px;
   transition: text-shadow 180ms ease, filter 180ms ease;
 }
