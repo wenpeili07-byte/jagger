@@ -668,7 +668,7 @@ h1 span {
   }
 
   .film-stack {
-    width: min(100%, 1040px);
+    width: 100%;
     gap: 6px;
   }
 
