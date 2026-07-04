@@ -564,9 +564,14 @@ h1 span {
   transition: color 180ms ease, transform 180ms ease;
 }
 
-.service-tile:hover .service-cta,
-.service-tile.is-active .service-cta {
-  color: var(--hot);
+.service-tile:hover .service-cta {
+  color: var(--accent);
+  transform: translateX(4px);
+}
+
+.service-tile.is-active .service-cta,
+.service-tile:focus-visible .service-cta {
+  color: var(--accent-bright);
   transform: translateX(4px);
 }
 
