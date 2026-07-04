@@ -509,12 +509,17 @@ h1 span {
 .service-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
   gap: clamp(8px, 1.4vw, 16px);
 }
 
 .service-tile {
-  min-height: clamp(150px, 18vw, 230px);
+  height: 100%;
+  min-height: clamp(220px, 21vw, 278px);
   padding: clamp(14px, 2vw, 22px);
+  align-items: stretch;
+  justify-content: space-between;
+  flex-direction: column;
 }
 
 .service-tile::before {
@@ -525,10 +530,44 @@ h1 span {
 }
 
 .service-tile h2 {
-  margin: 0;
-  font-size: clamp(19px, 2.4vw, 34px);
+  margin: 0 0 12px;
+  font-size: clamp(22px, 2.2vw, 32px);
   letter-spacing: 0;
   line-height: 1.15;
+}
+
+.service-content {
+  display: grid;
+  gap: 0;
+}
+
+.service-copy {
+  display: block;
+  max-width: 24em;
+  color: var(--muted);
+  font-size: clamp(13px, 1.1vw, 15px);
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.service-cta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: clamp(18px, 3vw, 34px);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.service-tile:hover .service-cta,
+.service-tile.is-active .service-cta {
+  color: var(--hot);
+  transform: translateX(4px);
 }
 
 .theme-brand {
@@ -694,7 +733,7 @@ h1 span {
   }
 
   .service-tile {
-    min-height: 150px;
-    padding: 12px;
+    min-height: 230px;
+    padding: 14px;
   }
 }
