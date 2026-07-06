@@ -211,5 +211,33 @@
     </main>
 
     <script src="./cases.js?v=scene-fade-20260705"></script>
+    <script>
+      (() => {
+        const casesPage = document.querySelector(".cases-page");
+        if (!casesPage) return;
+
+        function fadeToScene(scene) {
+          if (!scene) return;
+          document.querySelectorAll(".scene-fade-layer").forEach((layer) => layer.remove());
+          casesPage.style.setProperty("--cases-active-scene", scene);
+          casesPage.style.setProperty("--active-case-scene", scene);
+          casesPage.classList.remove("scene-is-fading");
+          void casesPage.offsetWidth;
+          casesPage.classList.add("scene-is-fading");
+        }
+
+        document.querySelectorAll(".case-feature-card").forEach((card) => {
+          const update = () => {
+            const scene = card.dataset.scene || getComputedStyle(card).getPropertyValue("--scene").trim();
+            const sceneValue = scene.startsWith("url(") || scene.startsWith("linear-gradient(") ? scene : `url("${scene}")`;
+            fadeToScene(sceneValue);
+          };
+
+          ["pointerenter", "mouseenter", "focus", "click"].forEach((eventName) => {
+            card.addEventListener(eventName, update);
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
