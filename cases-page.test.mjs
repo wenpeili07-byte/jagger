@@ -14,7 +14,7 @@ assert.match(html, /data-filter="audi"[\s\S]*AUDI/, "filter sidebar should inclu
 assert.equal((html.match(/class="case-feature-card/g) || []).length, 6, "PLAN A hero should show six feature cards");
 assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive should use the current six cases as reference content");
 assert.match(html, /36 MODIFIED-CAR CASE FILES/, "archive should be framed as a 36-case library");
-assert.match(html, /<script src="\.\/cases\.js\?v=cases-archive-20260705"><\/script>/, "cases page should load its own interaction script");
+assert.match(html, /<script src="\.\/cases\.js\?v=cases-archive-hover-20260705"><\/script>/, "cases page should load its own interaction script");
 
 assert.match(css, /\.cases-hero\s*\{[^}]*min-height:\s*calc\(100vh - 86px\)/s, "PLAN A hero should preserve a near-first-screen visual area");
 assert.match(css, /\.cases-gap\s*\{[^}]*height:\s*100px/s, "hero and archive should be separated by 100px");
