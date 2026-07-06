@@ -204,5 +204,28 @@
     </main>
 
     <script src="./script.js?v=scene-fade-20260705"></script>
+    <script>
+      (() => {
+        const shell = document.querySelector(".site-shell");
+        if (!shell) return;
+
+        function fadeToScene(scene) {
+          if (!scene) return;
+          document.querySelectorAll(".scene-fade-layer").forEach((layer) => layer.remove());
+          shell.style.setProperty("--active-case-scene", scene);
+          shell.dataset.currentScene = scene;
+          shell.classList.remove("scene-is-fading");
+          void shell.offsetWidth;
+          shell.classList.add("scene-is-fading");
+        }
+
+        document.querySelectorAll(".film-card").forEach((card) => {
+          const update = () => fadeToScene(getComputedStyle(card).getPropertyValue("--scene").trim());
+          ["pointerenter", "mouseenter", "focus", "click"].forEach((eventName) => {
+            card.addEventListener(eventName, update);
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
