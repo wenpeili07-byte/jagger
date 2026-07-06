@@ -19,7 +19,8 @@ assert.match(html, /function fadeToScene\(scene\)/, "cases page should keep a si
 assert.doesNotMatch(html, /@keyframes sceneFadeIn/, "cases page should use the shared stylesheet fade animation instead of duplicating it inline");
 assert.equal((css.match(/@keyframes sceneFadeIn/g) || []).length, 1, "shared stylesheet should define the background fade-in animation once");
 assert.doesNotMatch(html, /scene-fade-layer/, "cases page should not keep old fade-layer cleanup from the removed animation path");
-assert.doesNotMatch(html, /\["pointerenter",\s*"mouseenter"/, "case background should not bind both pointerenter and mouseenter");
+assert.match(html, /\["mouseenter",\s*"focus",\s*"click"\]/, "case background should use one stable hover event plus focus and click");
+assert.doesNotMatch(html, /pointerenter/, "case background should not bind both pointerenter and mouseenter");
 assert.match(html, /activeScene === scene/, "case background should not restart the fade when the active scene is unchanged");
 
 assert.match(css, /\.cases-hero\s*\{[^}]*min-height:\s*calc\(100vh - 86px\)/s, "PLAN A hero should preserve a near-first-screen visual area");
