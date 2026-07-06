@@ -31,8 +31,9 @@ function setArchiveFilter(filter) {
 }
 
 featureCards.forEach((card) => {
-  card.addEventListener("mouseenter", () => setHeroScene(card));
-  card.addEventListener("focus", () => setHeroScene(card));
+  ["mouseenter", "mouseover", "pointerenter", "focus", "focusin", "click"].forEach((eventName) => {
+    card.addEventListener(eventName, () => setHeroScene(card));
+  });
 });
 
 filterButtons.forEach((button) => {
