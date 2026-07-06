@@ -487,9 +487,7 @@ filmCards.forEach((card) => {
   card.addEventListener("pointerenter", previewCard);
   card.addEventListener("pointermove", previewCard);
   card.addEventListener("mouseenter", () => previewCaseBackground(card));
-  card.addEventListener("mouseleave", resetCaseBackground);
   card.addEventListener("focus", () => previewCaseBackground(card));
-  card.addEventListener("blur", resetCaseBackground);
   card.addEventListener("click", () => previewCaseBackground(card));
 });
 
