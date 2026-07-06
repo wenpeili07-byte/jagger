@@ -68,12 +68,32 @@ a {
 }
 
 .site-shell::before {
-  z-index: -2;
+  z-index: -3;
   background-image: var(--active-case-scene);
   background-position: center top;
   background-size: cover;
   background-repeat: no-repeat;
   filter: saturate(1.12) contrast(1.08) brightness(1.03);
+}
+
+.scene-fade-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0;
+  filter: saturate(0.92) contrast(1.02) brightness(0.72);
+  transform: scale(1.018);
+  transition: opacity 520ms ease, filter 760ms ease, transform 760ms ease;
+}
+
+.scene-fade-layer.is-visible {
+  opacity: 1;
+  filter: saturate(1.12) contrast(1.08) brightness(1.03);
+  transform: scale(1);
 }
 
 .site-shell::after {
