@@ -221,8 +221,7 @@
             fadeToScene(sceneValue);
           };
 
-          const enterEvent = window.PointerEvent ? "pointerenter" : "mouseenter";
-          [enterEvent, "focus", "click"].forEach((eventName) => {
+          ["mouseenter", "focus", "click"].forEach((eventName) => {
             card.addEventListener(eventName, update, true);
           });
         });
