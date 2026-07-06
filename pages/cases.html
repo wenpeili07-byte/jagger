@@ -227,14 +227,18 @@
         }
 
         document.querySelectorAll(".case-feature-card").forEach((card) => {
-          const update = () => {
+          const update = (event) => {
+            event.stopImmediatePropagation();
             const scene = card.dataset.scene || getComputedStyle(card).getPropertyValue("--scene").trim();
             const sceneValue = scene.startsWith("url(") || scene.startsWith("linear-gradient(") ? scene : `url("${scene}")`;
+            document.querySelectorAll(".case-feature-card").forEach((item) => {
+              item.classList.toggle("is-active", item === card);
+            });
             fadeToScene(sceneValue);
           };
 
           ["pointerenter", "mouseenter", "focus", "click"].forEach((eventName) => {
-            card.addEventListener(eventName, update);
+            card.addEventListener(eventName, update, true);
           });
         });
       })();
