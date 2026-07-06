@@ -336,23 +336,11 @@ function transitionSceneBackground(scene) {
   }
 
   activeSceneTarget = scene;
-  shell.querySelectorAll(".scene-fade-layer").forEach((layer) => layer.remove());
-
-  const layer = document.createElement("span");
-  layer.className = "scene-fade-layer";
-  layer.setAttribute("aria-hidden", "true");
-  layer.style.backgroundImage = scene;
-  shell.append(layer);
-
-  requestAnimationFrame(() => {
-    layer.classList.add("is-visible");
-  });
-
-  window.setTimeout(() => {
-    shell.style.setProperty("--active-case-scene", scene);
-    shell.dataset.currentScene = scene;
-    layer.remove();
-  }, 780);
+  shell.style.setProperty("--active-case-scene", scene);
+  shell.dataset.currentScene = scene;
+  shell.classList.remove("scene-is-fading");
+  void shell.offsetWidth;
+  shell.classList.add("scene-is-fading");
 }
 
 function getInitialLanguage() {
@@ -474,9 +462,7 @@ cards.forEach((card) => {
   const index = Number(card.dataset.index);
   const activateCard = () => setActive(index);
 
-  card.addEventListener("pointerenter", activateCard);
-  card.addEventListener("pointermove", activateCard);
-  card.addEventListener("mouseenter", () => setActive(index));
+  card.addEventListener("mouseenter", activateCard);
   card.addEventListener("focus", () => setActive(index));
   card.addEventListener("click", () => setActive(index));
 });
@@ -484,11 +470,10 @@ cards.forEach((card) => {
 filmCards.forEach((card) => {
   const previewCard = () => previewCaseBackground(card);
 
-  card.addEventListener("pointerenter", previewCard);
-  card.addEventListener("pointermove", previewCard);
-  card.addEventListener("mouseenter", () => previewCaseBackground(card));
+  card.addEventListener("mouseenter", previewCard);
   card.addEventListener("focus", () => previewCaseBackground(card));
   card.addEventListener("click", () => previewCaseBackground(card));
+  card.addEventListener("mouseleave", resetCaseBackground);
 });
 
 rows.forEach((row) => {
