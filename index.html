@@ -220,10 +220,15 @@
         }
 
         document.querySelectorAll(".film-card").forEach((card) => {
-          const update = () => fadeToScene(getComputedStyle(card).getPropertyValue("--scene").trim());
-          ["pointerenter", "mouseenter", "focus", "click"].forEach((eventName) => {
-            card.addEventListener(eventName, update);
+          const preview = (event) => {
+            event.stopImmediatePropagation();
+            fadeToScene(getComputedStyle(card).getPropertyValue("--scene").trim());
+          };
+          const followLink = () => fadeToScene(getComputedStyle(card).getPropertyValue("--scene").trim());
+          ["pointerenter", "mouseenter", "focus"].forEach((eventName) => {
+            card.addEventListener(eventName, preview, true);
           });
+          card.addEventListener("click", followLink, true);
         });
       })();
     </script>
