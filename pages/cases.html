@@ -5,24 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Cases | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../styles.css?v=cases-archive-20260705" />
-    <style>
-      .site-shell.scene-is-fading::before,
-      .cases-page.scene-is-fading::before {
-        animation: sceneFadeIn 780ms ease both;
-      }
-
-      @keyframes sceneFadeIn {
-        0% {
-          opacity: 0.3;
-          filter: saturate(0.86) contrast(1) brightness(0.62);
-        }
-
-        100% {
-          opacity: 1;
-          filter: saturate(1.12) contrast(1.08) brightness(1.03);
-        }
-      }
-    </style>
   </head>
   <body>
     <main class="site-shell cases-page" aria-label="LONMA DYNAMIC 案例页面">
@@ -210,15 +192,17 @@
       </section>
     </main>
 
-    <script src="./cases.js?v=scene-fade-20260705"></script>
+    <script src="./cases.js?v=case-filter-only-20260706"></script>
     <script>
       (() => {
         const casesPage = document.querySelector(".cases-page");
         if (!casesPage) return;
+        let activeScene = getComputedStyle(casesPage).getPropertyValue("--cases-active-scene").trim();
 
         function fadeToScene(scene) {
           if (!scene) return;
-          document.querySelectorAll(".scene-fade-layer").forEach((layer) => layer.remove());
+          if (activeScene === scene) return;
+          activeScene = scene;
           casesPage.style.setProperty("--cases-active-scene", scene);
           casesPage.style.setProperty("--active-case-scene", scene);
           casesPage.classList.remove("scene-is-fading");
@@ -237,7 +221,8 @@
             fadeToScene(sceneValue);
           };
 
-          ["pointerenter", "mouseenter", "focus", "click"].forEach((eventName) => {
+          const enterEvent = window.PointerEvent ? "pointerenter" : "mouseenter";
+          [enterEvent, "focus", "click"].forEach((eventName) => {
             card.addEventListener(eventName, update, true);
           });
         });
