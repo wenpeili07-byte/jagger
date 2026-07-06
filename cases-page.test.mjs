@@ -14,7 +14,13 @@ assert.match(html, /data-filter="audi"[\s\S]*AUDI/, "filter sidebar should inclu
 assert.equal((html.match(/class="case-feature-card/g) || []).length, 6, "PLAN A hero should show six feature cards");
 assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive should use the current six cases as reference content");
 assert.match(html, /36 MODIFIED-CAR CASE FILES/, "archive should be framed as a 36-case library");
-assert.match(html, /<script src="\.\/cases\.js\?v=scene-fade-20260705"><\/script>/, "cases page should load its own interaction script");
+assert.match(html, /<script src="\.\/cases\.js\?v=case-filter-only-20260706"><\/script>/, "cases page should load its own filter script");
+assert.match(html, /function fadeToScene\(scene\)/, "cases page should keep a single inline scene fade controller");
+assert.doesNotMatch(html, /@keyframes sceneFadeIn/, "cases page should use the shared stylesheet fade animation instead of duplicating it inline");
+assert.equal((css.match(/@keyframes sceneFadeIn/g) || []).length, 1, "shared stylesheet should define the background fade-in animation once");
+assert.doesNotMatch(html, /scene-fade-layer/, "cases page should not keep old fade-layer cleanup from the removed animation path");
+assert.doesNotMatch(html, /\["pointerenter",\s*"mouseenter"/, "case background should not bind both pointerenter and mouseenter");
+assert.match(html, /activeScene === scene/, "case background should not restart the fade when the active scene is unchanged");
 
 assert.match(css, /\.cases-hero\s*\{[^}]*min-height:\s*calc\(100vh - 86px\)/s, "PLAN A hero should preserve a near-first-screen visual area");
 assert.match(css, /\.cases-gap\s*\{[^}]*height:\s*100px/s, "hero and archive should be separated by 100px");
@@ -24,5 +30,6 @@ assert.match(css, /\.filter-option\.is-active/s, "active filter should have its 
 
 assert.match(js, /data-filter/, "cases script should handle brand filter controls");
 assert.match(js, /data-brand/, "cases script should filter archive cards by brand");
-assert.match(js, /--cases-active-scene/, "cases script should update the hero background from case cards");
-assert.match(js, /scene-fade-layer/, "cases script should animate background scene changes");
+assert.doesNotMatch(js, /--cases-active-scene/, "cases filter script should not update the hero background");
+assert.doesNotMatch(js, /scene-is-fading/, "cases filter script should not animate background scene changes");
+assert.doesNotMatch(js, /scene-fade-layer/, "cases script should not create the old fade layer animation");
