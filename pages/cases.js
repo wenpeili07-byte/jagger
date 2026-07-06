@@ -5,12 +5,13 @@ const archiveCards = [...document.querySelectorAll("[data-brand]")];
 const activeFilterLabel = document.querySelector("[data-active-filter]");
 
 function setHeroScene(card) {
-  const scene = card.dataset.scene;
+  const scene = card.dataset.scene || getComputedStyle(card).getPropertyValue("--scene").trim();
   if (!casesPage || !scene) return;
+  const sceneValue = scene.startsWith("url(") || scene.startsWith("linear-gradient(") ? scene : `url("${scene}")`;
 
   featureCards.forEach((item) => item.classList.toggle("is-active", item === card));
-  casesPage.style.setProperty("--cases-active-scene", `url("${scene}")`);
-  casesPage.style.setProperty("--active-case-scene", `url("${scene}")`);
+  casesPage.style.setProperty("--cases-active-scene", sceneValue);
+  casesPage.style.setProperty("--active-case-scene", sceneValue);
 }
 
 function setArchiveFilter(filter) {
@@ -39,3 +40,7 @@ featureCards.forEach((card) => {
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => setArchiveFilter(button.dataset.filter));
 });
+
+if (featureCards[0]) {
+  setHeroScene(featureCards[0]);
+}
