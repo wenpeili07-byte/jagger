@@ -6,6 +6,20 @@
     <title>Cases | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../styles.css?v=cases-archive-20260705" />
     <style>
+      .case-feature-card {
+        --scroll-lift: 0px;
+        --scroll-scale: 1;
+        transform: translateY(var(--scroll-lift)) scale(var(--scroll-scale));
+        transform-style: preserve-3d;
+        will-change: transform, opacity;
+      }
+
+      .case-feature-card:hover,
+      .case-feature-card.is-active,
+      .case-feature-card:focus-visible {
+        transform: translateY(calc(var(--scroll-lift) - 2px)) scale(var(--scroll-scale));
+      }
+
       .case-feature-card > * {
         pointer-events: none;
       }
@@ -197,7 +211,9 @@
       </section>
     </main>
 
-    <script src="./cases.js?v=case-filter-only-20260706"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="./cases.js?v=gsap-scroll-20260706"></script>
     <script>
       (() => {
         const casesPage = document.querySelector(".cases-page");
