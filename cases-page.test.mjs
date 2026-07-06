@@ -14,8 +14,8 @@ assert.match(html, /data-filter="audi"[\s\S]*AUDI/, "filter sidebar should inclu
 assert.equal((html.match(/class="case-feature-card/g) || []).length, 6, "PLAN A hero should show six feature cards");
 assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive should use the current six cases as reference content");
 assert.match(html, /36 MODIFIED-CAR CASE FILES/, "archive should be framed as a 36-case library");
-assert.match(html, /gsap@3\.12\.5\/dist\/gsap\.min\.js/, "cases page should load GSAP for the case card scroll motion");
-assert.match(html, /gsap@3\.12\.5\/dist\/ScrollTrigger\.min\.js/, "cases page should load ScrollTrigger for scroll-driven case motion");
+assert.match(html, /\.\.\/assets\/vendor\/gsap\.min\.js/, "cases page should load the local GSAP file for the case card scroll motion");
+assert.match(html, /\.\.\/assets\/vendor\/ScrollTrigger\.min\.js/, "cases page should load the local ScrollTrigger file for scroll-driven case motion");
 assert.match(html, /<script src="\.\/cases\.js\?v=gsap-scroll-20260706"><\/script>/, "cases page should load its own GSAP-enhanced case script");
 assert.match(html, /\.case-feature-card\s*\{[^}]*--scroll-lift:\s*0px[^}]*--scroll-scale:\s*1/s, "case page should expose GSAP-safe transform variables close to the case markup");
 assert.match(html, /\.case-feature-card:hover,[\s\S]*?\.case-feature-card\.is-active,[\s\S]*?\.case-feature-card:focus-visible\s*\{[^}]*translateY\(calc\(var\(--scroll-lift\) - 2px\)\)/s, "case card hover should preserve GSAP scroll offset");
