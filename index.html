@@ -5,23 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LONMA DYNAMIC | Performance Journal</title>
     <link rel="stylesheet" href="./styles.css?v=blank-links-20260704" />
-    <style>
-      .site-shell.scene-is-fading::before {
-        animation: sceneFadeIn 780ms ease both;
-      }
-
-      @keyframes sceneFadeIn {
-        0% {
-          opacity: 0.3;
-          filter: saturate(0.86) contrast(1) brightness(0.62);
-        }
-
-        100% {
-          opacity: 1;
-          filter: saturate(1.12) contrast(1.08) brightness(1.03);
-        }
-      }
-    </style>
   </head>
   <body>
     <main class="site-shell" aria-label="LONMA DYNAMIC 公司网站">
@@ -204,33 +187,5 @@
     </main>
 
     <script src="./script.js?v=scene-fade-20260705"></script>
-    <script>
-      (() => {
-        const shell = document.querySelector(".site-shell");
-        if (!shell) return;
-
-        function fadeToScene(scene) {
-          if (!scene) return;
-          document.querySelectorAll(".scene-fade-layer").forEach((layer) => layer.remove());
-          shell.style.setProperty("--active-case-scene", scene);
-          shell.dataset.currentScene = scene;
-          shell.classList.remove("scene-is-fading");
-          void shell.offsetWidth;
-          shell.classList.add("scene-is-fading");
-        }
-
-        document.querySelectorAll(".film-card").forEach((card) => {
-          const preview = (event) => {
-            event.stopImmediatePropagation();
-            fadeToScene(getComputedStyle(card).getPropertyValue("--scene").trim());
-          };
-          const followLink = () => fadeToScene(getComputedStyle(card).getPropertyValue("--scene").trim());
-          ["pointerenter", "mouseenter", "focus"].forEach((eventName) => {
-            card.addEventListener(eventName, preview, true);
-          });
-          card.addEventListener("click", followLink, true);
-        });
-      })();
-    </script>
   </body>
 </html>
