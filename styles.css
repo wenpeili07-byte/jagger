@@ -73,27 +73,25 @@ a {
   background-position: center top;
   background-size: cover;
   background-repeat: no-repeat;
-  filter: saturate(1.12) contrast(1.08) brightness(1.03);
-}
-
-.scene-fade-layer {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  background-position: center top;
-  background-repeat: no-repeat;
-  background-size: cover;
-  opacity: 0;
-  filter: saturate(0.92) contrast(1.02) brightness(0.72);
-  transform: scale(1.018);
-  transition: opacity 520ms ease, filter 760ms ease, transform 760ms ease;
-}
-
-.scene-fade-layer.is-visible {
   opacity: 1;
   filter: saturate(1.12) contrast(1.08) brightness(1.03);
-  transform: scale(1);
+}
+
+.site-shell.scene-is-fading::before,
+.cases-page.scene-is-fading::before {
+  animation: sceneFadeIn 780ms ease both;
+}
+
+@keyframes sceneFadeIn {
+  0% {
+    opacity: 0.3;
+    filter: saturate(0.86) contrast(1) brightness(0.62);
+  }
+
+  100% {
+    opacity: 1;
+    filter: saturate(1.12) contrast(1.08) brightness(1.03);
+  }
 }
 
 .site-shell::after {
@@ -434,6 +432,11 @@ h1 span {
 .film-card {
   min-height: clamp(78px, 10vh, 116px);
   padding: 18px 24px;
+}
+
+.film-card > *,
+.case-feature-card > * {
+  pointer-events: none;
 }
 
 .film-card::before,
