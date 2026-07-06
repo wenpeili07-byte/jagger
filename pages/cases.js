@@ -22,3 +22,55 @@ function setArchiveFilter(filter) {
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => setArchiveFilter(button.dataset.filter));
 });
+
+function initCaseScrollMotion() {
+  const hero = document.querySelector(".cases-hero");
+  const caseCards = [...document.querySelectorAll(".case-feature-card")];
+  const hasReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!hero || caseCards.length === 0 || hasReducedMotion || !window.gsap || !window.ScrollTrigger) {
+    return;
+  }
+
+  const { gsap, ScrollTrigger } = window;
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.set(caseCards, {
+    autoAlpha: 0,
+    "--scroll-lift": (index) => `${index % 2 === 0 ? 42 : -42}px`,
+    "--scroll-scale": 0.955
+  });
+
+  gsap.to(caseCards, {
+    autoAlpha: 1,
+    "--scroll-lift": "0px",
+    "--scroll-scale": 1,
+    duration: 0.95,
+    ease: "power3.out",
+    stagger: {
+      amount: 0.42,
+      from: "start"
+    },
+    scrollTrigger: {
+      trigger: hero,
+      start: "top 72%",
+      end: "bottom 24%",
+      toggleActions: "play none none reverse"
+    }
+  });
+
+  if (window.matchMedia("(min-width: 900px)").matches) {
+    gsap.to(caseCards, {
+      "--scroll-lift": (index) => `${index % 2 === 0 ? -10 : 10}px`,
+      ease: "none",
+      scrollTrigger: {
+        trigger: hero,
+        start: "top top",
+        end: "bottom top",
+        scrub: 0.65
+      }
+    });
+  }
+}
+
+initCaseScrollMotion();
