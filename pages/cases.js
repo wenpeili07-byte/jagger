@@ -11,23 +11,11 @@ function transitionSceneBackground(scene) {
   }
 
   activeSceneTarget = scene;
-  casesPage.querySelectorAll(".scene-fade-layer").forEach((layer) => layer.remove());
-
-  const layer = document.createElement("span");
-  layer.className = "scene-fade-layer";
-  layer.setAttribute("aria-hidden", "true");
-  layer.style.backgroundImage = scene;
-  casesPage.append(layer);
-
-  requestAnimationFrame(() => {
-    layer.classList.add("is-visible");
-  });
-
-  window.setTimeout(() => {
-    casesPage.style.setProperty("--cases-active-scene", scene);
-    casesPage.style.setProperty("--active-case-scene", scene);
-    layer.remove();
-  }, 780);
+  casesPage.style.setProperty("--cases-active-scene", scene);
+  casesPage.style.setProperty("--active-case-scene", scene);
+  casesPage.classList.remove("scene-is-fading");
+  void casesPage.offsetWidth;
+  casesPage.classList.add("scene-is-fading");
 }
 
 function setHeroScene(card) {
