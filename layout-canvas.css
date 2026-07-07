@@ -1,7 +1,7 @@
-/* 1440 x 900 design canvas constraints. Loaded after styles.css. */
+/* 1728 x 1050 design canvas constraints. Loaded after styles.css. */
 .site-shell {
   width: 100%;
-  max-width: 1440px;
+  max-width: 1728px;
   margin: 0 auto;
 }
 
@@ -11,43 +11,43 @@
   right: auto;
   bottom: 0;
   left: 50%;
-  width: min(100%, 1440px);
+  width: min(100%, 1728px);
   transform: translateX(-50%);
 }
 
 .cover {
-  min-height: min(calc(100vh - 77px), 823px);
-  padding: clamp(26px, 4vw, 58px) clamp(20px, 4vw, 58px);
+  min-height: min(calc(100vh - 77px), 973px);
+  padding: clamp(26px, 4vw, 70px) clamp(20px, 4vw, 70px);
 }
 
 .film-card {
-  min-height: clamp(78px, 6.4vw, 92px);
+  min-height: clamp(78px, 6.4vw, 110px);
 }
 
 .film-card.is-active {
-  min-height: clamp(108px, 8.75vw, 126px);
+  min-height: clamp(108px, 8.75vw, 151px);
   transform: translateX(-10px);
 }
 
 .cases-hero {
-  min-height: min(calc(100vh - 77px), 823px);
+  min-height: min(calc(100vh - 77px), 973px);
 }
 
 .case-feature-card {
-  min-height: clamp(126px, 9.4vw, 178px);
+  min-height: clamp(126px, 9.4vw, 214px);
 }
 
 .case-archive {
-  padding-inline: clamp(24px, 5vw, 72px);
+  padding-inline: clamp(24px, 5vw, 86px);
 }
 
-@media (min-width: 1440px) {
+@media (min-width: 1728px) {
   .film-card {
-    min-height: 92px;
+    min-height: 110px;
   }
 
   .film-card.is-active {
-    min-height: 126px;
+    min-height: 151px;
     transform: translateX(-10px);
   }
 }
