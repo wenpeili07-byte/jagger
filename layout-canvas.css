@@ -1,0 +1,53 @@
+/* 1440 x 900 design canvas constraints. Loaded after styles.css. */
+.site-shell {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.site-shell::before,
+.site-shell::after {
+  top: 0;
+  right: auto;
+  bottom: 0;
+  left: 50%;
+  width: min(100%, 1440px);
+  transform: translateX(-50%);
+}
+
+.cover {
+  min-height: min(calc(100vh - 77px), 823px);
+  padding: clamp(26px, 4vw, 58px) clamp(20px, 4vw, 58px);
+}
+
+.film-card {
+  min-height: clamp(78px, 6.4vw, 92px);
+}
+
+.film-card.is-active {
+  min-height: clamp(108px, 8.75vw, 126px);
+  transform: translateX(-10px);
+}
+
+.cases-hero {
+  min-height: min(calc(100vh - 77px), 823px);
+}
+
+.case-feature-card {
+  min-height: clamp(126px, 9.4vw, 178px);
+}
+
+.case-archive {
+  padding-inline: clamp(24px, 5vw, 72px);
+}
+
+@media (min-width: 1440px) {
+  .film-card {
+    min-height: 92px;
+  }
+
+  .film-card.is-active {
+    min-height: 126px;
+    transform: translateX(-10px);
+  }
+}
