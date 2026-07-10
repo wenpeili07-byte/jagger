@@ -31,6 +31,9 @@ assert.match(html, /<script src="\.\/cases\.js\?v=hero-rail-20260709"><\/script>
 assert.match(html, /function fadeToScene\(scene\)/, "cases page should keep a single inline scene fade controller");
 assert.doesNotMatch(html, /@keyframes sceneFadeIn/, "cases page should use the shared stylesheet fade animation instead of duplicating it inline");
 assert.equal((css.match(/@keyframes sceneFadeIn/g) || []).length, 1, "shared stylesheet should define the background fade-in animation once");
+assert.match(css, /@keyframes sceneFadeIn\s*\{\s*0%\s*\{\s*opacity:\s*0\.16;\s*\}\s*100%\s*\{\s*opacity:\s*1;\s*\}\s*\}/s, "case background fade should only fade from transparent to solid");
+const sceneFadeBlock = css.match(/@keyframes sceneFadeIn\s*\{[\s\S]*?\n\}/)?.[0] || "";
+assert.doesNotMatch(sceneFadeBlock, /(transform|scale|background-size|filter):/, "case background fade should not scale, resize, or filter the image");
 assert.doesNotMatch(html, /scene-fade-layer/, "cases page should not keep old fade-layer cleanup from the removed animation path");
 assert.match(html, /\["mouseenter",\s*"focus",\s*"click"\]/, "case background should use one stable hover event plus focus and click");
 assert.doesNotMatch(html, /pointerenter/, "case background should not bind both pointerenter and mouseenter");
