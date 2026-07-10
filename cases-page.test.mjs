@@ -54,6 +54,8 @@ assert.match(js, /function initCaseScrollMotion\(\)/, "cases script should initi
 assert.match(js, /gsap\.registerPlugin\(ScrollTrigger\)/, "cases script should register ScrollTrigger");
 assert.match(js, /--scroll-lift/, "GSAP motion should animate CSS variables instead of replacing hover transforms");
 assert.match(js, /function initMaskedImageRail\(\)/, "cases script should initialize the masked vertical image rail");
+assert.match(js, /function initNativeMaskedImageRail/, "cases script should keep a native rail fallback when external motion files are blocked");
+assert.match(js, /requestAnimationFrame\(updateRail\)/, "native rail fallback should animate with requestAnimationFrame");
 assert.match(js, /ScrollTrigger\.matchMedia/, "masked image rail should only run the full effect on desktop breakpoints");
 assert.match(js, /yPercent/, "rail images should animate inside their masks using yPercent");
 assert.match(js, /clipPath/, "rail mask frames should animate clipping with scroll progress");
