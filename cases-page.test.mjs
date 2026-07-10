@@ -45,15 +45,20 @@ assert.match(css, /\.mwg_effect060\s+\.pin-height\s*\{[^}]*height:\s*auto/s, "ef
 assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*position:\s*relative[^}]*overflow:\s*hidden/s, "effect 060 rail should stay static instead of sticky during page scroll");
 assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*grid-template-columns:\s*144px\s+minmax\(240px,\s*1fr\)/s, "effect 060 rail should keep a narrow title block and single image column");
 assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*background:\s*transparent/s, "right case module should not have its own background color");
-assert.doesNotMatch(css, /\.mwg_effect060\s+\.slides\s*\{[^}]*will-change:\s*transform/s, "effect 060 slides list should not be scroll-animated");
+assert.match(css, /\.mwg_effect060\s+\.slides\s*\{[^}]*overflow-y:\s*auto[^}]*overscroll-behavior:\s*contain/s, "effect 060 slides should scroll independently inside the right module");
+assert.match(css, /\.mwg_effect060\s+\.slides\s*\{[^}]*scrollbar-width:\s*none/s, "effect 060 independent rail should keep the scrollbar hidden");
 assert.match(css, /\.mwg_effect060\s+\.slide\s*\{[^}]*height:\s*var\(--slot-h\)[^}]*clip-path:\s*inset\(12%\s+0\s+12%\s+0\)/s, "each effect 060 slide should sit inside a mask frame");
 assert.match(css, /\.mwg_effect060\s+\.media\s*\{[^}]*object-fit:\s*cover[^}]*transform:\s*translateY\(-12%\)\s+scale\(1\.14\)/s, "effect 060 images should stay masked without scroll-driven transform changes");
 assert.match(css, /\.filter-option\.is-active/s, "active filter should have its own state styling");
 
 assert.match(js, /data-filter/, "cases script should handle brand filter controls");
 assert.match(js, /data-brand/, "cases script should filter archive cards by brand");
+assert.match(js, /function initIndependentRailScroll\(\)/, "cases script should initialize independent rail wheel scrolling");
+assert.match(js, /rail\.addEventListener\("wheel"/, "right case module should own its wheel interaction");
+assert.match(js, /event\.preventDefault\(\)/, "right case module wheel interaction should not leak into page scroll");
 assert.doesNotMatch(js, /function initEffect060Rail/, "cases script should not initialize scroll-driven rail motion");
 assert.doesNotMatch(js, /requestAnimationFrame/, "right case module should not be driven by page scroll");
+assert.doesNotMatch(js, /window\.addEventListener\("scroll"/, "right case module should not listen to page scroll");
 assert.doesNotMatch(js, /slides\.style\.transform/, "effect 060 rail should not move the slides list during scroll");
 assert.doesNotMatch(js, /media\.style\.transform/, "effect 060 rail should not resize images during scroll");
 assert.doesNotMatch(js, /slide\.style\.clipPath/, "effect 060 rail should not animate slide masks during scroll");
