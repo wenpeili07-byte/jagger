@@ -22,3 +22,19 @@ function setArchiveFilter(filter) {
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => setArchiveFilter(button.dataset.filter));
 });
+
+function initIndependentRailScroll() {
+  const rail = document.querySelector(".mwg_effect060 .slides");
+  const desktopRail = window.matchMedia("(min-width: 1181px)");
+
+  if (!rail) return;
+
+  rail.addEventListener("wheel", (event) => {
+    if (!desktopRail.matches) return;
+
+    event.preventDefault();
+    rail.scrollTop += event.deltaY;
+  }, { passive: false });
+}
+
+initIndependentRailScroll();
