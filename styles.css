@@ -643,37 +643,37 @@ h1 span {
 .film-card[data-index="0"],
 .case-feature-card[data-index="0"],
 .archive-card[data-index="0"] {
-  --scene: url("./assets/images/网页/案例1/首页背景.jpg");
+  --scene: url("./assets/images/网页/optimized/case-01.jpg");
 }
 
 .film-card[data-index="1"],
 .case-feature-card[data-index="1"],
 .archive-card[data-index="1"] {
-  --scene: url("./assets/images/网页/案例2/DSC00889.jpg");
+  --scene: url("./assets/images/网页/optimized/case-02.jpg");
 }
 
 .film-card[data-index="2"],
 .case-feature-card[data-index="2"],
 .archive-card[data-index="2"] {
-  --scene: url("./assets/images/网页/案例3/DSC00702.jpg");
+  --scene: url("./assets/images/网页/optimized/case-03.jpg");
 }
 
 .film-card[data-index="3"],
 .case-feature-card[data-index="3"],
 .archive-card[data-index="3"] {
-  --scene: url("./assets/images/网页/案例4/DSC00969.jpg");
+  --scene: url("./assets/images/网页/optimized/case-04.jpg");
 }
 
 .film-card[data-index="4"],
 .case-feature-card[data-index="4"],
 .archive-card[data-index="4"] {
-  --scene: url("./assets/images/网页/案例5/DSC00552.jpg");
+  --scene: url("./assets/images/网页/optimized/case-05.jpg");
 }
 
 .film-card[data-index="5"],
 .case-feature-card[data-index="5"],
 .archive-card[data-index="5"] {
-  --scene: url("./assets/images/网页/案例6/WechatIMG2477.jpg");
+  --scene: url("./assets/images/网页/optimized/case-06.jpg");
 }
 
 .detail-panel {
@@ -813,7 +813,7 @@ h1 span {
 }
 
 .cases-page {
-  --cases-active-scene: url("./assets/images/网页/案例1/首页背景.jpg");
+  --cases-active-scene: url("./assets/images/网页/optimized/case-01.jpg");
   --active-case-scene: var(--cases-active-scene);
   background: #111315;
 }

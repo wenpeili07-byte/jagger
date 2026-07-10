@@ -18,7 +18,9 @@ assert.match(html, /data-filter="audi"[\s\S]*AUDI/, "filter sidebar should inclu
 assert.doesNotMatch(html, /class="case-feature-card/, "PLAN A hero should no longer use the six large case modules");
 assert.match(html, /<section class="mwg_effect060"/, "PLAN A hero should use the effect 060 masked vertical image rail");
 assert.match(html, /<div class="pin-height">[\s\S]*<div class="container">[\s\S]*<div class="content">[\s\S]*<div class="slides">/, "effect 060 rail should use a pin-height, fixed container, content block, and vertical slides list");
-assert.equal((html.match(/data-scene="\.\.\/assets\/images\/网页\/案例/g) || []).length, 6, "effect 060 rail should show six case image slides");
+assert.equal((html.match(/data-scene="\.\.\/assets\/images\/网页\/optimized\/case-/g) || []).length, 6, "effect 060 rail should show six optimized case image slides");
+assert.equal((html.match(/<img[^>]+src="\.\.\/assets\/images\/网页\/optimized\/case-/g) || []).length, 12, "case rail and archive should use optimized case images");
+assert.doesNotMatch(html, /assets\/images\/网页\/案例[1-6]\//, "cases page should avoid loading oversized original case images");
 assert.equal((html.match(/class="slide spacer"/g) || []).length, 4, "effect 060 rail should include spacer slides so five positions stay visible");
 assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive should use the current six cases as reference content");
 assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should not include the old scrolling masked image rail");
