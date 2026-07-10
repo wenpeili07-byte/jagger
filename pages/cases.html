@@ -6,26 +6,7 @@
     <title>Cases | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../styles.css?v=cases-archive-20260705" />
     <link rel="stylesheet" href="../layout-canvas.css?v=canvas-20260706-1728" />
-    <link rel="stylesheet" href="../case-rail.css?v=masked-rail-20260709" />
-    <style>
-      .case-feature-card {
-        --scroll-lift: 0px;
-        --scroll-scale: 1;
-        transform: translateY(var(--scroll-lift)) scale(var(--scroll-scale));
-        transform-style: preserve-3d;
-        will-change: transform, opacity;
-      }
-
-      .case-feature-card:hover,
-      .case-feature-card.is-active,
-      .case-feature-card:focus-visible {
-        transform: translateY(calc(var(--scroll-lift) - 2px)) scale(var(--scroll-scale));
-      }
-
-      .case-feature-card > * {
-        pointer-events: none;
-      }
-    </style>
+    <link rel="stylesheet" href="../case-rail.css?v=hero-rail-20260709" />
   </head>
   <body>
     <main class="site-shell cases-page" aria-label="LONMA DYNAMIC 案例页面">
@@ -59,56 +40,38 @@
           <span class="cases-meta"><b>ROLL 01</b> · PERFORMANCE GARAGE</span>
         </div>
 
-        <div class="case-feature-grid" aria-label="精选案例">
-          <button class="case-feature-card is-active" type="button" data-index="0">
-            <img src="../assets/images/网页/案例1/首页背景.jpg" alt="" />
-            <span class="feature-number">01</span>
-            <span class="feature-kicker">CASE 01</span>
-            <strong>街道宽体</strong>
-            <em>STREET WIDEBODY</em>
-            <span class="feature-arrow">→</span>
-          </button>
-          <button class="case-feature-card" type="button" data-index="1">
-            <img src="../assets/images/网页/案例2/DSC00889.jpg" alt="" />
-            <span class="feature-number">02</span>
-            <span class="feature-kicker">CASE 02</span>
-            <strong>赛道化升级</strong>
-            <em>TRACK SETUP</em>
-            <span class="feature-arrow">→</span>
-          </button>
-          <button class="case-feature-card" type="button" data-index="2">
-            <img src="../assets/images/网页/案例3/DSC00702.jpg" alt="" />
-            <span class="feature-number">03</span>
-            <span class="feature-kicker">CASE 03</span>
-            <strong>姿态低趴</strong>
-            <em>LOW STANCE</em>
-            <span class="feature-arrow">→</span>
-          </button>
-          <button class="case-feature-card" type="button" data-index="3">
-            <img src="../assets/images/网页/案例4/DSC00969.jpg" alt="" />
-            <span class="feature-number">04</span>
-            <span class="feature-kicker">CASE 04</span>
-            <strong>涡轮特调</strong>
-            <em>TURBO TUNE</em>
-            <span class="feature-arrow">→</span>
-          </button>
-          <button class="case-feature-card" type="button" data-index="4">
-            <img src="../assets/images/网页/案例5/DSC00552.jpg" alt="" />
-            <span class="feature-number">05</span>
-            <span class="feature-kicker">CASE 05</span>
-            <strong>影像作品车</strong>
-            <em>PHOTO FEATURE</em>
-            <span class="feature-arrow">→</span>
-          </button>
-          <button class="case-feature-card" type="button" data-index="5">
-            <img src="../assets/images/网页/案例6/WechatIMG2477.jpg" alt="" />
-            <span class="feature-number">06</span>
-            <span class="feature-kicker">CASE 06</span>
-            <strong>蓝色性能车</strong>
-            <em>BLUE PERFORMANCE</em>
-            <span class="feature-arrow">→</span>
-          </button>
-        </div>
+        <section class="hero-image-rail" aria-label="精选案例图片轨道">
+          <div class="hero-rail-label">
+            <span>CASE IMAGE RAIL</span>
+            <b>06 / 36</b>
+          </div>
+          <div class="hero-rail-track">
+            <button class="hero-rail-frame is-active" type="button" data-scene="../assets/images/网页/案例1/首页背景.jpg">
+              <img src="../assets/images/网页/案例1/首页背景.jpg" alt="" />
+              <span>01 · STREET WIDEBODY</span>
+            </button>
+            <button class="hero-rail-frame" type="button" data-scene="../assets/images/网页/案例2/DSC00889.jpg">
+              <img src="../assets/images/网页/案例2/DSC00889.jpg" alt="" />
+              <span>02 · TRACK SETUP</span>
+            </button>
+            <button class="hero-rail-frame" type="button" data-scene="../assets/images/网页/案例3/DSC00702.jpg">
+              <img src="../assets/images/网页/案例3/DSC00702.jpg" alt="" />
+              <span>03 · LOW STANCE</span>
+            </button>
+            <button class="hero-rail-frame" type="button" data-scene="../assets/images/网页/案例4/DSC00969.jpg">
+              <img src="../assets/images/网页/案例4/DSC00969.jpg" alt="" />
+              <span>04 · TURBO TUNE</span>
+            </button>
+            <button class="hero-rail-frame" type="button" data-scene="../assets/images/网页/案例5/DSC00552.jpg">
+              <img src="../assets/images/网页/案例5/DSC00552.jpg" alt="" />
+              <span>05 · PHOTO FEATURE</span>
+            </button>
+            <button class="hero-rail-frame" type="button" data-scene="../assets/images/网页/案例6/WechatIMG2477.jpg">
+              <img src="../assets/images/网页/案例6/WechatIMG2477.jpg" alt="" />
+              <span>06 · BLUE PERFORMANCE</span>
+            </button>
+          </div>
+        </section>
       </section>
 
       <div class="cases-gap" aria-hidden="true"></div>
@@ -213,8 +176,6 @@
       </section>
     </main>
 
-    <script src="../assets/vendor/motion-core.js"></script>
-    <script src="../assets/vendor/scroll-motion.js"></script>
     <script src="./cases.js?v=gsap-scroll-20260706"></script>
     <script>
       (() => {
@@ -233,12 +194,12 @@
           casesPage.classList.add("scene-is-fading");
         }
 
-        document.querySelectorAll(".case-feature-card").forEach((card) => {
+        document.querySelectorAll(".hero-rail-frame").forEach((card) => {
           const update = (event) => {
             event.stopImmediatePropagation();
             const scene = card.dataset.scene || getComputedStyle(card).getPropertyValue("--scene").trim();
             const sceneValue = scene.startsWith("url(") || scene.startsWith("linear-gradient(") ? scene : `url("${scene}")`;
-            document.querySelectorAll(".case-feature-card").forEach((item) => {
+            document.querySelectorAll(".hero-rail-frame").forEach((item) => {
               item.classList.toggle("is-active", item === card);
             });
             fadeToScene(sceneValue);
