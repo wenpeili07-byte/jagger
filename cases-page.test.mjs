@@ -21,8 +21,8 @@ assert.doesNotMatch(html, /<section class="masked-image-rail"/, "masked vertical
 assert.match(html, /36 MODIFIED-CAR CASE FILES/, "archive should be framed as a 36-case library");
 assert.match(html, /layout-canvas\.css\?v=canvas-20260706-1728/, "cases page should load the 1728 design canvas layout override");
 assert.match(html, /case-rail\.css\?v=masked-rail-20260709/, "cases page should load the masked rail stylesheet separately from the large main stylesheet");
-assert.match(html, /\.\.\/assets\/vendor\/gsap\.min\.js/, "cases page should load the local GSAP file for the case card scroll motion");
-assert.match(html, /\.\.\/assets\/vendor\/ScrollTrigger\.min\.js/, "cases page should load the local ScrollTrigger file for scroll-driven case motion");
+assert.match(html, /\.\.\/assets\/vendor\/motion-core\.js/, "cases page should load the local GSAP motion file without an extension-blocked asset name");
+assert.match(html, /\.\.\/assets\/vendor\/scroll-motion\.js/, "cases page should load the local ScrollTrigger motion file without an extension-blocked asset name");
 assert.match(html, /<script src="\.\/cases\.js\?v=gsap-scroll-20260706"><\/script>/, "cases page should load its own GSAP-enhanced case script");
 assert.match(html, /\.case-feature-card\s*\{[^}]*--scroll-lift:\s*0px[^}]*--scroll-scale:\s*1/s, "case page should expose GSAP-safe transform variables close to the case markup");
 assert.match(html, /\.case-feature-card:hover,[\s\S]*?\.case-feature-card\.is-active,[\s\S]*?\.case-feature-card:focus-visible\s*\{[^}]*translateY\(calc\(var\(--scroll-lift\) - 2px\)\)/s, "case card hover should preserve GSAP scroll offset");
