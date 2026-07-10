@@ -34,6 +34,7 @@ assert.equal((css.match(/@keyframes sceneFadeIn/g) || []).length, 1, "shared sty
 assert.match(css, /@keyframes sceneFadeIn\s*\{\s*0%\s*\{\s*opacity:\s*0\.16;\s*\}\s*100%\s*\{\s*opacity:\s*1;\s*\}\s*\}/s, "case background fade should only fade from transparent to solid");
 const sceneFadeBlock = css.match(/@keyframes sceneFadeIn\s*\{[\s\S]*?\n\}/)?.[0] || "";
 assert.doesNotMatch(sceneFadeBlock, /(transform|scale|background-size|filter):/, "case background fade should not scale, resize, or filter the image");
+assert.doesNotMatch(css, /data:image\//, "stylesheets should reference image files instead of embedding base64 images");
 assert.doesNotMatch(html, /scene-fade-layer/, "cases page should not keep old fade-layer cleanup from the removed animation path");
 assert.match(html, /\["mouseenter",\s*"focus",\s*"click"\]/, "case background should use one stable hover event plus focus and click");
 assert.doesNotMatch(html, /pointerenter/, "case background should not bind both pointerenter and mouseenter");
