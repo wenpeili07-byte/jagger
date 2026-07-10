@@ -40,10 +40,12 @@ assert.match(css, /\.cases-hero\s*\{[^}]*min-height:\s*min\(calc\(100vh - 77px\)
 assert.match(css, /\.cases-gap\s*\{[^}]*height:\s*100px/s, "hero and archive should be separated by 100px");
 assert.match(css, /\.archive-layout\s*\{[^}]*grid-template-columns:\s*260px\s+minmax\(0,\s*1fr\)/s, "archive should use a left filter sidebar");
 assert.match(css, /\.archive-grid\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s, "archive should use four cards per row on desktop");
-assert.match(css, /\.mwg_effect060\s+\.pin-height\s*\{[^}]*height:\s*min\(122vh,\s*1040px\)/s, "effect 060 rail should provide a contained scroll area");
+assert.match(css, /\.mwg_effect060\s*\{[^}]*--slot-h:\s*clamp\(104px,\s*12\.2vh,\s*128px\)/s, "effect 060 rail should use compact five-slot image positions");
+assert.match(css, /\.mwg_effect060\s+\.pin-height\s*\{[^}]*height:\s*min\(116vh,\s*980px\)/s, "effect 060 rail should provide a contained scroll area");
 assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*position:\s*sticky[^}]*overflow:\s*hidden/s, "effect 060 rail should use a sticky clipped frame");
+assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*grid-template-columns:\s*144px\s+minmax\(240px,\s*1fr\)/s, "effect 060 rail should keep a narrow title block and single image column");
 assert.match(css, /\.mwg_effect060\s+\.slides\s*\{[^}]*will-change:\s*transform/s, "effect 060 slides list should move with transform");
-assert.match(css, /\.mwg_effect060\s+\.slide\s*\{[^}]*height:\s*var\(--slot-h\)[^}]*clip-path:\s*inset\(9%\s+0\s+9%\s+0\)/s, "each effect 060 slide should sit inside a mask frame");
+assert.match(css, /\.mwg_effect060\s+\.slide\s*\{[^}]*height:\s*var\(--slot-h\)[^}]*clip-path:\s*inset\(12%\s+0\s+12%\s+0\)/s, "each effect 060 slide should sit inside a mask frame");
 assert.match(css, /\.mwg_effect060\s+\.media\s*\{[^}]*object-fit:\s*cover[^}]*will-change:\s*transform/s, "effect 060 images should use object-cover and transform-friendly animation");
 assert.match(css, /\.filter-option\.is-active/s, "active filter should have its own state styling");
 
@@ -54,6 +56,7 @@ assert.match(js, /requestAnimationFrame\(update\)/, "effect 060 rail should anim
 assert.match(js, /slides\.style\.transform/, "effect 060 rail should move the slides list with transform");
 assert.match(js, /media\.style\.transform/, "effect 060 rail should animate each image inside its mask");
 assert.match(js, /slide\.style\.clipPath/, "effect 060 rail should animate each slide mask");
+assert.match(js, /const focus = 1 - normalized/, "effect 060 rail should size each image based on its position within the mask frame");
 assert.doesNotMatch(js, /buildMaskedImageRail/, "cases script should not generate an archive rail");
 assert.doesNotMatch(js, /initCaseScrollMotion/, "cases script should not run GSAP case-card motion after the cards are removed");
 assert.doesNotMatch(js, /initMaskedImageRail/, "cases script should not run scroll-driven rail motion");
