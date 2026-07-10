@@ -79,18 +79,16 @@ a {
 
 .site-shell.scene-is-fading::before,
 .cases-page.scene-is-fading::before {
-  animation: sceneFadeIn 780ms ease both;
+  animation: sceneFadeIn 640ms ease-out both;
 }
 
 @keyframes sceneFadeIn {
   0% {
-    opacity: 0.3;
-    filter: saturate(0.86) contrast(1) brightness(0.62);
+    opacity: 0.16;
   }
 
   100% {
     opacity: 1;
-    filter: saturate(1.12) contrast(1.08) brightness(1.03);
   }
 }
 
@@ -822,7 +820,7 @@ h1 span {
 
 .cases-page::before {
   background-image: var(--cases-active-scene);
-  transition: background-image 220ms ease, filter 220ms ease;
+  transition: none;
 }
 
 .cases-page::after {
@@ -1257,6 +1255,7 @@ h1 span {
   .archive-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
 }
 
 @media (max-width: 760px) {
