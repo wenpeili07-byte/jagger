@@ -40,36 +40,44 @@
           <span class="cases-meta"><b>ROLL 01</b> · PERFORMANCE GARAGE</span>
         </div>
 
-        <section class="hero-image-rail" aria-label="精选案例图片轨道">
-          <div class="hero-rail-label">
-            <span>CASE IMAGE RAIL</span>
-            <b>06 / 36</b>
-          </div>
-          <div class="hero-rail-track">
-            <button class="hero-rail-frame is-active" type="button" data-scene="../assets/images/网页/案例1/首页背景.jpg">
-              <img src="../assets/images/网页/案例1/首页背景.jpg" alt="" />
-              <span>01 · STREET WIDEBODY</span>
-            </button>
-            <button class="hero-rail-frame" type="button" data-scene="../assets/images/网页/案例2/DSC00889.jpg">
-              <img src="../assets/images/网页/案例2/DSC00889.jpg" alt="" />
-              <span>02 · TRACK SETUP</span>
-            </button>
-            <button class="hero-rail-frame" type="button" data-scene="../assets/images/网页/案例3/DSC00702.jpg">
-              <img src="../assets/images/网页/案例3/DSC00702.jpg" alt="" />
-              <span>03 · LOW STANCE</span>
-            </button>
-            <button class="hero-rail-frame" type="button" data-scene="../assets/images/网页/案例4/DSC00969.jpg">
-              <img src="../assets/images/网页/案例4/DSC00969.jpg" alt="" />
-              <span>04 · TURBO TUNE</span>
-            </button>
-            <button class="hero-rail-frame" type="button" data-scene="../assets/images/网页/案例5/DSC00552.jpg">
-              <img src="../assets/images/网页/案例5/DSC00552.jpg" alt="" />
-              <span>05 · PHOTO FEATURE</span>
-            </button>
-            <button class="hero-rail-frame" type="button" data-scene="../assets/images/网页/案例6/WechatIMG2477.jpg">
-              <img src="../assets/images/网页/案例6/WechatIMG2477.jpg" alt="" />
-              <span>06 · BLUE PERFORMANCE</span>
-            </button>
+        <section class="mwg_effect060" aria-label="精选案例遮罩式垂直图像轨道">
+          <div class="pin-height">
+            <div class="container">
+              <div class="content">
+                <p>Featured Projects</p>
+                <p>2022 → 2026</p>
+              </div>
+              <div class="slides">
+                <div class="slide spacer" aria-hidden="true"><div class="media"></div></div>
+                <div class="slide spacer" aria-hidden="true"><div class="media"></div></div>
+                <button class="slide is-active" type="button" data-scene="../assets/images/网页/案例1/首页背景.jpg">
+                  <img class="media" src="../assets/images/网页/案例1/首页背景.jpg" alt="" />
+                  <span>01 · STREET WIDEBODY</span>
+                </button>
+                <button class="slide" type="button" data-scene="../assets/images/网页/案例2/DSC00889.jpg">
+                  <img class="media" src="../assets/images/网页/案例2/DSC00889.jpg" alt="" />
+                  <span>02 · TRACK SETUP</span>
+                </button>
+                <button class="slide" type="button" data-scene="../assets/images/网页/案例3/DSC00702.jpg">
+                  <img class="media" src="../assets/images/网页/案例3/DSC00702.jpg" alt="" />
+                  <span>03 · LOW STANCE</span>
+                </button>
+                <button class="slide" type="button" data-scene="../assets/images/网页/案例4/DSC00969.jpg">
+                  <img class="media" src="../assets/images/网页/案例4/DSC00969.jpg" alt="" />
+                  <span>04 · TURBO TUNE</span>
+                </button>
+                <button class="slide" type="button" data-scene="../assets/images/网页/案例5/DSC00552.jpg">
+                  <img class="media" src="../assets/images/网页/案例5/DSC00552.jpg" alt="" />
+                  <span>05 · PHOTO FEATURE</span>
+                </button>
+                <button class="slide" type="button" data-scene="../assets/images/网页/案例6/WechatIMG2477.jpg">
+                  <img class="media" src="../assets/images/网页/案例6/WechatIMG2477.jpg" alt="" />
+                  <span>06 · BLUE PERFORMANCE</span>
+                </button>
+                <div class="slide spacer" aria-hidden="true"><div class="media"></div></div>
+                <div class="slide spacer" aria-hidden="true"><div class="media"></div></div>
+              </div>
+            </div>
           </div>
         </section>
       </section>
@@ -194,12 +202,12 @@
           casesPage.classList.add("scene-is-fading");
         }
 
-        document.querySelectorAll(".hero-rail-frame").forEach((card) => {
+        document.querySelectorAll(".mwg_effect060 .slide[data-scene]").forEach((card) => {
           const update = (event) => {
             event.stopImmediatePropagation();
             const scene = card.dataset.scene || getComputedStyle(card).getPropertyValue("--scene").trim();
             const sceneValue = scene.startsWith("url(") || scene.startsWith("linear-gradient(") ? scene : `url("${scene}")`;
-            document.querySelectorAll(".hero-rail-frame").forEach((item) => {
+            document.querySelectorAll(".mwg_effect060 .slide[data-scene]").forEach((item) => {
               item.classList.toggle("is-active", item === card);
             });
             fadeToScene(sceneValue);
