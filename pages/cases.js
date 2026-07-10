@@ -130,7 +130,12 @@ function initMaskedImageRail() {
   const images = frames.map((frame) => frame.querySelector("img")).filter(Boolean);
   const hasReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  if (!rail || !viewport || !track || frames.length === 0 || images.length === 0 || hasReducedMotion || !window.gsap || !window.ScrollTrigger) {
+  if (!rail || !viewport || !track || frames.length === 0 || images.length === 0 || hasReducedMotion) {
+    return;
+  }
+
+  if (!window.gsap || !window.ScrollTrigger) {
+    initNativeMaskedImageRail({ rail, viewport, track, frames, images });
     return;
   }
 
@@ -205,6 +210,49 @@ function initMaskedImageRail() {
       };
     }
   });
+}
+
+function initNativeMaskedImageRail({ rail, viewport, track, frames, images }) {
+  if (!window.matchMedia("(min-width: 1181px)").matches) {
+    return;
+  }
+
+  let ticking = false;
+
+  const updateRail = () => {
+    ticking = false;
+    const archive = document.querySelector(".case-archive");
+    if (!archive) return;
+
+    const archiveRect = archive.getBoundingClientRect();
+    const scrollSpan = window.innerHeight + archiveRect.height;
+    const progress = Math.min(Math.max((window.innerHeight - archiveRect.top) / scrollSpan, 0), 1);
+    const overflow = Math.max(track.scrollHeight - viewport.clientHeight, 0);
+    track.style.transform = `translate3d(0, ${-overflow * progress}px, 0)`;
+
+    frames.forEach((frame, index) => {
+      const frameRect = frame.getBoundingClientRect();
+      const frameProgress = Math.min(Math.max((window.innerHeight - frameRect.top) / (window.innerHeight + frameRect.height), 0), 1);
+      const inset = 12 - (Math.sin(frameProgress * Math.PI) * 12);
+      const lift = 8 - (frameProgress * 8);
+      const imageY = -8 + (frameProgress * 15);
+      const scale = 1.12 - (frameProgress * 0.1);
+
+      frame.style.clipPath = `inset(${inset}% 0% ${inset}% 0%)`;
+      frame.style.transform = `translate3d(0, ${lift}%, 0)`;
+      images[index].style.transform = `translate3d(0, ${imageY}%, 0) scale(${scale})`;
+    });
+  };
+
+  const requestUpdate = () => {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(updateRail);
+  };
+
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
+  updateRail();
 }
 
 buildMaskedImageRail();
