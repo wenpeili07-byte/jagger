@@ -25,7 +25,7 @@ assert.match(html, /layout-canvas\.css\?v=canvas-20260706-1728/, "cases page sho
 assert.match(html, /case-rail\.css\?v=hero-rail-20260709/, "cases page should load the hero rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
-assert.match(html, /<script src="\.\/cases\.js\?v=gsap-scroll-20260706"><\/script>/, "cases page should keep its archive filter script");
+assert.match(html, /<script src="\.\/cases\.js\?v=hero-rail-20260709"><\/script>/, "cases page should keep its archive filter script");
 assert.match(html, /function fadeToScene\(scene\)/, "cases page should keep a single inline scene fade controller");
 assert.doesNotMatch(html, /@keyframes sceneFadeIn/, "cases page should use the shared stylesheet fade animation instead of duplicating it inline");
 assert.equal((css.match(/@keyframes sceneFadeIn/g) || []).length, 1, "shared stylesheet should define the background fade-in animation once");
