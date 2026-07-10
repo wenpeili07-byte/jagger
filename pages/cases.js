@@ -39,6 +39,7 @@ function initEffect060Rail() {
   let ticking = false;
 
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+  const lerp = (start, end, progress) => start + (end - start) * progress;
 
   const update = () => {
     ticking = false;
@@ -51,9 +52,10 @@ function initEffect060Rail() {
     }
 
     const rect = pinHeight.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
     const travel = Math.max(slides.scrollHeight - container.clientHeight, 0);
     const scrollable = Math.max(rect.height - container.clientHeight, 1);
-    const progress = clamp(-rect.top / scrollable, 0, 1);
+    const progress = clamp((container.offsetTop - rect.top) / scrollable, 0, 1);
 
     slides.style.transform = `translate3d(0, ${-travel * progress}px, 0)`;
 
@@ -62,11 +64,15 @@ function initEffect060Rail() {
       if (!media || slide.classList.contains("spacer")) return;
 
       const slideRect = slide.getBoundingClientRect();
-      const spaceProgress = clamp((container.getBoundingClientRect().bottom - slideRect.top) / (container.clientHeight + slideRect.height), 0, 1);
-      const centered = Math.sin(spaceProgress * Math.PI);
-      const inset = 12 - centered * 12;
-      const imageY = -12 + spaceProgress * 16;
-      const scale = 1.16 - centered * 0.1;
+      const slideCenter = slideRect.top + slideRect.height / 2;
+      const containerCenter = containerRect.top + containerRect.height / 2;
+      const distance = Math.abs(slideCenter - containerCenter);
+      const normalized = clamp(distance / (containerRect.height / 2), 0, 1);
+      const visibleProgress = clamp((containerRect.bottom - slideRect.top) / (containerRect.height + slideRect.height), 0, 1);
+      const focus = 1 - normalized;
+      const inset = lerp(14, 0, focus);
+      const imageY = lerp(-13, 7, visibleProgress);
+      const scale = lerp(1.18, 1.04, focus);
 
       slide.style.clipPath = `inset(${inset}% 0% ${inset}% 0%)`;
       media.style.transform = `translate3d(0, ${imageY}%, 0) scale(${scale})`;
