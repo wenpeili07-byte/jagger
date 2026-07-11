@@ -17,7 +17,8 @@ assert.match(html, /data-filter="bmw"[\s\S]*BMW/, "filter sidebar should include
 assert.match(html, /data-filter="audi"[\s\S]*AUDI/, "filter sidebar should include AUDI");
 assert.doesNotMatch(html, /class="case-feature-card/, "PLAN A hero should no longer use the six large case modules");
 assert.match(html, /<section class="mwg_effect060"/, "PLAN A hero should use the effect 060 masked vertical image rail");
-assert.match(html, /<div class="pin-height">[\s\S]*<div class="container">[\s\S]*<div class="content">[\s\S]*<div class="slides">/, "effect 060 rail should use a pin-height, fixed container, content block, and vertical slides list");
+assert.match(html, /<div class="pin-height">[\s\S]*<div class="container">[\s\S]*<div class="slides">/, "effect 060 rail should use a pin-height, fixed container, and vertical slides list");
+assert.doesNotMatch(html, /<div class="content">|Featured Projects|2022 → 2026/, "effect 060 rail should not show the white title block or its text");
 assert.equal((html.match(/data-scene="\.\.\/assets\/images\/网页\/optimized\/case-/g) || []).length, 6, "effect 060 rail should show six optimized case image slides");
 assert.equal((html.match(/<img[^>]+src="\.\.\/assets\/images\/网页\/optimized\/case-/g) || []).length, 12, "case rail and archive should use optimized case images");
 assert.doesNotMatch(html, /assets\/images\/网页\/案例[1-6]\//, "cases page should avoid loading oversized original case images");
@@ -49,7 +50,9 @@ assert.match(css, /\.archive-grid\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s
 assert.match(css, /\.mwg_effect060\s*\{[^}]*--slot-h:\s*clamp\(104px,\s*12\.2vh,\s*128px\)/s, "effect 060 rail should use compact five-slot image positions");
 assert.match(css, /\.mwg_effect060\s+\.pin-height\s*\{[^}]*height:\s*auto/s, "effect 060 rail should not add extra scroll-driven height");
 assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*position:\s*relative[^}]*overflow:\s*hidden/s, "effect 060 rail should stay static instead of sticky during page scroll");
-assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*grid-template-columns:\s*144px\s+minmax\(240px,\s*1fr\)/s, "effect 060 rail should keep a narrow title block and single image column");
+assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*grid-template-columns:\s*minmax\(240px,\s*1fr\)/s, "effect 060 rail should use a single image column after removing the title block");
+assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*border:\s*0/s, "effect 060 rail should not draw a white frame around the right module");
+assert.doesNotMatch(css, /\.mwg_effect060\s+\.content/, "effect 060 rail should not keep styles for the removed title block");
 assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*background:\s*transparent/s, "right case module should not have its own background color");
 assert.match(css, /\.mwg_effect060\s+\.slides\s*\{[^}]*overflow-y:\s*auto[^}]*overscroll-behavior:\s*contain/s, "effect 060 slides should scroll independently inside the right module");
 assert.match(css, /\.mwg_effect060\s+\.slides\s*\{[^}]*scrollbar-width:\s*none/s, "effect 060 independent rail should keep the scrollbar hidden");
