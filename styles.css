@@ -815,11 +815,13 @@ h1 span {
 .cases-page {
   --cases-active-scene: url("./assets/images/网页/optimized/case-01.jpg");
   --active-case-scene: var(--cases-active-scene);
-  background: #111315;
+  background: transparent;
 }
 
 .cases-page::before {
   background-image: var(--cases-active-scene);
+  background-position: center center;
+  background-size: cover;
   transition: none;
 }
 

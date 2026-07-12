@@ -28,7 +28,7 @@ assert.ok(leftPanelMatch, "left panel should exist");
 assert.deepEqual(navLinks, directPages, "header middle navigation should link to blank pages");
 for (const pagePath of directPages) {
   const pageHtml = readFileSync(new URL(pagePath, import.meta.url), "utf8");
-  const expectedStyleVersion = pagePath === "./pages/cases.html" ? "cases-archive-20260705" : "page-header-20260705";
+  const expectedStyleVersion = pagePath === "./pages/cases.html" ? "cases-bg-visible-20260711" : "page-header-20260705";
   assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="\\.\\.\\/styles\\.css\\?v=${expectedStyleVersion}" \\/>`), `${pagePath} should load the shared stylesheet`);
   assert.match(pageHtml, /<header class="topbar">/, `${pagePath} should include the shared header`);
   assert.match(pageHtml, /<a class="brand" href="\.\.\/index\.html"/, `${pagePath} brand should link back to the homepage`);

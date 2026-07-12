@@ -26,6 +26,7 @@ assert.equal((html.match(/class="slide spacer"/g) || []).length, 4, "effect 060 
 assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive should use the current six cases as reference content");
 assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should not include the old scrolling masked image rail");
 assert.match(html, /36 MODIFIED-CAR CASE FILES/, "archive should be framed as a 36-case library");
+assert.match(html, /styles\.css\?v=cases-bg-visible-20260711/, "cases page should bust the stylesheet cache for background visibility fixes");
 assert.match(html, /layout-canvas\.css\?v=canvas-20260706-1728/, "cases page should load the 1728 design canvas layout override");
 assert.match(html, /case-rail\.css\?v=hero-rail-20260709/, "cases page should load the hero rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
@@ -44,6 +45,9 @@ assert.doesNotMatch(html, /pointerenter/, "case background should not bind both 
 assert.match(html, /activeScene === scene/, "case background should not restart the fade when the active scene is unchanged");
 
 assert.match(css, /\.cases-hero\s*\{[^}]*min-height:\s*min\(calc\(100vh - 77px\),\s*973px\)/s, "PLAN A hero should preserve a 1728x1050 first-screen visual area without stretching on taller displays");
+assert.match(css, /\.cases-page\s*\{[^}]*background:\s*transparent/s, "case page shell should stay transparent so the fixed background scene is visible");
+assert.match(css, /\.cases-page::before\s*\{[^}]*background-image:\s*var\(--cases-active-scene\)[^}]*background-position:\s*center center[^}]*background-size:\s*cover/s, "case page background should use one centered full-bleed scene image");
+assert.doesNotMatch(css, /\.cases-page::before\s*\{[^}]*background-image:\s*var\(--cases-active-scene\),/s, "case page background should not duplicate the same image in multiple layers");
 assert.match(css, /\.cases-gap\s*\{[^}]*height:\s*100px/s, "hero and archive should be separated by 100px");
 assert.match(css, /\.archive-layout\s*\{[^}]*grid-template-columns:\s*260px\s+minmax\(0,\s*1fr\)/s, "archive should use a left filter sidebar");
 assert.match(css, /\.archive-grid\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s, "archive should use four cards per row on desktop");
