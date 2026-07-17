@@ -1,3 +1,9 @@
 .DS_Store
 node_modules/
 .vercel/
+.cache/
+.pnpm-home/
+sanity/node_modules/
+sanity/dist/
+sanity/.env.local
+.sanity/
