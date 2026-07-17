@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 const packageJson = JSON.parse(readFileSync(new URL("./sanity/package.json", import.meta.url), "utf8"));
 const config = readFileSync(new URL("./sanity/sanity.config.js", import.meta.url), "utf8");
 const schemaIndex = readFileSync(new URL("./sanity/schemaTypes/index.js", import.meta.url), "utf8");
 const caseSchema = readFileSync(new URL("./sanity/schemaTypes/casePage.js", import.meta.url), "utf8");
 const readme = readFileSync(new URL("./sanity/README.md", import.meta.url), "utf8");
+const vercelConfigUrl = new URL("./sanity/vercel.json", import.meta.url);
 
 assert.equal(packageJson.name, "lonma-dynamic-sanity-studio", "Sanity Studio should have a dedicated package");
 assert.equal(packageJson.type, "module", "Sanity Studio should use ESM config files");
@@ -28,3 +29,11 @@ assert.match(caseSchema, /name:\s*'video'/, "Case schema should include video fi
 assert.match(caseSchema, /name:\s*'cta'/, "Case schema should include CTA fields");
 
 assert.match(readme, /does not replace the live site or the existing Decap setup yet/i, "Sanity README should state that this is only a comparison setup");
+
+assert.ok(existsSync(vercelConfigUrl), "Sanity Studio should include a Vercel SPA fallback");
+const vercelConfig = JSON.parse(readFileSync(vercelConfigUrl, "utf8"));
+assert.deepEqual(
+  vercelConfig.rewrites,
+  [{ source: "/(.*)", destination: "/index.html" }],
+  "Sanity Studio should route direct editor URLs back to index.html",
+);
