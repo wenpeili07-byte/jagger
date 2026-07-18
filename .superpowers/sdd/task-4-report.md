@@ -60,10 +60,10 @@ Result: exited `0` with no output.
 
 ## Self-Review
 
-- Active, hover, and keyboard-focus selectors were preserved unchanged.
+- The initial viewport-containment fix preserved the then-current active, hover, and keyboard-focus selectors; the final code-review follow-up below gates hover styling by pointer capability.
 - The desktop 24% / 76% workspace split and existing image crop rules were preserved.
-- Only `content-pages.css` and `content-pages.test.mjs` were committed.
-- `.superpowers/` and `outputs/` were not staged or committed.
+- The implementation commits changed only `content-pages.css` and `content-pages.test.mjs`.
+- `outputs/` was not staged or committed.
 
 ## Concerns
 
@@ -75,7 +75,7 @@ Result: exited `0` with no output.
 
 - Follow-up base: `a7f1dd5`
 - Browser QA at `390 x 844` found intrinsic image sizing expanding individual mobile service rows and causing screenshot timeouts.
-- Desktop behavior remains governed by the unchanged rules outside the `max-width: 760px` media query.
+- At that follow-up stage, desktop behavior remained governed by rules outside the then-current `max-width: 760px` Services query.
 
 ### RED Evidence
 
@@ -141,19 +141,23 @@ Result: exited `0` with no output.
 - `83c52b8` released the workspace from viewport-bound height at `761px` to `980px` and changed the six rail tracks to natural `auto` sizing.
 - `f89f080` gave tablet rows a stable `162px` minimum and removed media from intrinsic track sizing by absolutely filling the right image slot.
 - `f1e032d` widened the tablet copy/media split to `56% / 44%` and aligned the absolute media edge and arrow to the same `56%` boundary.
-- The global desktop `42% / 58%` row split and the `max-width: 760px` mobile composition remain unchanged.
+- Final code-review commit `617029b` moved the Services tablet range to `768px` through `980px` and the Services mobile composition to `max-width: 767px`; the shared About/Contact `max-width: 760px` behavior remains unchanged.
+- The global desktop `42% / 58%` row split remains unchanged.
 
 ## Controller Browser QA Completion
 
+- Services now scopes `--accent-bright` to `#3788c8`. The automated contrast contract reports `4.89:1` on `#111315` and `4.59:1` on `#171a1d`, meeting AA for the small accent text.
 - `1900 x 1050`: `scrollWidth` and `clientWidth` were both `1900`; the workspace measured `1898 x 974` at `y=77`; six rows measured `162.164px` or `162.172px`; no horizontal overflow. Screenshot: `outputs/services-workshop-process-1900.png`.
 - `1440 x 900`: `scrollWidth` and `clientWidth` were both `1440`; the workspace measured `1438 x 824` at `y=77`; six rows measured `137.164px` or `137.172px`; no horizontal overflow. Screenshot: `outputs/services-workshop-process-1440.png`.
 - `980 x 900` English: the shared header measured `152px`; all six rows measured `162px`; copy and media remained contained, with no text or horizontal overflow.
 - `900 x 900` English: all six rows measured `162px`, with no text or horizontal overflow.
-- `768 x 900` English: rows grew naturally from `177px` to `202px`; all copy and media remained contained; `PERFORMANCE PARTS` and `ECU CALIBRATION` fit, with no text or horizontal overflow.
+- `768 x 900` English remained in the tablet split. Rows grew naturally from `177px` to `202px`; all copy and media remained contained, with no text or horizontal overflow.
+- `767 x 900` English stacked into one `765px` column. All six rows measured `360px`; copy and media remained contained, with no text or horizontal overflow.
 - `390 x 844` English: all six rows measured exactly `360px` with current copy, media measured `359px` to `360px`, and copy and arrows remained contained. The natural `min-height` plus absolute-media CSS permits future longer or resized text to grow without intrinsic-image expansion. No text or horizontal overflow was observed. Full screenshot: `outputs/services-workshop-process-mobile.png`.
 - The language toggle passed `zh -> en -> zh`: shared navigation, left title, and all service titles and descriptions updated. The English desktop screenshot is `outputs/services-workshop-process-english-1900.png`; no service-copy text overflow was observed.
-- Row 04 initializes as active. Focusing row 01 left exactly row 01 active, and its computed focus outline was `rgb(46, 125, 189) solid 2px`. Pointer activation of row 02 navigated to `pages/services/parts.html`; the language toggle was also verified.
+- Runtime activation and focus of row 02 left exactly row 02 active. Its surface was neutral `rgb(23, 26, 29)`, its label was blue `rgb(55, 136, 200)`, and its focus outline was a matching `2px solid` blue. Reload restored row 04 as the sole default active row.
+- Fine-pointer hover styling is gated by the automated CSS contract. The in-app browser does not expose reliable hover emulation, so runtime hover emulation is not claimed.
 - Browser console errors: none.
 - The final `1900` screenshot and `outputs/services-workshop-process-comparison.png` were refreshed. The combined comparison found no P0 or P1 visual mismatch; Chinese title hierarchy and existing case photography match the written specification and approved direction.
-- Controller regression check: `node --test *.test.mjs` passed `6/6`; `git diff --check 91300c9..HEAD` was clean.
+- Final regression check: `node --test *.test.mjs` passed `8/8`; `git diff --check` was clean.
 - All `outputs/` files are local QA artifacts and were not committed.
