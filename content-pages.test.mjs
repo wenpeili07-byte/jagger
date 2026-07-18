@@ -76,7 +76,12 @@ assert.match(css, /@media \(max-width:\s*760px\)/, "content pages should include
 assert.match(css, /\.process-step\s*\{[^}]*min-height:/s, "process stages should reserve stable equal heights");
 assert.doesNotMatch(css, /\.process-step\s*\{[^}]*border-radius:/s, "process stages should not become rounded cards");
 assert.match(css, /\.services-workspace\s*\{[^}]*grid-template-columns:/s, "services should use the selected split workspace");
-assert.match(css, /\.service-process-rail\s*\{[^}]*grid-template-rows:\s*repeat\(6,/s, "desktop rail should reserve six equal rows");
+assert.match(css, /\.services-workspace\s*\{[^}]*\n\s*height:\s*calc\(min\(1050px,\s*100vh\)\s*-\s*76px\)/s, "desktop services workspace should occupy one viewport-bound canvas");
+assert.match(css, /\.services-workspace\s*\{[^}]*min-height:\s*[5-9]\d{2}px/s, "desktop services workspace should retain a practical minimum height");
+assert.match(css, /\.service-process-rail\s*\{[^}]*grid-template-rows:\s*repeat\(6,\s*minmax\(0,\s*1fr\)\)/s, "desktop rail should reserve six equal rows without intrinsic minimums");
+assert.match(css, /\.service-process-rail\s*\{[^}]*min-height:\s*0/s, "service rail should contain intrinsic child height");
+assert.match(css, /\.service-process-row\s*\{[^}]*min-height:\s*0/s, "service rows should not expand from intrinsic content");
+assert.match(css, /\.service-process-media\s*\{[^}]*min-height:\s*0/s, "service media should remain contained within each row");
 assert.match(css, /\.service-process-media img\s*\{[^}]*object-fit:\s*cover/s, "service imagery should crop without distortion");
 assert.doesNotMatch(css, /\.service-process-row:hover[\s\S]{0,800}\.service-process-media img\s*\{[^}]*transform:/s, "service hover should not zoom or move images");
 assert.match(css, /\.service-process-row\[data-active\],\s*\.service-process-row:hover\s*\{[^}]*background:\s*#171a1d/s, "service active and hover states should keep a neutral black-gray background");
@@ -84,6 +89,7 @@ assert.match(css, /\.service-process-row::before\s*\{[^}]*background:\s*var\(--a
 assert.match(css, /\.service-process-row\[data-active\]\s+\.service-process-number,[\s\S]{0,700}color:\s*var\(--accent-bright\)/s, "service active states should keep blue numbers, labels, and arrows");
 assert.match(css, /\.service-process-row:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s, "service rows should keep visible keyboard focus");
 assert.match(css, /@media \(max-width:\s*760px\)[\s\S]*\.services-workspace\s*\{[^}]*grid-template-columns:\s*1fr/s, "services should stack cleanly on mobile");
+assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.services-workspace\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/s, "mobile services workspace should restore natural stacked scrolling");
 
 assert.match(js, /localStorage\.setItem\("lonma-language"/, "language choice should persist across pages");
 assert.match(js, /querySelectorAll\("\[data-zh\]\[data-en\]"\)/, "content copy should switch between Chinese and English");
