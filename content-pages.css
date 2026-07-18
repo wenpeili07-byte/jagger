@@ -433,7 +433,7 @@
 
 .service-process-row[data-active],
 .service-process-row:hover {
-  background: rgba(28, 93, 153, 0.14);
+  background: #171a1d;
 }
 
 .service-process-row[data-active]::before,

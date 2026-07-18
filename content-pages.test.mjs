@@ -79,6 +79,9 @@ assert.match(css, /\.services-workspace\s*\{[^}]*grid-template-columns:/s, "serv
 assert.match(css, /\.service-process-rail\s*\{[^}]*grid-template-rows:\s*repeat\(6,/s, "desktop rail should reserve six equal rows");
 assert.match(css, /\.service-process-media img\s*\{[^}]*object-fit:\s*cover/s, "service imagery should crop without distortion");
 assert.doesNotMatch(css, /\.service-process-row:hover[\s\S]{0,800}\.service-process-media img\s*\{[^}]*transform:/s, "service hover should not zoom or move images");
+assert.match(css, /\.service-process-row\[data-active\],\s*\.service-process-row:hover\s*\{[^}]*background:\s*#171a1d/s, "service active and hover states should keep a neutral black-gray background");
+assert.match(css, /\.service-process-row::before\s*\{[^}]*background:\s*var\(--accent-bright\)/s, "service rows should reserve blue for the left edge");
+assert.match(css, /\.service-process-row\[data-active\]\s+\.service-process-number,[\s\S]{0,700}color:\s*var\(--accent-bright\)/s, "service active states should keep blue numbers, labels, and arrows");
 assert.match(css, /\.service-process-row:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s, "service rows should keep visible keyboard focus");
 assert.match(css, /@media \(max-width:\s*760px\)[\s\S]*\.services-workspace\s*\{[^}]*grid-template-columns:\s*1fr/s, "services should stack cleanly on mobile");
 
