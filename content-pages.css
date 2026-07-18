@@ -700,6 +700,19 @@
   .service-process-rail {
     grid-template-rows: repeat(6, auto);
   }
+
+  .service-process-row {
+    min-height: 162px;
+  }
+
+  .service-process-media {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 48%;
+    height: 100%;
+  }
 }
 
 @media (max-width: 760px) {
