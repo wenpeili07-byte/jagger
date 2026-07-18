@@ -111,4 +111,17 @@
   }
 
   setLanguage(currentLanguage);
+
+  const serviceRows = Array.from(document.querySelectorAll("[data-service-row]"));
+
+  const setActiveServiceRow = (activeRow) => {
+    serviceRows.forEach((row) => {
+      row.toggleAttribute("data-active", row === activeRow);
+    });
+  };
+
+  serviceRows.forEach((row) => {
+    row.addEventListener("pointerenter", () => setActiveServiceRow(row));
+    row.addEventListener("focusin", () => setActiveServiceRow(row));
+  });
 })();
