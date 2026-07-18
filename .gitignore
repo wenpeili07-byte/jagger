@@ -7,3 +7,4 @@ sanity/node_modules/
 sanity/dist/
 sanity/.env.local
 .sanity/
+.worktrees/
