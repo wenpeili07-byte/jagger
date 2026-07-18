@@ -88,10 +88,12 @@ assert.match(css, /\.service-process-row\[data-active\],\s*\.service-process-row
 assert.match(css, /\.service-process-row::before\s*\{[^}]*background:\s*var\(--accent-bright\)/s, "service rows should reserve blue for the left edge");
 assert.match(css, /\.service-process-row\[data-active\]\s+\.service-process-number,[\s\S]{0,700}color:\s*var\(--accent-bright\)/s, "service active states should keep blue numbers, labels, and arrows");
 assert.match(css, /\.service-process-row:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s, "service rows should keep visible keyboard focus");
+assert.match(css, /@media \(min-width:\s*761px\) and \(max-width:\s*980px\)\s*\{[\s\S]*?\.services-workspace\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/s, "tablet services workspace should use natural document height below the shared header breakpoint");
+assert.match(css, /@media \(min-width:\s*761px\) and \(max-width:\s*980px\)\s*\{[\s\S]*?\.service-process-rail\s*\{[^}]*grid-template-rows:\s*repeat\(6,\s*auto\)/s, "tablet service rows should grow with their copy");
 assert.match(css, /@media \(max-width:\s*760px\)[\s\S]*\.services-workspace\s*\{[^}]*grid-template-columns:\s*1fr/s, "services should stack cleanly on mobile");
 assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.services-workspace\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/s, "mobile services workspace should restore natural stacked scrolling");
-assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.service-process-row\s*\{[^}]*grid-template-rows:\s*minmax\(0,\s*1fr\)[^}]*height:\s*360px[^}]*min-height:\s*0/s, "mobile service rows should use one stable contained overlay track");
-assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.service-process-media\s*\{[^}]*height:\s*100%[^}]*min-height:\s*0/s, "mobile service media should fill, not expand, its row");
+assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.service-process-row\s*\{[^}]*grid-template-rows:\s*auto[^}]*height:\s*auto[^}]*min-height:\s*360px/s, "mobile service rows should grow naturally from a stable minimum height");
+assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.service-process-media\s*\{[^}]*position:\s*absolute[^}]*inset:\s*0[^}]*height:\s*100%[^}]*min-height:\s*0/s, "mobile service media should fill the row without contributing intrinsic height");
 
 assert.match(js, /localStorage\.setItem\("lonma-language"/, "language choice should persist across pages");
 assert.match(js, /querySelectorAll\("\[data-zh\]\[data-en\]"\)/, "content copy should switch between Chinese and English");
