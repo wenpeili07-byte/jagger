@@ -42,11 +42,23 @@ const serviceLinks = [
   "./services/chassis.html",
   "./services/exhaust.html",
 ];
-assert.equal((servicesHtml.match(/class="service-index-row"/g) || []).length, 6, "services should contain six equal business rows");
+assert.match(servicesHtml, /class="services-workspace"/, "services should use the selected workshop workspace");
+assert.match(servicesHtml, /class="services-intro"/, "services should keep a dedicated editorial introduction");
+assert.match(servicesHtml, /class="service-process-rail"/, "services should present one continuous process rail");
+assert.doesNotMatch(servicesHtml, /class="content-hero services-hero"/, "services should remove the old standalone hero");
+assert.doesNotMatch(servicesHtml, /class="service-index"/, "services should remove the old flat service index");
+assert.equal((servicesHtml.match(/data-service-row/g) || []).length, 6, "services should contain six interactive process rows");
+assert.equal((servicesHtml.match(/class="service-process-media"/g) || []).length, 6, "each service row should include LONMA photography");
 for (const href of serviceLinks) {
   assert.match(servicesHtml, new RegExp(`href="${href.replaceAll(".", "\\.")}"`), `services should link to ${href}`);
 }
 assert.match(servicesHtml, /01[\s\S]*BUILD[\s\S]*02[\s\S]*PARTS[\s\S]*03[\s\S]*PHOTO[\s\S]*04[\s\S]*ECU[\s\S]*05[\s\S]*CHASSIS[\s\S]*06[\s\S]*EXHAUST/, "services should keep the established service order");
+
+for (const caseNumber of ["01", "02", "03", "04", "05", "06"]) {
+  const imagePath = `./assets/images/网页/optimized/case-${caseNumber}.jpg`;
+  assert.ok(existsSync(new URL(imagePath, import.meta.url)), `${imagePath} should exist`);
+  assert.match(servicesHtml, new RegExp(`optimized/case-${caseNumber}\\.jpg`), `services should use case-${caseNumber}.jpg`);
+}
 
 assert.match(contactHtml, /<form class="contact-form" data-contact-form>/, "contact should include a focused project inquiry form");
 for (const name of ["name", "email", "vehicle", "service", "message"]) {
@@ -60,13 +72,19 @@ assert.match(css, /\.content-hero-media img\s*\{[^}]*object-fit:\s*cover/s, "con
 assert.match(css, /\.content-hero-copy\s*\{[^}]*justify-content:\s*center/s, "about hero copy should keep the selected vertically centered composition");
 assert.match(css, /\.content-display\s*\{[^}]*font-family:\s*Impact/s, "display headings should use a tall condensed automotive face");
 assert.match(css, /\.content-process::before\s*\{[^}]*width:\s*25%[^}]*background:\s*var\(--accent-bright\)/s, "about process should keep the selected blue progress line");
-assert.match(css, /\.service-index-row\s*\{[^}]*border-top:\s*1px solid var\(--line\)/s, "service rows should use neutral borders by default");
-assert.match(css, /\.service-index-row:hover\s*\{[^}]*background:\s*rgba\(28,\s*93,\s*153,\s*0\.14\)/s, "service hover should use restrained dark automotive blue");
 assert.match(css, /@media \(max-width:\s*760px\)/, "content pages should include a mobile layout");
 assert.match(css, /\.process-step\s*\{[^}]*min-height:/s, "process stages should reserve stable equal heights");
 assert.doesNotMatch(css, /\.process-step\s*\{[^}]*border-radius:/s, "process stages should not become rounded cards");
+assert.match(css, /\.services-workspace\s*\{[^}]*grid-template-columns:/s, "services should use the selected split workspace");
+assert.match(css, /\.service-process-rail\s*\{[^}]*grid-template-rows:\s*repeat\(6,/s, "desktop rail should reserve six equal rows");
+assert.match(css, /\.service-process-media img\s*\{[^}]*object-fit:\s*cover/s, "service imagery should crop without distortion");
+assert.doesNotMatch(css, /\.service-process-row:hover[\s\S]{0,800}\.service-process-media img\s*\{[^}]*transform:/s, "service hover should not zoom or move images");
+assert.match(css, /\.service-process-row:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s, "service rows should keep visible keyboard focus");
+assert.match(css, /@media \(max-width:\s*760px\)[\s\S]*\.services-workspace\s*\{[^}]*grid-template-columns:\s*1fr/s, "services should stack cleanly on mobile");
 
 assert.match(js, /localStorage\.setItem\("lonma-language"/, "language choice should persist across pages");
 assert.match(js, /querySelectorAll\("\[data-zh\]\[data-en\]"\)/, "content copy should switch between Chinese and English");
 assert.match(js, /new FormData\(contactForm\)/, "contact submit should use the visible form values");
 assert.match(js, /mailto:hello@lonmadynamic\.com/, "contact submit should open a prefilled email to LONMA");
+assert.match(js, /querySelectorAll\("\[data-service-row\]"\)/, "services should initialize the active process row");
+assert.match(js, /toggleAttribute\("data-active"/, "only one process row should remain active");
