@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
+import { test } from "node:test";
 
 const aboutHtml = readFileSync(new URL("./pages/about.html", import.meta.url), "utf8");
 const servicesHtml = readFileSync(new URL("./pages/services.html", import.meta.url), "utf8");
@@ -17,6 +18,51 @@ const pages = [
   ["services", servicesHtml],
   ["contact", contactHtml],
 ];
+
+function findCssBlock(source, header) {
+  const start = source.indexOf(header);
+  assert.notEqual(start, -1, `${header} should exist`);
+
+  const openBrace = source.indexOf("{", start + header.length);
+  assert.notEqual(openBrace, -1, `${header} should open a CSS block`);
+
+  let depth = 0;
+  for (let index = openBrace; index < source.length; index += 1) {
+    if (source[index] === "{") {
+      depth += 1;
+    } else if (source[index] === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        return {
+          body: source.slice(openBrace + 1, index),
+          end: index + 1,
+          start,
+        };
+      }
+    }
+  }
+
+  assert.fail(`${header} should close its CSS block`);
+}
+
+function relativeLuminance(hexColor) {
+  const channels = hexColor
+    .slice(1)
+    .match(/.{2}/g)
+    .map((channel) => Number.parseInt(channel, 16) / 255)
+    .map((channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4));
+
+  return (0.2126 * channels[0]) + (0.7152 * channels[1]) + (0.0722 * channels[2]);
+}
+
+function contrastRatio(firstColor, secondColor) {
+  const firstLuminance = relativeLuminance(firstColor);
+  const secondLuminance = relativeLuminance(secondColor);
+  const lighter = Math.max(firstLuminance, secondLuminance);
+  const darker = Math.min(firstLuminance, secondLuminance);
+
+  return (lighter + 0.05) / (darker + 0.05);
+}
 
 for (const [name, html] of pages) {
   assert.match(html, /class="site-shell content-page/, `${name} should use the content-page shell`);
@@ -48,6 +94,8 @@ assert.match(servicesHtml, /class="service-process-rail"/, "services should pres
 assert.doesNotMatch(servicesHtml, /class="content-hero services-hero"/, "services should remove the old standalone hero");
 assert.doesNotMatch(servicesHtml, /class="service-index"/, "services should remove the old flat service index");
 assert.equal((servicesHtml.match(/data-service-row/g) || []).length, 6, "services should contain six interactive process rows");
+assert.equal((servicesHtml.match(/data-active/g) || []).length, 1, "services should keep exactly one default active row");
+assert.match(servicesHtml, /href="\.\/services\/ecu\.html" data-service-row data-active/, "service row 04 should remain active by default");
 assert.equal((servicesHtml.match(/class="service-process-media"/g) || []).length, 6, "each service row should include LONMA photography");
 for (const href of serviceLinks) {
   assert.match(servicesHtml, new RegExp(`href="${href.replaceAll(".", "\\.")}"`), `services should link to ${href}`);
@@ -84,17 +132,51 @@ assert.match(css, /\.service-process-row\s*\{[^}]*min-height:\s*0/s, "service ro
 assert.match(css, /\.service-process-media\s*\{[^}]*min-height:\s*0/s, "service media should remain contained within each row");
 assert.match(css, /\.service-process-media img\s*\{[^}]*object-fit:\s*cover/s, "service imagery should crop without distortion");
 assert.doesNotMatch(css, /\.service-process-row:hover[\s\S]{0,800}\.service-process-media img\s*\{[^}]*transform:/s, "service hover should not zoom or move images");
-assert.match(css, /\.service-process-row\[data-active\],\s*\.service-process-row:hover\s*\{[^}]*background:\s*#171a1d/s, "service active and hover states should keep a neutral black-gray background");
 assert.match(css, /\.service-process-row::before\s*\{[^}]*background:\s*var\(--accent-bright\)/s, "service rows should reserve blue for the left edge");
 assert.match(css, /\.service-process-row\[data-active\]\s+\.service-process-number,[\s\S]{0,700}color:\s*var\(--accent-bright\)/s, "service active states should keep blue numbers, labels, and arrows");
 assert.match(css, /\.service-process-row:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s, "service rows should keep visible keyboard focus");
-assert.match(css, /@media \(min-width:\s*761px\) and \(max-width:\s*980px\)\s*\{[\s\S]*?\.services-workspace\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/s, "tablet services workspace should use natural document height below the shared header breakpoint");
-assert.match(css, /@media \(min-width:\s*761px\) and \(max-width:\s*980px\)\s*\{[\s\S]*?\.service-process-rail\s*\{[^}]*grid-template-rows:\s*repeat\(6,\s*auto\)/s, "tablet service rows should grow with their copy");
-assert.match(css, /@media \(min-width:\s*761px\) and \(max-width:\s*980px\)\s*\{[\s\S]*?\.service-process-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*56%\)\s+minmax\(0,\s*44%\)[^}]*min-height:\s*162px[^}]*\}[\s\S]*?\.service-process-media\s*\{[^}]*position:\s*absolute[^}]*top:\s*0[^}]*right:\s*0[^}]*bottom:\s*0[^}]*left:\s*56%[^}]*height:\s*100%[^}]*\}[\s\S]*?\.service-process-arrow\s*\{[^}]*left:\s*calc\(56%\s*-\s*22px\)/s, "tablet rows should align a robust text column, contained media, and arrow at the same split");
-assert.match(css, /@media \(max-width:\s*760px\)[\s\S]*\.services-workspace\s*\{[^}]*grid-template-columns:\s*1fr/s, "services should stack cleanly on mobile");
-assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.services-workspace\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/s, "mobile services workspace should restore natural stacked scrolling");
-assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.service-process-row\s*\{[^}]*grid-template-rows:\s*auto[^}]*height:\s*auto[^}]*min-height:\s*360px/s, "mobile service rows should grow naturally from a stable minimum height");
-assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.service-process-media\s*\{[^}]*position:\s*absolute[^}]*inset:\s*0[^}]*height:\s*100%[^}]*min-height:\s*0/s, "mobile service media should fill the row without contributing intrinsic height");
+
+test("services uses a page-scoped accent that meets AA on both neutral surfaces", () => {
+  const scopedAccent = css.match(/\.services-page\s*\{[^}]*--accent-bright:\s*(#[\da-f]{6})\s*;/i);
+  assert.ok(scopedAccent, "services should override --accent-bright only within .services-page");
+
+  for (const surface of ["#111315", "#171a1d"]) {
+    const ratio = contrastRatio(scopedAccent[1], surface);
+    assert.ok(ratio >= 4.5, `${scopedAccent[1]} should reach 4.5:1 on ${surface}; received ${ratio.toFixed(2)}:1`);
+  }
+});
+
+test("services stacks through 767px and starts its tablet layout at 768px", () => {
+  const tabletServices = findCssBlock(css, "@media (min-width: 768px) and (max-width: 980px)");
+  const mobileServices = findCssBlock(css, "@media (max-width: 767px)");
+  const sharedMobile = findCssBlock(css, "@media (max-width: 760px)");
+
+  assert.match(tabletServices.body, /\.services-workspace\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/s, "tablet services workspace should use natural document height");
+  assert.match(tabletServices.body, /\.service-process-rail\s*\{[^}]*grid-template-rows:\s*repeat\(6,\s*auto\)/s, "tablet service rows should grow with their copy");
+  assert.match(mobileServices.body, /\.services-workspace\s*\{[^}]*grid-template-columns:\s*1fr[^}]*height:\s*auto[^}]*min-height:\s*0/s, "services should stack through 767px");
+  assert.match(mobileServices.body, /\.service-process-row\s*\{[^}]*grid-template-rows:\s*auto[^}]*height:\s*auto[^}]*min-height:\s*360px/s, "mobile service rows should retain their stable minimum");
+  assert.match(sharedMobile.body, /\.content-page \.topbar\s*\{[^}]*position:\s*relative/s, "the shared About and Contact mobile breakpoint should remain at 760px");
+  assert.doesNotMatch(sharedMobile.body, /\.(?:services-|service-process-)/, "Services responsive rules should not remain in the shared 760px block");
+});
+
+test("services gates hover visuals to fine pointers while active and focus states remain global", () => {
+  const finePointerHover = findCssBlock(css, "@media (hover: hover) and (pointer: fine)");
+  const globalCss = `${css.slice(0, finePointerHover.start)}${css.slice(finePointerHover.end)}`;
+
+  assert.doesNotMatch(globalCss, /\.service-process-row:hover/, "Services hover selectors should only exist in the fine-pointer media block");
+  assert.match(finePointerHover.body, /\.service-process-row:hover\s*\{[^}]*background:\s*#171a1d/s, "real hover should keep the neutral active surface");
+  assert.match(finePointerHover.body, /\.service-process-row:hover::before\s*\{[^}]*transform:\s*scaleY\(1\)/s, "real hover should reveal the blue edge");
+  assert.match(finePointerHover.body, /\.service-process-row:hover \.service-process-number,[\s\S]{0,300}\.service-process-row:hover \.service-process-label,[\s\S]{0,300}\.service-process-row:hover \.service-process-arrow\s*\{[^}]*color:\s*var\(--accent-bright\)/s, "real hover should color the number, label, and arrow blue");
+  assert.match(finePointerHover.body, /\.service-process-row:hover \.service-process-media img\s*\{[^}]*brightness\(0\.8\)[^}]*opacity:\s*1/s, "real hover should preserve the brighter image treatment");
+  assert.match(finePointerHover.body, /\.service-process-row:hover \.service-process-arrow\s*\{[^}]*translate:\s*6px 0/s, "real hover should preserve arrow motion");
+
+  assert.match(globalCss, /\.service-process-row\[data-active\]\s*\{[^}]*background:\s*#171a1d/s, "the active row should keep its neutral surface globally");
+  assert.match(globalCss, /\.service-process-row\[data-active\]::before,\s*\.service-process-row:focus-visible::before\s*\{[^}]*transform:\s*scaleY\(1\)/s, "active and focus-visible rows should reveal the blue edge globally");
+  assert.match(globalCss, /\.service-process-row\[data-active\] \.service-process-number,[\s\S]{0,300}\.service-process-row\[data-active\] \.service-process-label,[\s\S]{0,300}\.service-process-row\[data-active\] \.service-process-arrow\s*\{[^}]*color:\s*var\(--accent-bright\)/s, "the active number, label, and arrow should remain blue globally");
+  assert.match(globalCss, /\.service-process-row\[data-active\] \.service-process-media img\s*\{[^}]*brightness\(0\.8\)[^}]*opacity:\s*1/s, "the active row should keep its brighter image globally");
+  assert.match(globalCss, /\.service-process-row\[data-active\] \.service-process-arrow\s*\{[^}]*translate:\s*6px 0/s, "the active row should keep its arrow position globally");
+  assert.match(globalCss, /\.service-process-row:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s, "keyboard focus should remain visible globally");
+});
 
 assert.match(js, /localStorage\.setItem\("lonma-language"/, "language choice should persist across pages");
 assert.match(js, /querySelectorAll\("\[data-zh\]\[data-en\]"\)/, "content copy should switch between Chinese and English");

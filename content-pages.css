@@ -254,6 +254,10 @@
   line-height: 1.7;
 }
 
+.services-page {
+  --accent-bright: #3788c8;
+}
+
 .services-workspace {
   display: grid;
   grid-template-columns: minmax(320px, 24%) minmax(0, 1fr);
@@ -435,39 +439,31 @@
   transition: color 200ms ease, translate 200ms ease;
 }
 
-.service-process-row[data-active],
-.service-process-row:hover {
+.service-process-row[data-active] {
   background: #171a1d;
 }
 
 .service-process-row[data-active]::before,
-.service-process-row:hover::before,
 .service-process-row:focus-visible::before {
   transform: scaleY(1);
 }
 
 .service-process-row[data-active] .service-process-number,
 .service-process-row[data-active] .service-process-label,
-.service-process-row[data-active] .service-process-arrow,
-.service-process-row:hover .service-process-number,
-.service-process-row:hover .service-process-label,
-.service-process-row:hover .service-process-arrow {
+.service-process-row[data-active] .service-process-arrow {
   color: var(--accent-bright);
 }
 
-.service-process-row[data-active] .service-process-media::after,
-.service-process-row:hover .service-process-media::after {
+.service-process-row[data-active] .service-process-media::after {
   background: rgba(9, 11, 12, 0.08);
 }
 
-.service-process-row[data-active] .service-process-media img,
-.service-process-row:hover .service-process-media img {
+.service-process-row[data-active] .service-process-media img {
   filter: saturate(0.94) contrast(1.06) brightness(0.8);
   opacity: 1;
 }
 
-.service-process-row[data-active] .service-process-arrow,
-.service-process-row:hover .service-process-arrow {
+.service-process-row[data-active] .service-process-arrow {
   translate: 6px 0;
 }
 
@@ -475,6 +471,35 @@
   z-index: 6;
   outline: 2px solid var(--accent-bright);
   outline-offset: -3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .service-process-row:hover {
+    background: #171a1d;
+  }
+
+  .service-process-row:hover::before {
+    transform: scaleY(1);
+  }
+
+  .service-process-row:hover .service-process-number,
+  .service-process-row:hover .service-process-label,
+  .service-process-row:hover .service-process-arrow {
+    color: var(--accent-bright);
+  }
+
+  .service-process-row:hover .service-process-media::after {
+    background: rgba(9, 11, 12, 0.08);
+  }
+
+  .service-process-row:hover .service-process-media img {
+    filter: saturate(0.94) contrast(1.06) brightness(0.8);
+    opacity: 1;
+  }
+
+  .service-process-row:hover .service-process-arrow {
+    translate: 6px 0;
+  }
 }
 
 .contact-inquiry {
@@ -691,7 +716,7 @@
   }
 }
 
-@media (min-width: 761px) and (max-width: 980px) {
+@media (min-width: 768px) and (max-width: 980px) {
   .services-workspace {
     height: auto;
     min-height: 0;
@@ -717,6 +742,79 @@
 
   .service-process-arrow {
     left: calc(56% - 22px);
+  }
+}
+
+@media (max-width: 767px) {
+  .services-workspace {
+    display: grid;
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+  }
+
+  .services-intro {
+    min-height: 430px;
+    padding: 54px 24px 34px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .services-intro h1 {
+    max-width: none;
+    font-size: 54px;
+  }
+
+  .services-intro-signature {
+    margin-top: 72px;
+  }
+
+  .service-process-rail {
+    display: block;
+  }
+
+  .service-process-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
+    min-height: 360px;
+  }
+
+  .service-process-copy {
+    z-index: 3;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    padding: 98px 52px 28px 68px;
+    background: rgba(17, 19, 21, 0.76);
+  }
+
+  .service-process-media {
+    position: absolute;
+    inset: 0;
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .service-process-number {
+    top: 24px;
+    left: 24px;
+  }
+
+  .service-process-arrow {
+    top: auto;
+    right: 24px;
+    bottom: 28px;
+    left: auto;
+    transform: none;
+  }
+
+  .service-process-row[data-active] .service-process-arrow {
+    translate: 0;
   }
 }
 
@@ -787,78 +885,6 @@
   .content-photo-band-copy h2,
   .contact-intro h2 {
     font-size: 34px;
-  }
-
-  .services-workspace {
-    display: grid;
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: 0;
-  }
-
-  .services-intro {
-    min-height: 430px;
-    padding: 54px 24px 34px;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .services-intro h1 {
-    max-width: none;
-    font-size: 54px;
-  }
-
-  .services-intro-signature {
-    margin-top: 72px;
-  }
-
-  .service-process-rail {
-    display: block;
-  }
-
-  .service-process-row {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    height: auto;
-    min-height: 360px;
-  }
-
-  .service-process-copy {
-    z-index: 3;
-    grid-column: 1;
-    grid-row: 1;
-    align-self: end;
-    padding: 98px 52px 28px 68px;
-    background: rgba(17, 19, 21, 0.76);
-  }
-
-  .service-process-media {
-    position: absolute;
-    inset: 0;
-    grid-column: 1;
-    grid-row: 1;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-  }
-
-  .service-process-number {
-    top: 24px;
-    left: 24px;
-  }
-
-  .service-process-arrow {
-    top: auto;
-    right: 24px;
-    bottom: 28px;
-    left: auto;
-    transform: none;
-  }
-
-  .service-process-row[data-active] .service-process-arrow,
-  .service-process-row:hover .service-process-arrow {
-    translate: 0;
   }
 
   .contact-inquiry {
