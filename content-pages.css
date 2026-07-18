@@ -702,6 +702,7 @@
   }
 
   .service-process-row {
+    grid-template-columns: minmax(0, 56%) minmax(0, 44%);
     min-height: 162px;
   }
 
@@ -710,8 +711,12 @@
     top: 0;
     right: 0;
     bottom: 0;
-    left: 48%;
+    left: 56%;
     height: 100%;
+  }
+
+  .service-process-arrow {
+    left: calc(56% - 22px);
   }
 }
 
