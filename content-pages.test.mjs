@@ -90,6 +90,8 @@ assert.match(css, /\.service-process-row\[data-active\]\s+\.service-process-numb
 assert.match(css, /\.service-process-row:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s, "service rows should keep visible keyboard focus");
 assert.match(css, /@media \(max-width:\s*760px\)[\s\S]*\.services-workspace\s*\{[^}]*grid-template-columns:\s*1fr/s, "services should stack cleanly on mobile");
 assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.services-workspace\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/s, "mobile services workspace should restore natural stacked scrolling");
+assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.service-process-row\s*\{[^}]*grid-template-rows:\s*minmax\(0,\s*1fr\)[^}]*height:\s*360px[^}]*min-height:\s*0/s, "mobile service rows should use one stable contained overlay track");
+assert.match(css, /@media \(max-width:\s*760px\)\s*\{[\s\S]*?\.service-process-media\s*\{[^}]*height:\s*100%[^}]*min-height:\s*0/s, "mobile service media should fill, not expand, its row");
 
 assert.match(js, /localStorage\.setItem\("lonma-language"/, "language choice should persist across pages");
 assert.match(js, /querySelectorAll\("\[data-zh\]\[data-en\]"\)/, "content copy should switch between Chinese and English");
