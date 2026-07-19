@@ -18,6 +18,7 @@
   flex-direction: column;
   justify-content: center;
   min-width: 0;
+  container-type: inline-size;
   padding: clamp(48px, 7vw, 118px) var(--site-gutter);
 }
 
@@ -39,9 +40,14 @@
   margin: 18px 0 20px;
   color: var(--ink);
   font-family: Impact, "Arial Narrow", Arial, sans-serif;
-  font-size: clamp(64px, 7vw, 128px);
+  font-size: clamp(48px, 8rem, 128px);
   line-height: 0.9;
-  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1180px) {
+  .detail-copy h1 {
+    font-size: clamp(48px, 16cqw, 72px);
+  }
 }
 
 .detail-intro {
@@ -128,6 +134,7 @@
 
   .detail-copy h1 {
     max-width: none;
+    font-size: clamp(48px, 16cqw, 72px);
   }
 
   .detail-copy {
@@ -147,7 +154,7 @@
   }
 
   .detail-copy h1 {
-    font-size: 64px;
+    font-size: clamp(48px, 16cqw, 72px);
   }
 
   .detail-story,

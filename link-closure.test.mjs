@@ -125,6 +125,7 @@ assert.match(sharedCss, /\.nav a\[aria-current="page"\]::after\s*\{[^}]*backgrou
 assert.doesNotMatch(contentCss, /\.content-page \.nav a\[aria-current="page"\]/, "active navigation styling should not be limited to content pages");
 
 const serviceCss = read("./service-detail.css");
+const caseCss = read("./case-detail.css");
 assert.match(serviceCss, /\.service-detail-page\s*\{/);
 assert.match(serviceCss, /\.detail-hero\s*\{[^}]*grid-template-columns:/s);
 assert.match(serviceCss, /\.detail-process\s*\{/);
@@ -135,10 +136,21 @@ assert.ok(detailIndexDeclarations, "service detail pages should define an index 
 assert.match(detailIndexDeclarations, /color:\s*var\(--muted\)/, "the index label should use a neutral default color");
 assert.doesNotMatch(detailIndexDeclarations, /var\(--accent(?:-bright)?\)/, "the index label should not be blue by default");
 assert.match(serviceCss, /@media \(max-width:\s*1099px\)[\s\S]*?\.detail-hero\s*\{[^}]*grid-template-columns:\s*1fr/s);
-assert.match(serviceCss, /\.detail-copy h1\s*\{[^}]*overflow-wrap:\s*anywhere/s, "two-column headings should safely wrap long English words");
 assert.match(serviceCss, /@media \(max-width:\s*1099px\)[\s\S]*?\.detail-copy h1\s*\{[^}]*max-width:\s*none/s, "stacked headings should keep natural word wrapping");
 assert.doesNotMatch(serviceCss, /width:\s*100vw|transform:\s*scale\(/);
 assert.match(serviceCss, /\.detail-contact\s*\{[^}]*border-top:\s*1px solid var\(--line\)/s, "the contact separator should remain neutral");
+
+for (const [name, detailCss, stackedBreakpoint] of [
+  ["service", serviceCss, "1099px"],
+  ["case", caseCss, "899px"],
+]) {
+  assert.match(detailCss, /\.detail-copy\s*\{[^}]*container-type:\s*inline-size/s, `${name} detail copy should establish an inline-size container`);
+  assert.match(detailCss, /\.detail-copy h1\s*\{[^}]*font-size:\s*clamp\(48px,\s*8rem,\s*128px\)/s, `${name} detail heading should retain a non-viewport fallback`);
+  assert.match(detailCss, /@media \(max-width:\s*1180px\)[\s\S]*?\.detail-copy h1\s*\{[^}]*font-size:\s*clamp\(48px,\s*16cqw,\s*72px\)/s, `${name} 1100px heading should shrink to its narrow copy column`);
+  assert.match(detailCss, new RegExp(`@media \\(max-width:\\s*${stackedBreakpoint.replace(".", "\\.")}\\)[\\s\\S]*?\\.detail-copy h1\\s*\\{[^}]*font-size:\\s*clamp\\(48px,\\s*16cqw,\\s*72px\\)`, "s"), `${name} stacked heading should keep container-relative sizing`);
+  assert.match(detailCss, /@media \(max-width:\s*620px\)[\s\S]*?\.detail-copy h1\s*\{[^}]*font-size:\s*clamp\(48px,\s*16cqw,\s*72px\)/s, `${name} mobile heading should not restore a fixed oversized size`);
+  assert.doesNotMatch(detailCss, /\.detail-copy h1\s*\{[^}]*font-size:\s*[^;]*vw|\.detail-copy h1\s*\{[^}]*overflow-wrap:\s*anywhere/s, `${name} detail headings should preserve normal word boundaries without viewport scaling`);
+}
 
 function assertNoPermanentAccentBorders(css) {
   for (const [, selectorGroup, declarations] of css.matchAll(/(\.detail-[^{]+)\s*\{([^}]*)\}/gs)) {
@@ -162,7 +174,7 @@ assert.throws(
 
 assertNoPermanentAccentBorders(serviceCss);
 
-for (const detailCss of [read("./case-detail.css"), serviceCss]) {
+for (const detailCss of [caseCss, serviceCss]) {
   assert.doesNotMatch(
     detailCss,
     /\.detail-contact a:hover,[\s\S]{0,500}?\{[^}]*color:\s*var\(--accent-bright\)/,
