@@ -31,6 +31,19 @@ for (const id of caseIds) {
   assert.match(html, /data-zh="[^"]+"[^>]*data-en="[^"]+"/, `${route} should contain bilingual content`);
   assert.match(html, /class="detail-contact"/, `${route} should contain a contact action`);
   assert.match(html, /class="detail-pagination"/, `${route} should contain previous and next links`);
+
+  const pagination = html.match(/<nav class="detail-pagination"[\s\S]*?<\/nav>/);
+  assert.ok(pagination, `${route} should contain a complete pagination region`);
+  const paginationLinks = [...pagination[0].matchAll(/<a\b[^>]*>/g)];
+  assert.equal(paginationLinks.length, 2, `${route} should have two pagination links`);
+
+  for (const [index, link] of paginationLinks.entries()) {
+    assert.match(
+      link[0],
+      /data-zh="[^"]+"[^>]*data-en="[^"]+"/,
+      `${route} pagination link ${index + 1} should be bilingual`
+    );
+  }
 }
 
 for (const id of serviceIds) {

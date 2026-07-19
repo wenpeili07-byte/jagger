@@ -63,8 +63,8 @@ export const renderCasePage = (record) => `<!doctype html>
         ${i18n("a", { zh: "开始咨询 →", en: "START AN INQUIRY →" }, ' href="../contact.html"')}
       </section>
       <nav class="detail-pagination" aria-label="Case pagination">
-        <a href="./case-${record.previous}.html">← CASE ${record.previous}</a>
-        <a href="./case-${record.next}.html">CASE ${record.next} →</a>
+        ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html"`)}
+        ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html"`)}
       </nav>
     </main>
     <script src="../../content-pages.js?v=detail-language-20260719"></script>
