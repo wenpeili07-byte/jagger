@@ -2,15 +2,16 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the Services page's permanently visible image slices with row-local 1:1 previews that reveal on desktop hover or keyboard focus without moving the six-row layout.
+**Goal:** Keep the Services page's permanently visible right-side image slices and add row-local 1:1 previews that reveal on desktop hover or keyboard focus without moving the six-row layout.
 
-**Architecture:** Keep the existing HTML and one-image-per-row structure. Rework only the Services CSS so `.service-process-media` becomes an absolutely positioned square overlay on desktop, while the row itself remains the single interaction boundary; retain a simple square image treatment inside the existing stacked mobile layout. Extend the static CSS tests to lock the square ratio, hidden default state, row-local reveal, motion limits, and reduced-motion fallback.
+**Architecture:** Keep `.service-process-media` as the permanent right grid column and add `.service-process-preview` as a second row-local image using the same source. The preview is an absolutely positioned square overlay on desktop, while the row remains the single interaction boundary. Hide the redundant preview on mobile and retain the existing full-row image treatment. Extend the static tests to lock both image roles, the square ratio, hidden default state, row-local reveal, motion limits, and reduced-motion fallback.
 
 **Tech Stack:** Static HTML, CSS, Node.js built-in test runner
 
 ## Global Constraints
 
 - Keep the deployed left introduction column and six service rows.
+- Keep every permanent right-side horizontal sample image visible on desktop.
 - Keep every existing service number, label, title, description, destination, and image source.
 - Desktop preview aspect ratio is exactly `1 / 1`.
 - Animate only `opacity` and `transform`.
@@ -25,9 +26,11 @@
 **Files:**
 - Modify: `content-pages.test.mjs`
 - Modify: `content-pages.css`
+- Modify: `pages/services.html`
 
 **Interfaces:**
 - Consumes: the existing `.service-process-row > .service-process-media > img` markup in `pages/services.html`
+- Adds: one `.service-process-preview > img` sibling per row using the same image source
 - Produces: CSS-only row-local hover/focus preview states; no JavaScript API or shared preview state
 
 - [ ] **Step 1: Write the failing CSS contract tests**
@@ -228,8 +231,9 @@ python3 -m http.server 4193
 
 Desktop checks at `1900 x 1050`:
 
-- no image is visible before hover;
+- all six horizontal samples are visible before hover;
 - hovering rows 01 through 06 reveals the matching image;
+- the permanent horizontal sample remains visible while the square preview is open;
 - crossing number, title, description, and arrow does not flicker;
 - each image is square and does not move the rail;
 - first and last row previews remain inside the Services canvas;
@@ -238,6 +242,7 @@ Desktop checks at `1900 x 1050`:
 Mobile checks at `390 x 844`:
 
 - each row is square and contains its own image;
+- no duplicate square overlay is displayed;
 - text remains readable;
 - no horizontal overflow occurs;
 - header and footer remain unchanged.
@@ -245,6 +250,6 @@ Mobile checks at `390 x 844`:
 - [ ] **Step 7: Commit the implementation**
 
 ```bash
-git add content-pages.css content-pages.test.mjs
-git commit -m "Refine services square hover previews"
+git add pages/services.html content-pages.css content-pages.test.mjs docs/superpowers/specs/2026-07-18-services-square-hover-preview-design.md docs/superpowers/plans/2026-07-18-services-square-hover-preview.md
+git commit -m "Keep services samples with hover previews"
 ```
