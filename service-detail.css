@@ -1,0 +1,156 @@
+.service-detail-page {
+  background: #111315;
+}
+
+.service-detail-page::before,
+.service-detail-page::after {
+  display: none;
+}
+
+.detail-hero {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.82fr) minmax(0, 1.18fr);
+  min-height: min(calc(100vh - var(--site-header-height)), var(--site-first-screen-max));
+}
+
+.detail-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: clamp(48px, 7vw, 118px) var(--site-gutter);
+}
+
+.detail-back,
+.detail-index {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.detail-index {
+  margin: 44px 0 0;
+  color: var(--accent-bright);
+}
+
+.detail-copy h1 {
+  max-width: 8em;
+  margin: 18px 0 20px;
+  color: var(--ink);
+  font-family: Impact, "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(64px, 7vw, 128px);
+  line-height: 0.9;
+}
+
+.detail-intro {
+  max-width: 34em;
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.detail-hero-media {
+  min-width: 0;
+  min-height: 560px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.detail-hero-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.94) contrast(1.06) brightness(0.82);
+}
+
+.detail-story,
+.detail-contact {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(68px, 8vw, 128px) var(--site-gutter);
+}
+
+.detail-story p:first-child {
+  max-width: 46em;
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(19px, 2vw, 30px);
+  line-height: 1.65;
+}
+
+.detail-process {
+  margin-top: 48px !important;
+  color: var(--muted) !important;
+  font-family: var(--mono);
+  font-size: 12px !important;
+  letter-spacing: 0.08em;
+}
+
+.detail-contact {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 32px;
+  border-top: 1px solid var(--line);
+}
+
+.detail-contact h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(34px, 4vw, 68px);
+}
+
+.detail-contact a {
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.detail-contact a:hover,
+.detail-contact a:focus-visible,
+.detail-back:hover,
+.detail-back:focus-visible {
+  color: var(--accent-bright);
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 5px;
+}
+
+@media (max-width: 899px) {
+  .detail-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-copy {
+    min-height: 520px;
+  }
+
+  .detail-hero-media {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (max-width: 620px) {
+  .detail-copy {
+    min-height: 470px;
+    padding-inline: 20px;
+  }
+
+  .detail-copy h1 {
+    font-size: 64px;
+  }
+
+  .detail-story,
+  .detail-contact {
+    padding-inline: 20px;
+  }
+
+  .detail-contact {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

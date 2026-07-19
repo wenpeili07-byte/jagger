@@ -63,3 +63,11 @@ assert.deepEqual(
   "all six archive cards should link to their matching detail pages"
 );
 assert.doesNotMatch(casesHtml, /class="archive-card" href="#"/, "case archive should not retain dead links");
+
+const serviceCss = read("./service-detail.css");
+assert.match(serviceCss, /\.service-detail-page\s*\{/);
+assert.match(serviceCss, /\.detail-hero\s*\{[^}]*grid-template-columns:/s);
+assert.match(serviceCss, /\.detail-process\s*\{/);
+assert.match(serviceCss, /@media \(max-width:\s*899px\)[\s\S]*?\.detail-hero\s*\{[^}]*grid-template-columns:\s*1fr/s);
+assert.doesNotMatch(serviceCss, /width:\s*100vw|transform:\s*scale\(/);
+assert.doesNotMatch(serviceCss, /\.detail-(?:hero|story|contact)\s*\{[^}]*border:\s*[^0]/s);
