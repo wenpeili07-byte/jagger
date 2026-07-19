@@ -144,6 +144,11 @@ for (const [name, detailCss, stackedBreakpoint] of [
   ["service", serviceCss, "1099px"],
   ["case", caseCss, "899px"],
 ]) {
+  assert.match(detailCss, /\.detail-hero\s*\{[^}]*\n\s*height:\s*min\(calc\(100vh - var\(--site-header-height\)\),\s*var\(--site-first-screen-max\)\)/s, `${name} desktop hero should have a bounded first-screen height`);
+  assert.match(detailCss, /\.detail-hero-media\s*\{[^}]*\n\s*height:\s*100%[^}]*\n\s*min-height:\s*0/s, `${name} desktop hero media should fill the bounded grid row`);
+  assert.match(detailCss, /\.detail-hero-media img\s*\{[^}]*object-fit:\s*cover/s, `${name} hero image should continue to crop within the stable row`);
+  assert.match(detailCss, new RegExp(`@media \\(max-width:\\s*${stackedBreakpoint.replace(".", "\\.")}\\)[\\s\\S]*?\\.detail-hero\\s*\\{[^}]*grid-template-columns:\\s*1fr[^}]*height:\\s*auto`, "s"), `${name} stacked hero should release the desktop height`);
+  assert.match(detailCss, new RegExp(`@media \\(max-width:\\s*${stackedBreakpoint.replace(".", "\\.")}\\)[\\s\\S]*?\\.detail-hero-media\\s*\\{[^}]*height:\\s*auto[^}]*min-height:\\s*0[^}]*aspect-ratio:\\s*4\\s*\\/\\s*3`, "s"), `${name} stacked hero media should preserve the 4:3 flow`);
   assert.match(detailCss, /\.detail-copy\s*\{[^}]*container-type:\s*inline-size/s, `${name} detail copy should establish an inline-size container`);
   assert.match(detailCss, /\.detail-copy h1\s*\{[^}]*font-size:\s*clamp\(48px,\s*8rem,\s*128px\)/s, `${name} detail heading should retain a non-viewport fallback`);
   assert.match(detailCss, /@media \(max-width:\s*1180px\)[\s\S]*?\.detail-copy h1\s*\{[^}]*font-size:\s*clamp\(48px,\s*16cqw,\s*72px\)/s, `${name} 1100px heading should shrink to its narrow copy column`);

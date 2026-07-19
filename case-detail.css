@@ -10,7 +10,7 @@
 .detail-hero {
   display: grid;
   grid-template-columns: minmax(320px, 0.72fr) minmax(0, 1.28fr);
-  min-height: min(calc(100vh - var(--site-header-height)), var(--site-first-screen-max));
+  height: min(calc(100vh - var(--site-header-height)), var(--site-first-screen-max));
 }
 
 .detail-copy {
@@ -61,7 +61,8 @@
 
 .detail-hero-media {
   min-width: 0;
-  min-height: 560px;
+  height: 100%;
+  min-height: 0;
   margin: 0;
   overflow: hidden;
 }
@@ -132,6 +133,7 @@
 @media (max-width: 899px) {
   .detail-hero {
     grid-template-columns: 1fr;
+    height: auto;
   }
 
   .detail-copy {
@@ -143,6 +145,7 @@
   }
 
   .detail-hero-media {
+    height: auto;
     min-height: 0;
     aspect-ratio: 4 / 3;
   }
