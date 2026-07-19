@@ -23,7 +23,8 @@ For LONMA DYNAMIC, the reference is adapted to the existing sharper automotive
 style:
 
 - fixed `1 / 1` aspect ratio;
-- the existing horizontal image column remains visible beneath the preview;
+- the existing horizontal image column remains visible at rest and fades out
+  while the preview is visible;
 - no new card background or decorative frame;
 - a subtle shadow and no more than the site's existing small corner radius;
 - existing BMW-inspired blue remains limited to active text, line, arrow, and
@@ -38,13 +39,17 @@ asset. A second image element reuses that row's source for the overlay.
 The square preview:
 
 - is positioned on the right side of the service list;
-- uses `clamp()` sizing so it remains approximately 320-420 px while fitting
-  the available content canvas;
+- matches the horizontal sample column width: `58%` on desktop, `52%` on
+  compact desktop, and `44%` on landscape tablet;
 - uses `aspect-ratio: 1 / 1` and `object-fit: cover`;
 - starts at `opacity: 0`, slightly lower, and with a small negative rotation;
 - becomes visible over about 500 ms with a smooth ease;
 - receives the highest stacking order only for the active row;
 - never changes the width or height of the row.
+
+When the square preview appears, that row's permanent horizontal sample fades
+to `opacity: 0`. A small responsive right inset keeps the rotated preview
+inside the page canvas without reducing its image width.
 
 Hovering any part of the row, including its text, must keep the same animation
 active. Keyboard focus must produce the same visible result. Moving directly
@@ -82,9 +87,11 @@ content, and service destinations are outside this change.
 
 1. The deployed Services structure remains recognizable and unchanged in
    content and order.
-2. Every service keeps its permanently visible horizontal sample on desktop.
-3. Hovering or focusing a row adds only that row's correct square preview.
-4. Every preview is square and uses `object-fit: cover`.
+2. Every service keeps its horizontal sample visible on desktop at rest.
+3. Hovering or focusing a row fades its sample out and reveals only that row's
+   correct square preview.
+4. Every preview is square, uses `object-fit: cover`, and matches the current
+   horizontal sample column width.
 5. The reveal does not move or resize any row.
 6. Hover remains stable while the pointer crosses row text and controls.
 7. Mobile keeps one readable image per row and has no horizontal overflow.

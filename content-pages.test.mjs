@@ -132,9 +132,12 @@ assert.match(css, /\.service-process-rail\s*\{[^}]*min-height:\s*0/s, "service r
 assert.match(css, /\.service-process-row\s*\{[^}]*grid-template-columns:\s*minmax\(330px,\s*42%\)\s*minmax\(0,\s*58%\)[^}]*min-height:\s*0[^}]*overflow:\s*visible/s, "desktop rows should retain their sample-image column while allowing previews to float");
 assert.match(css, /\.service-process-media\s*\{[^}]*position:\s*relative[^}]*grid-column:\s*2[^}]*overflow:\s*hidden/s, "the permanent sample should remain in the right grid column");
 assert.match(css, /\.service-process-media img\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*object-fit:\s*cover/s, "permanent sample imagery should crop without distortion");
-assert.match(css, /\.service-process-preview\s*\{[^}]*position:\s*absolute[^}]*aspect-ratio:\s*1\s*\/\s*1[^}]*opacity:\s*0[^}]*pointer-events:\s*none/s, "desktop square previews should be separate hidden overlays");
+assert.match(css, /\.service-process-preview\s*\{[^}]*position:\s*absolute[^}]*right:\s*clamp\(22px,\s*2vw,\s*38px\)[^}]*width:\s*58%[^}]*aspect-ratio:\s*1\s*\/\s*1[^}]*opacity:\s*0[^}]*pointer-events:\s*none/s, "desktop square previews should match the permanent sample column width and stay inside the canvas while rotated");
 assert.match(css, /\.service-process-preview img\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*object-fit:\s*cover/s, "square preview imagery should crop without distortion");
 assert.match(css, /\.service-process-row:first-child \.service-process-preview\s*\{[^}]*top:\s*34px/s, "the first preview should clear the sticky header");
+assert.match(css, /\.service-process-row:nth-child\(2\) \.service-process-preview\s*\{[^}]*top:\s*-80px/s, "the second enlarged preview should remain inside the canvas");
+assert.match(css, /\.service-process-row:nth-child\(3\) \.service-process-preview\s*\{[^}]*top:\s*-240px/s, "the third enlarged preview should remain inside the canvas");
+assert.match(css, /\.service-process-row:nth-child\(4\) \.service-process-preview\s*\{[^}]*top:\s*auto[^}]*bottom:\s*-220px/s, "the fourth enlarged preview should remain inside the canvas");
 assert.match(css, /\.service-process-row:nth-child\(5\) \.service-process-preview\s*\{[^}]*top:\s*auto[^}]*bottom:\s*-24px/s, "the fifth preview should lift into the visible canvas");
 assert.match(css, /\.service-process-row:last-child \.service-process-preview\s*\{[^}]*top:\s*auto[^}]*bottom:\s*34px/s, "the final preview should remain inside the visible canvas");
 assert.match(css, /\.service-process-arrow\s*\{[^}]*z-index:\s*9/s, "the arrow should remain visible above the square preview");
@@ -155,16 +158,20 @@ test("services uses a page-scoped accent that meets AA on both neutral surfaces"
 });
 
 test("services stacks through 767px and starts its tablet layout at 768px", () => {
+  const compactDesktop = findCssBlock(css, "@media (max-width: 1180px)");
   const tabletServices = findCssBlock(css, "@media (min-width: 768px) and (max-width: 980px)");
   const mobileServices = findCssBlock(css, "@media (max-width: 767px)");
   const sharedMobile = findCssBlock(css, "@media (max-width: 760px)");
 
+  assert.match(compactDesktop.body, /\.service-process-preview\s*\{[^}]*width:\s*52%/s, "compact desktop previews should match the 52 percent sample column");
   assert.match(tabletServices.body, /\.services-workspace\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/s, "tablet services workspace should use natural document height");
   assert.match(tabletServices.body, /\.service-process-rail\s*\{[^}]*grid-template-rows:\s*repeat\(6,\s*auto\)/s, "tablet service rows should grow with their copy");
+  assert.match(tabletServices.body, /\.service-process-preview\s*\{[^}]*width:\s*44%/s, "tablet previews should match the 44 percent sample column");
   assert.match(mobileServices.body, /\.services-workspace\s*\{[^}]*grid-template-columns:\s*1fr[^}]*height:\s*auto[^}]*min-height:\s*0/s, "services should stack through 767px");
   assert.match(mobileServices.body, /\.service-process-row\s*\{[^}]*grid-template-rows:\s*auto[^}]*width:\s*100%[^}]*min-height:\s*0[^}]*aspect-ratio:\s*1\s*\/\s*1[^}]*overflow:\s*hidden/s, "mobile service rows should become stable square image modules");
   assert.match(mobileServices.body, /\.service-process-media\s*\{[^}]*position:\s*absolute[^}]*z-index:\s*1[^}]*grid-column:\s*1[^}]*inset:\s*0[^}]*width:\s*100%[^}]*height:\s*100%/s, "mobile should keep each permanent sample below its readable copy");
   assert.match(mobileServices.body, /\.service-process-preview\s*\{[^}]*display:\s*none/s, "mobile should hide the redundant desktop-only square preview");
+  assert.match(mobileServices.body, /\.service-process-row:hover \.service-process-media,\s*\.service-process-row:focus-visible \.service-process-media\s*\{[^}]*opacity:\s*1/s, "mobile should never hide the only visible service image");
   assert.match(sharedMobile.body, /\.content-page \.topbar\s*\{[^}]*position:\s*relative/s, "the shared About and Contact mobile breakpoint should remain at 760px");
   assert.doesNotMatch(sharedMobile.body, /\.(?:services-|service-process-)/, "Services responsive rules should not remain in the shared 760px block");
 });
@@ -174,11 +181,11 @@ test("services gates hover visuals to fine pointers while active and focus state
   const reducedMotion = findCssBlock(css, "@media (prefers-reduced-motion: reduce)");
   const globalCss = `${css.slice(0, finePointerHover.start)}${css.slice(finePointerHover.end, reducedMotion.start)}${css.slice(reducedMotion.end)}`;
 
-  assert.doesNotMatch(globalCss, /\.service-process-row:hover/, "Services visual hover selectors should only exist in the fine-pointer and reduced-motion media blocks");
+  assert.doesNotMatch(css.slice(0, finePointerHover.start), /\.service-process-row:hover/, "Services visual hover selectors should begin inside the fine-pointer media block");
   assert.match(finePointerHover.body, /\.service-process-row:hover\s*\{[^}]*background:\s*#171a1d/s, "real hover should keep the neutral active surface");
   assert.match(finePointerHover.body, /\.service-process-row:hover::before\s*\{[^}]*transform:\s*scaleY\(1\)/s, "real hover should reveal the blue edge");
   assert.match(finePointerHover.body, /\.service-process-row:hover \.service-process-number,[\s\S]{0,300}\.service-process-row:hover \.service-process-label,[\s\S]{0,300}\.service-process-row:hover \.service-process-arrow\s*\{[^}]*color:\s*var\(--accent-bright\)/s, "real hover should color the number, label, and arrow blue");
-  assert.match(finePointerHover.body, /\.service-process-row:hover \.service-process-media img\s*\{[^}]*brightness\(0\.8\)[^}]*opacity:\s*1/s, "hover should preserve the brighter permanent sample treatment");
+  assert.match(finePointerHover.body, /\.service-process-row:hover \.service-process-media\s*\{[^}]*opacity:\s*0/s, "hover should fade out the permanent sample when the large preview appears");
   assert.match(finePointerHover.body, /\.service-process-row:hover \.service-process-preview\s*\{[^}]*opacity:\s*1[^}]*transform:\s*translate3d\(0,\s*-12px,\s*0\)\s*rotate\(-5deg\)/s, "hover should reveal and lift only the current row's square preview");
   assert.match(finePointerHover.body, /\.service-process-row:hover \.service-process-arrow\s*\{[^}]*transform:\s*translate\(-100%,\s*-50%\)\s*rotate\(45deg\)/s, "hover should rotate the service arrow with the preview");
 
@@ -187,6 +194,7 @@ test("services gates hover visuals to fine pointers while active and focus state
   assert.match(globalCss, /\.service-process-row\[data-active\] \.service-process-number,[\s\S]{0,300}\.service-process-row\[data-active\] \.service-process-label,[\s\S]{0,300}\.service-process-row\[data-active\] \.service-process-arrow\s*\{[^}]*color:\s*var\(--accent-bright\)/s, "the active number, label, and arrow should remain blue globally");
   assert.match(globalCss, /\.service-process-row\[data-active\] \.service-process-media img\s*\{[^}]*brightness\(0\.8\)[^}]*opacity:\s*1/s, "the active row should keep its permanent sample visible and bright");
   assert.match(globalCss, /\.service-process-row:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s, "keyboard focus should remain visible globally");
+  assert.match(globalCss, /\.service-process-row:focus-visible \.service-process-media\s*\{[^}]*opacity:\s*0/s, "keyboard focus should fade the permanent sample while the large preview is visible");
   assert.match(globalCss, /\.service-process-row:focus-visible \.service-process-preview\s*\{[^}]*opacity:\s*1[^}]*transform:\s*translate3d\(0,\s*-12px,\s*0\)\s*rotate\(-5deg\)/s, "keyboard focus should reveal the matching square preview");
 });
 

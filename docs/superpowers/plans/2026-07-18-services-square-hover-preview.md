@@ -2,16 +2,16 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Keep the Services page's permanently visible right-side image slices and add row-local 1:1 previews that reveal on desktop hover or keyboard focus without moving the six-row layout.
+**Goal:** Keep the Services page's right-side image slices visible at rest, then fade the active slice out while a full-column-width 1:1 preview reveals on desktop hover or keyboard focus without moving the six-row layout.
 
-**Architecture:** Keep `.service-process-media` as the permanent right grid column and add `.service-process-preview` as a second row-local image using the same source. The preview is an absolutely positioned square overlay on desktop, while the row remains the single interaction boundary. Hide the redundant preview on mobile and retain the existing full-row image treatment. Extend the static tests to lock both image roles, the square ratio, hidden default state, row-local reveal, motion limits, and reduced-motion fallback.
+**Architecture:** Keep `.service-process-media` as the right grid column and add `.service-process-preview` as a second row-local image using the same source. The preview is an absolutely positioned square overlay whose width tracks the media column (`58%`, `52%`, or `44%` by breakpoint); the original media fades out during reveal. The row remains the single interaction boundary. Hide the redundant preview on mobile and retain the existing full-row image treatment. Extend the static tests to lock both image roles, responsive width parity, the hidden default state, row-local takeover, motion limits, and reduced-motion fallback.
 
 **Tech Stack:** Static HTML, CSS, Node.js built-in test runner
 
 ## Global Constraints
 
 - Keep the deployed left introduction column and six service rows.
-- Keep every permanent right-side horizontal sample image visible on desktop.
+- Keep every right-side horizontal sample image visible on desktop at rest.
 - Keep every existing service number, label, title, description, destination, and image source.
 - Desktop preview aspect ratio is exactly `1 / 1`.
 - Animate only `opacity` and `transform`.
@@ -20,6 +20,20 @@
 - Use the existing mobile breakpoint at `767px`.
 
 ---
+
+## Final Revision
+
+The implementation below is superseded where it conflicts with these final
+requirements:
+
+- `.service-process-preview` uses the same width percentage as the right media
+  column and a small responsive right inset;
+- hover and focus-visible set the matching `.service-process-media` to
+  `opacity: 0`;
+- mobile keeps `.service-process-media` at `opacity: 1` and hides
+  `.service-process-preview`;
+- row-specific vertical offsets keep all six enlarged previews inside the
+  desktop canvas.
 
 ### Task 1: Row-Local Square Preview
 
@@ -233,7 +247,8 @@ Desktop checks at `1900 x 1050`:
 
 - all six horizontal samples are visible before hover;
 - hovering rows 01 through 06 reveals the matching image;
-- the permanent horizontal sample remains visible while the square preview is open;
+- the matching horizontal sample fades out while the square preview is open;
+- preview CSS width matches the horizontal sample column width;
 - crossing number, title, description, and arrow does not flicker;
 - each image is square and does not move the rail;
 - first and last row previews remain inside the Services canvas;
