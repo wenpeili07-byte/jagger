@@ -315,10 +315,10 @@
 .service-process-row {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(330px, 42%) minmax(0, 58%);
+  grid-template-columns: minmax(0, 1fr);
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
   border-top: 1px solid var(--line);
   color: var(--ink);
   text-decoration: none;
@@ -360,10 +360,9 @@
 .service-process-copy {
   position: relative;
   z-index: 2;
-  grid-column: 1;
   min-width: 0;
-  padding: 22px 54px 20px 96px;
-  background: rgba(17, 19, 21, 0.94);
+  padding: 22px min(500px, 52%) 20px 96px;
+  background: transparent;
 }
 
 .service-process-label {
@@ -391,32 +390,54 @@
 }
 
 .service-process-media {
-  position: relative;
-  z-index: 1;
-  grid-column: 2;
-  min-width: 0;
-  min-height: 0;
+  position: absolute;
+  z-index: 8;
+  top: clamp(-72px, -5.5vw, -44px);
+  right: clamp(26px, 4vw, 76px);
+  width: min(420px, 44%);
+  aspect-ratio: 1 / 1;
   margin: 0;
   overflow: hidden;
+  border-radius: 6px;
   background: #171a1d;
+  box-shadow: 12px 18px 38px rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 12px, 0) rotate(0deg);
+  transform-origin: 50% 50%;
+  transition: opacity 500ms ease-out, transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
 
 .service-process-media::after {
   position: absolute;
   inset: 0;
-  background: rgba(9, 11, 12, 0.2);
+  background: rgba(9, 11, 12, 0.08);
   content: "";
-  transition: background 200ms ease;
 }
 
 .service-process-media img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: saturate(0.82) contrast(1.05) brightness(0.68);
-  opacity: 0.88;
-  transition: filter 220ms ease, opacity 220ms ease;
+  filter: saturate(1.02) contrast(1.04) brightness(0.88);
+  opacity: 1;
+}
+
+.service-process-row:first-child .service-process-media {
+  top: 34px;
+}
+
+.service-process-row:nth-child(5) .service-process-media {
+  top: auto;
+  bottom: -24px;
+}
+
+.service-process-row:last-child .service-process-media {
+  top: auto;
+  bottom: 34px;
 }
 
 .service-process-row:nth-child(2) .service-process-media img,
@@ -430,13 +451,14 @@
 
 .service-process-arrow {
   position: absolute;
-  z-index: 5;
+  z-index: 9;
   top: 50%;
-  left: calc(42% - 30px);
+  right: 34px;
+  left: auto;
   color: var(--muted);
   font-size: 25px;
   transform: translate(-100%, -50%);
-  transition: color 200ms ease, translate 200ms ease;
+  transition: color 200ms ease, transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .service-process-row[data-active] {
@@ -454,27 +476,24 @@
   color: var(--accent-bright);
 }
 
-.service-process-row[data-active] .service-process-media::after {
-  background: rgba(9, 11, 12, 0.08);
-}
-
-.service-process-row[data-active] .service-process-media img {
-  filter: saturate(0.94) contrast(1.06) brightness(0.8);
-  opacity: 1;
-}
-
-.service-process-row[data-active] .service-process-arrow {
-  translate: 6px 0;
-}
-
 .service-process-row:focus-visible {
-  z-index: 6;
+  z-index: 7;
   outline: 2px solid var(--accent-bright);
   outline-offset: -3px;
 }
 
+.service-process-row:focus-visible .service-process-media {
+  opacity: 1;
+  transform: translate3d(0, -12px, 0) rotate(-5deg);
+}
+
+.service-process-row:focus-visible .service-process-arrow {
+  transform: translate(-100%, -50%) rotate(45deg);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .service-process-row:hover {
+    z-index: 7;
     background: #171a1d;
   }
 
@@ -488,17 +507,13 @@
     color: var(--accent-bright);
   }
 
-  .service-process-row:hover .service-process-media::after {
-    background: rgba(9, 11, 12, 0.08);
-  }
-
-  .service-process-row:hover .service-process-media img {
-    filter: saturate(0.94) contrast(1.06) brightness(0.8);
+  .service-process-row:hover .service-process-media {
     opacity: 1;
+    transform: translate3d(0, -12px, 0) rotate(-5deg);
   }
 
   .service-process-row:hover .service-process-arrow {
-    translate: 6px 0;
+    transform: translate(-100%, -50%) rotate(45deg);
   }
 }
 
@@ -699,18 +714,6 @@
     grid-template-columns: minmax(270px, 30%) minmax(0, 1fr);
   }
 
-  .service-process-row {
-    grid-template-columns: minmax(250px, 48%) minmax(0, 52%);
-  }
-
-  .service-process-copy {
-    padding-right: 34px;
-  }
-
-  .service-process-arrow {
-    left: calc(48% - 22px);
-  }
-
   .contact-inquiry {
     grid-template-columns: 1fr;
   }
@@ -727,21 +730,7 @@
   }
 
   .service-process-row {
-    grid-template-columns: minmax(0, 56%) minmax(0, 44%);
     min-height: 162px;
-  }
-
-  .service-process-media {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 56%;
-    height: 100%;
-  }
-
-  .service-process-arrow {
-    left: calc(56% - 22px);
   }
 }
 
@@ -777,8 +766,10 @@
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-    height: auto;
-    min-height: 360px;
+    width: 100%;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
   }
 
   .service-process-copy {
@@ -792,12 +783,23 @@
 
   .service-process-media {
     position: absolute;
+    z-index: 1;
     inset: 0;
-    grid-column: 1;
-    grid-row: 1;
     width: 100%;
     height: 100%;
-    min-height: 0;
+    aspect-ratio: auto;
+    border-radius: 0;
+    box-shadow: none;
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+
+  .service-process-row:first-child .service-process-media,
+  .service-process-row:nth-child(5) .service-process-media,
+  .service-process-row:last-child .service-process-media {
+    top: 0;
+    bottom: 0;
   }
 
   .service-process-number {
@@ -813,9 +815,6 @@
     transform: none;
   }
 
-  .service-process-row[data-active] .service-process-arrow {
-    translate: 0;
-  }
 }
 
 @media (max-width: 760px) {
@@ -929,5 +928,15 @@
   .service-process-media img,
   .service-process-arrow {
     transition: none;
+  }
+
+  .service-process-media {
+    transform: none;
+    transition: opacity 120ms linear;
+  }
+
+  .service-process-row:hover .service-process-media,
+  .service-process-row:focus-visible .service-process-media {
+    transform: none;
   }
 }
