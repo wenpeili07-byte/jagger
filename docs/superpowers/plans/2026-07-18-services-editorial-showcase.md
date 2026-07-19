@@ -77,7 +77,7 @@ assert.match(
 );
 assert.match(js, /querySelectorAll\("\[data-service-index\]"\)/, "services should discover selectable rows");
 assert.match(js, /function setActiveService\(index\)/, "services should expose one active-state controller");
-assert.match(js, /dataServicePreviewIndex/, "services should synchronize shared preview images");
+assert.match(js, /servicePreviewIndex/, "services should synchronize shared preview images");
 assert.doesNotMatch(js, /window\.addEventListener\("scroll"|requestAnimationFrame/, "services should not be driven by page scroll");
 ```
 
