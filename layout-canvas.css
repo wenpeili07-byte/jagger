@@ -1,7 +1,14 @@
-/* 1728 x 1050 design canvas constraints. Loaded after styles.css. */
+/* 1900 x 1050 shared design canvas. Loaded after styles.css. */
+:root {
+  --site-max-width: 1900px;
+  --site-header-height: 77px;
+  --site-first-screen-max: 973px;
+  --site-gutter: clamp(20px, 4vw, 76px);
+}
+
 .site-shell {
   width: 100%;
-  max-width: 1728px;
+  max-width: var(--site-max-width);
   margin: 0 auto;
 }
 
@@ -11,13 +18,14 @@
   right: auto;
   bottom: 0;
   left: 50%;
-  width: min(100%, 1728px);
+  width: min(100%, var(--site-max-width));
   transform: translateX(-50%);
 }
 
-.cover {
-  min-height: min(calc(100vh - 77px), 973px);
-  padding: clamp(26px, 4vw, 70px) clamp(20px, 4vw, 70px);
+.cover,
+.cases-hero {
+  min-height: min(calc(100vh - var(--site-header-height)), var(--site-first-screen-max));
+  padding: clamp(26px, 4vw, 70px) var(--site-gutter);
 }
 
 .film-card {
@@ -29,10 +37,6 @@
   transform: translateX(-10px);
 }
 
-.cases-hero {
-  min-height: min(calc(100vh - 77px), 973px);
-}
-
 .case-feature-card {
   min-height: clamp(126px, 9.4vw, 214px);
 }
@@ -41,7 +45,7 @@
   padding-inline: clamp(24px, 5vw, 86px);
 }
 
-@media (min-width: 1728px) {
+@media (min-width: 1900px) {
   .film-card {
     min-height: 110px;
   }
@@ -49,5 +53,37 @@
   .film-card.is-active {
     min-height: 151px;
     transform: translateX(-10px);
+  }
+
+}
+
+@media (min-width: 900px) and (max-width: 1180px) {
+  .cover,
+  .cases-hero {
+    padding-inline: clamp(20px, 3vw, 36px);
+  }
+
+  .cover {
+    padding-block: 26px;
+  }
+}
+
+@media (min-width: 1700px) {
+  .cover {
+    padding-block: 27.5px;
+  }
+
+  .film-card {
+    min-height: 106px;
+    padding-block: 16px;
+  }
+
+  .film-card.is-active {
+    min-height: 139px;
+  }
+
+  .detail-panel {
+    margin-top: 12px;
+    padding-top: 12px;
   }
 }

@@ -1,0 +1,76 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+
+const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
+const canvasCss = read("./layout-canvas.css");
+const sharedCss = read("./styles.css");
+const contentCss = read("./content-pages.css");
+const publicPages = [
+  "./index.html",
+  "./pages/about.html",
+  "./pages/services.html",
+  "./pages/cases.html",
+  "./pages/contact.html",
+  "./pages/cases/case-01.html",
+  "./pages/services/build.html",
+  "./pages/services/parts.html",
+  "./pages/services/photo.html",
+  "./pages/services/ecu.html",
+  "./pages/services/chassis.html",
+  "./pages/services/exhaust.html",
+];
+
+// Task 2: shared canvas and cache coverage.
+assert.match(canvasCss, /--site-max-width:\s*1900px/, "canvas should define the 1900px site maximum");
+assert.match(canvasCss, /--site-header-height:\s*77px/, "canvas should define the 77px desktop header");
+assert.match(canvasCss, /--site-first-screen-max:\s*973px/, "canvas should cap first screens at 973px below the header");
+assert.match(canvasCss, /\.site-shell\s*\{[^}]*max-width:\s*var\(--site-max-width\)/s, "all shells should consume the shared maximum");
+assert.match(canvasCss, /\.site-shell::before,\s*\.site-shell::after\s*\{[^}]*width:\s*min\(100%,\s*var\(--site-max-width\)\)/s, "fixed backgrounds should use the shared maximum");
+assert.doesNotMatch(canvasCss, /1728px/, "the shared canvas should not retain the obsolete width");
+assert.doesNotMatch(canvasCss, /transform:\s*scale\(/, "the shared canvas must not scale the page");
+const globalSelectors = new Set(["html", "body", ".site-shell", ".content-page.site-shell"]);
+for (const css of [canvasCss, sharedCss, contentCss].join("\n").matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+  const [, selectorText, declarations] = css;
+  const selectors = selectorText.split(",").map((selector) => selector.trim());
+  if (selectors.some((selector) => globalSelectors.has(selector))) {
+    assert.doesNotMatch(declarations, /transform:\s*scale\(/, "global page selectors must not scale the page");
+  }
+}
+assert.match(canvasCss, /\.cover,\s*\.cases-hero\s*\{[^}]*min-height:\s*min\(calc\(100vh - var\(--site-header-height\)\),\s*var\(--site-first-screen-max\)\)/s, "cover and cases hero should consume the shared header and first-screen height variables");
+assert.doesNotMatch(contentCss, /\.content-page\.site-shell\s*\{[^}]*max-width:/s, "content pages should not own a second canvas width");
+
+for (const path of publicPages) {
+  const html = read(path);
+  assert.match(html, /layout-canvas\.css\?v=canvas-20260719-1900/, `${path} should load the 1900px canvas version`);
+}
+
+// Task 3: compact header and services rules.
+assert.match(sharedCss, /\.topbar\s*\{[^}]*min-height:\s*var\(--site-header-height\)/s, "topbar should consume the shared header height");
+assert.match(contentCss, /@media \(min-width:\s*768px\) and \(max-width:\s*980px\)[\s\S]*?\.service-process-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*56%\)\s+minmax\(0,\s*44%\)/s, "790px services should keep the uploaded process-rail design with shrinkable columns");
+assert.match(sharedCss, /@media \(max-width:\s*980px\)[\s\S]*?\.topbar\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto/s, "compact headers should use two columns");
+const compactDesktopMarker = "@media (min-width: 900px) and (max-width: 1180px)";
+const compactDesktopStart = sharedCss.indexOf(compactDesktopMarker);
+assert.notEqual(compactDesktopStart, -1, "shared styles should define the 900-1180px compact-desktop range");
+const compactDesktopEnd = sharedCss.indexOf("@media", compactDesktopStart + compactDesktopMarker.length);
+const compactDesktopBlock = sharedCss.slice(compactDesktopStart, compactDesktopEnd);
+assert.match(compactDesktopBlock, /\.cover,\s*\.cases-hero\s*\{[^}]*grid-template-columns:\s*minmax\(240px,\s*0\.76fr\)\s+minmax\(0,\s*1\.24fr\)/s, "compact desktops should retain shrinkable two-column homepage and cases heroes");
+assert.doesNotMatch(compactDesktopBlock, /grid-template-columns:\s*1fr/, "compact desktops must not collapse major heroes to one column");
+const compactCanvasStart = canvasCss.indexOf(compactDesktopMarker);
+assert.notEqual(compactCanvasStart, -1, "the final canvas stylesheet should own compact-desktop spacing");
+const compactCanvasEnd = canvasCss.indexOf("@media", compactCanvasStart + compactDesktopMarker.length);
+const compactCanvasBlock = canvasCss.slice(compactCanvasStart, compactCanvasEnd);
+assert.match(compactCanvasBlock, /\.cover,\s*\.cases-hero\s*\{[^}]*padding-inline:\s*clamp\(20px,\s*3vw,\s*36px\)/s, "compact desktop gutters should survive the final canvas cascade");
+assert.match(compactCanvasBlock, /\.cover\s*\{[^}]*padding-block:\s*26px/s, "compact desktop homepage content should fit the 973px first screen");
+assert.match(sharedCss, /@media \(max-width:\s*899px\)[\s\S]*?\.cover\s*\{[^}]*grid-template-columns:\s*1fr/s, "split-screen layouts may collapse the homepage below the compact-desktop range");
+assert.match(sharedCss, /@media \(max-width:\s*899px\)[\s\S]*?\.cases-hero,\s*\.archive-layout\s*\{[^}]*grid-template-columns:\s*1fr/s, "split-screen layouts may collapse cases below the compact-desktop range");
+
+// Task 4: every large desktop should fit the complete homepage inside the shared 973px first screen.
+const largeDesktopMarker = "@media (min-width: 1700px)";
+const largeDesktopStart = canvasCss.indexOf(largeDesktopMarker);
+assert.notEqual(largeDesktopStart, -1, "canvas should define a 1700px large-desktop compaction override");
+const largeDesktopBlock = canvasCss.slice(largeDesktopStart);
+assert.match(largeDesktopBlock, /\.cover\s*\{[^}]*padding-block:\s*27\.5px/s, "large desktops should use the verified cover padding");
+assert.match(largeDesktopBlock, /\.film-card\s*\{[^}]*min-height:\s*106px[^}]*padding-block:\s*16px/s, "large desktops should use the verified compact film-card dimensions");
+assert.match(largeDesktopBlock, /\.film-card\.is-active\s*\{[^}]*min-height:\s*139px/s, "large desktops should use the verified active-card height");
+assert.match(largeDesktopBlock, /\.detail-panel\s*\{[^}]*margin-top:\s*12px[^}]*padding-top:\s*12px/s, "large desktops should use the verified compact detail spacing");
+assert.doesNotMatch(largeDesktopBlock, /max-height:/, "large-desktop compaction should also hold on tall wide displays");

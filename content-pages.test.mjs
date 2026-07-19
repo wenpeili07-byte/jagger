@@ -116,7 +116,13 @@ for (const name of ["name", "email", "vehicle", "service", "message"]) {
 assert.match(contactHtml, /type="email"[^>]*required/, "contact email should be required");
 assert.match(contactHtml, /data-contact-status/, "contact should expose a status message for form feedback");
 
-assert.match(css, /\.content-page\.site-shell\s*\{[^}]*max-width:\s*1900px/s, "content pages should use the selected 1900px desktop canvas");
+const contentPageShellBlock = css.match(/\.content-page\.site-shell\s*\{[^}]*\}/s)?.[0] || "";
+assert.match(contentPageShellBlock, /\.content-page\.site-shell\s*\{/, "content pages should keep a scoped visual block");
+assert.doesNotMatch(
+  contentPageShellBlock,
+  /(?:^|\n)\s*(?:width|max-width|margin(?:-[a-z-]+)?):/m,
+  "content pages should defer width and centering to layout-canvas.css"
+);
 assert.match(css, /\.content-hero-media img\s*\{[^}]*object-fit:\s*cover/s, "content hero imagery should crop without distortion");
 assert.match(css, /\.content-hero-copy\s*\{[^}]*justify-content:\s*center/s, "about hero copy should keep the selected vertically centered composition");
 assert.match(css, /\.content-display\s*\{[^}]*font-family:\s*Impact/s, "display headings should use a tall condensed automotive face");
@@ -125,7 +131,7 @@ assert.match(css, /@media \(max-width:\s*760px\)/, "content pages should include
 assert.match(css, /\.process-step\s*\{[^}]*min-height:/s, "process stages should reserve stable equal heights");
 assert.doesNotMatch(css, /\.process-step\s*\{[^}]*border-radius:/s, "process stages should not become rounded cards");
 assert.match(css, /\.services-workspace\s*\{[^}]*grid-template-columns:/s, "services should use the selected split workspace");
-assert.match(css, /\.services-workspace\s*\{[^}]*\n\s*height:\s*calc\(min\(1050px,\s*100vh\)\s*-\s*76px\)/s, "desktop services workspace should occupy one viewport-bound canvas");
+assert.match(css, /\.services-workspace\s*\{[^}]*\n\s*height:\s*calc\(min\(1050px,\s*100vh\)\s*-\s*var\(--site-header-height\)\)/s, "desktop services workspace should occupy one shared viewport-bound canvas");
 assert.match(css, /\.services-workspace\s*\{[^}]*min-height:\s*[5-9]\d{2}px/s, "desktop services workspace should retain a practical minimum height");
 assert.match(css, /\.service-process-rail\s*\{[^}]*grid-template-rows:\s*repeat\(6,\s*minmax\(0,\s*1fr\)\)/s, "desktop rail should reserve six equal rows without intrinsic minimums");
 assert.match(css, /\.service-process-rail\s*\{[^}]*min-height:\s*0/s, "service rail should contain intrinsic child height");

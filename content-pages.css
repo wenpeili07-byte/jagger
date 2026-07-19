@@ -7,9 +7,6 @@
 }
 
 .content-page.site-shell {
-  width: 100%;
-  max-width: 1900px;
-  margin: 0 auto;
   border-color: var(--line);
   background: #111315;
 }
@@ -261,7 +258,7 @@
 .services-workspace {
   display: grid;
   grid-template-columns: minmax(320px, 24%) minmax(0, 1fr);
-  height: calc(min(1050px, 100vh) - 76px);
+  height: calc(min(1050px, 100vh) - var(--site-header-height));
   min-height: 640px;
   border-bottom: 1px solid var(--line);
   background: #111315;
