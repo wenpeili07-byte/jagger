@@ -109,9 +109,10 @@
 .detail-pagination a:focus-visible,
 .detail-back:hover,
 .detail-back:focus-visible {
-  color: var(--accent-bright);
+  color: var(--ink);
   outline: 2px solid var(--accent-bright);
   outline-offset: 5px;
+  text-shadow: 0 0 10px var(--accent-glow);
 }
 
 .detail-pagination {

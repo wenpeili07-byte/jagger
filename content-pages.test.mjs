@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
+import vm from "node:vm";
 
 const aboutHtml = readFileSync(new URL("./pages/about.html", import.meta.url), "utf8");
 const servicesHtml = readFileSync(new URL("./pages/services.html", import.meta.url), "utf8");
@@ -227,3 +228,98 @@ assert.match(
   /currentSection === pageSection/,
   "nested detail routes should mark their parent navigation item active"
 );
+
+test("detail language controller updates accessible names and image alternatives", () => {
+  class FakeElement {
+    constructor({ attributes = {}, dataset = {} } = {}) {
+      this.attributes = new Map(Object.entries(attributes));
+      this.dataset = dataset;
+      this.listeners = new Map();
+      this.textContent = "";
+      this.classList = { toggle: () => {} };
+    }
+
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener);
+    }
+
+    dispatch(name) {
+      this.listeners.get(name)?.();
+    }
+
+    getAttribute(name) {
+      return this.attributes.get(name) ?? null;
+    }
+
+    removeAttribute(name) {
+      this.attributes.delete(name);
+    }
+
+    setAttribute(name, value) {
+      this.attributes.set(name, value);
+    }
+  }
+
+  const langToggle = new FakeElement({ attributes: { "aria-label": "Switch to English" } });
+  const brand = new FakeElement({
+    attributes: { "aria-label": "回到首页" },
+    dataset: { zhAriaLabel: "回到首页", enAriaLabel: "Back to home" },
+  });
+  const navigation = new FakeElement({
+    attributes: { "aria-label": "主导航" },
+    dataset: { zhAriaLabel: "主导航", enAriaLabel: "Main navigation" },
+  });
+  const image = new FakeElement({
+    attributes: { alt: "LONMA DYNAMIC 街道宽体" },
+    dataset: { zhAlt: "LONMA DYNAMIC 街道宽体", enAlt: "LONMA DYNAMIC STREET WIDEBODY" },
+  });
+  const pagination = new FakeElement({
+    attributes: { "aria-label": "案例分页" },
+    dataset: { zhAriaLabel: "案例分页", enAriaLabel: "Case pagination" },
+  });
+  const navLinks = [
+    new FakeElement({ attributes: { href: "../about.html" } }),
+    new FakeElement({ attributes: { href: "../services.html" } }),
+    new FakeElement({ attributes: { href: "../cases.html" } }),
+    new FakeElement({ attributes: { href: "../contact.html" } }),
+  ];
+  const translatedNodes = [new FakeElement({ dataset: { zh: "案例", en: "CASES" } })];
+  const nodesBySelector = new Map([
+    [".lang-toggle", [langToggle]],
+    ["[data-lang-option]", []],
+    ["[data-zh][data-en]", translatedNodes],
+    ["[data-zh-placeholder][data-en-placeholder]", []],
+    [".nav a", navLinks],
+    ["[data-contact-form]", []],
+    ["[data-contact-status]", []],
+    ["[data-service-row]", []],
+    ["[data-zh-aria-label][data-en-aria-label]", [brand, navigation, pagination]],
+    ["[data-zh-alt][data-en-alt]", [image]],
+  ]);
+  const document = {
+    body: { dataset: { section: "cases" } },
+    documentElement: { lang: "zh-CN" },
+    querySelector: (selector) => nodesBySelector.get(selector)?.[0] ?? null,
+    querySelectorAll: (selector) => nodesBySelector.get(selector) ?? [],
+  };
+  const localStorage = new Map();
+  const window = { location: { pathname: "/pages/cases/case-01.html" } };
+
+  vm.runInNewContext(js, {
+    document,
+    localStorage: {
+      getItem: (key) => localStorage.get(key) ?? null,
+      setItem: (key, value) => localStorage.set(key, value),
+    },
+    window,
+  });
+
+  langToggle.dispatch("click");
+
+  assert.equal(document.documentElement.lang, "en");
+  assert.equal(brand.getAttribute("aria-label"), "Back to home");
+  assert.equal(navigation.getAttribute("aria-label"), "Main navigation");
+  assert.equal(image.getAttribute("alt"), "LONMA DYNAMIC STREET WIDEBODY");
+  assert.equal(pagination.getAttribute("aria-label"), "Case pagination");
+  assert.equal(translatedNodes[0].textContent, "CASES");
+});

@@ -12,10 +12,12 @@ const escapeAttribute = (value) =>
     .replaceAll(">", "&gt;");
 const i18n = (tag, values, attributes = "") =>
   `<${tag}${attributes} data-zh="${escapeAttribute(values.zh)}" data-en="${escapeAttribute(values.en)}">${values.zh}</${tag}>`;
+const i18nAttribute = (attribute, values) =>
+  `${attribute}="${escapeAttribute(values.zh)}" data-zh-${attribute}="${escapeAttribute(values.zh)}" data-en-${attribute}="${escapeAttribute(values.en)}"`;
 
 const header = (section) => `<header class="topbar">
-    <a class="brand" href="../../index.html" aria-label="回到首页">LONMA DYNAMIC</a>
-    <nav class="nav" aria-label="主导航">
+    <a class="brand" href="../../index.html" ${i18nAttribute("aria-label", { zh: "回到首页", en: "Back to home" })}>LONMA DYNAMIC</a>
+    <nav class="nav" ${i18nAttribute("aria-label", { zh: "主导航", en: "Main navigation" })}>
       <a href="../about.html">关于</a>
       <a href="../services.html"${section === "services" ? ' aria-current="page"' : ""}>业务</a>
       <a href="../cases.html"${section === "cases" ? ' aria-current="page"' : ""}>案例</a>
@@ -52,7 +54,7 @@ export const renderCasePage = (record) => `<!doctype html>
           ${i18n("p", record.intro, ' class="detail-intro"')}
         </div>
         <figure class="detail-hero-media">
-          <img src="../../${record.image}" alt="LONMA DYNAMIC ${record.title.zh}" />
+          <img src="../../${record.image}" ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
         </figure>
       </section>
       <section class="detail-story">
@@ -62,7 +64,7 @@ export const renderCasePage = (record) => `<!doctype html>
         ${i18n("h2", { zh: "讨论你的下一台车", en: "DISCUSS YOUR NEXT BUILD" })}
         ${i18n("a", { zh: "开始咨询 →", en: "START AN INQUIRY →" }, ' href="../contact.html"')}
       </section>
-      <nav class="detail-pagination" aria-label="Case pagination">
+      <nav class="detail-pagination" ${i18nAttribute("aria-label", { zh: "案例分页", en: "Case pagination" })}>
         ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html"`)}
         ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html"`)}
       </nav>
@@ -93,7 +95,7 @@ export const renderServicePage = (record) => `<!doctype html>
           ${i18n("p", record.intro, ' class="detail-intro"')}
         </div>
         <figure class="detail-hero-media">
-          <img src="../../${record.image}" alt="LONMA DYNAMIC ${record.title.zh}" />
+          <img src="../../${record.image}" ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
         </figure>
       </section>
       <section class="detail-story">
@@ -110,13 +112,19 @@ export const renderServicePage = (record) => `<!doctype html>
 </html>
 `;
 
-await mkdir(resolve(root, "pages/cases"), { recursive: true });
-await mkdir(resolve(root, "pages/services"), { recursive: true });
+export async function writeDetailPages() {
+  await mkdir(resolve(root, "pages/cases"), { recursive: true });
+  await mkdir(resolve(root, "pages/services"), { recursive: true });
 
-for (const record of caseDetails) {
-  await writeFile(resolve(root, `pages/cases/case-${record.id}.html`), renderCasePage(record));
+  for (const record of caseDetails) {
+    await writeFile(resolve(root, `pages/cases/case-${record.id}.html`), renderCasePage(record));
+  }
+
+  for (const record of serviceDetails) {
+    await writeFile(resolve(root, `pages/services/${record.id}.html`), renderServicePage(record));
+  }
 }
 
-for (const record of serviceDetails) {
-  await writeFile(resolve(root, `pages/services/${record.id}.html`), renderServicePage(record));
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await writeDetailPages();
 }

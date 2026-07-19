@@ -4,6 +4,8 @@
   const languageOptions = [...document.querySelectorAll("[data-lang-option]")];
   const translatedNodes = [...document.querySelectorAll("[data-zh][data-en]")];
   const placeholderNodes = [...document.querySelectorAll("[data-zh-placeholder][data-en-placeholder]")];
+  const ariaLabelNodes = [...document.querySelectorAll("[data-zh-aria-label][data-en-aria-label]")];
+  const alternativeTextNodes = [...document.querySelectorAll("[data-zh-alt][data-en-alt]")];
   const navLinks = [...document.querySelectorAll(".nav a")];
   const contactForm = document.querySelector("[data-contact-form]");
   const contactStatus = document.querySelector("[data-contact-status]");
@@ -77,6 +79,14 @@
 
     placeholderNodes.forEach((node) => {
       node.setAttribute("placeholder", node.dataset[`${currentLanguage}Placeholder`]);
+    });
+
+    ariaLabelNodes.forEach((node) => {
+      node.setAttribute("aria-label", node.dataset[`${currentLanguage}AriaLabel`]);
+    });
+
+    alternativeTextNodes.forEach((node) => {
+      node.setAttribute("alt", node.dataset[`${currentLanguage}Alt`]);
     });
 
     updateNavigation(currentLanguage);
