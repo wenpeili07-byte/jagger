@@ -962,6 +962,7 @@ git commit -m "Build six service detail pages"
 **Files:**
 - Modify: `content-pages.js`
 - Modify: `content-pages.test.mjs`
+- Modify: `header-layout.test.mjs`
 - Modify: `responsive-layout.test.mjs`
 - Modify: `link-closure.test.mjs`
 
@@ -996,12 +997,18 @@ for (const id of ["02", "03", "04", "05", "06"]) {
 
 The existing six service detail routes remain in `publicPages`.
 
+Update `header-layout.test.mjs` for generated case and service detail pages:
+
+- Continue to assert their parent-level relative header links.
+- Assert the renderer's Chinese default header labels rather than static English labels.
+- Keep English navigation-label behavior under the `content-pages.test.mjs` language-controller contract, where Task 5 updates `content-pages.js`.
+
 - [ ] **Step 2: Run tests and verify nested-navigation failure**
 
 Run:
 
 ```bash
-env PATH="/Users/wenpeili/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH" node --test content-pages.test.mjs responsive-layout.test.mjs link-closure.test.mjs
+env PATH="/Users/wenpeili/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH" node --test content-pages.test.mjs header-layout.test.mjs responsive-layout.test.mjs link-closure.test.mjs
 ```
 
 Expected: FAIL because `content-pages.js` does not read `body.dataset.section`.
@@ -1066,7 +1073,7 @@ Verify in the in-app browser:
 - [ ] **Step 6: Commit language and responsive completion**
 
 ```bash
-git add content-pages.js content-pages.test.mjs responsive-layout.test.mjs link-closure.test.mjs
+git add content-pages.js content-pages.test.mjs header-layout.test.mjs responsive-layout.test.mjs link-closure.test.mjs
 git commit -m "Complete detail navigation and language behavior"
 ```
 
