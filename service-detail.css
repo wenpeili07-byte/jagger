@@ -31,7 +31,7 @@
 
 .detail-index {
   margin: 44px 0 0;
-  color: var(--accent-bright);
+  color: var(--muted);
 }
 
 .detail-copy h1 {
@@ -41,6 +41,7 @@
   font-family: Impact, "Arial Narrow", Arial, sans-serif;
   font-size: clamp(64px, 7vw, 128px);
   line-height: 0.9;
+  overflow-wrap: anywhere;
 }
 
 .detail-intro {
@@ -119,9 +120,13 @@
   outline-offset: 5px;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1099px) {
   .detail-hero {
     grid-template-columns: 1fr;
+  }
+
+  .detail-copy h1 {
+    max-width: none;
   }
 
   .detail-copy {

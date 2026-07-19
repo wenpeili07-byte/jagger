@@ -68,6 +68,24 @@ const serviceCss = read("./service-detail.css");
 assert.match(serviceCss, /\.service-detail-page\s*\{/);
 assert.match(serviceCss, /\.detail-hero\s*\{[^}]*grid-template-columns:/s);
 assert.match(serviceCss, /\.detail-process\s*\{/);
-assert.match(serviceCss, /@media \(max-width:\s*899px\)[\s\S]*?\.detail-hero\s*\{[^}]*grid-template-columns:\s*1fr/s);
+const detailIndexDeclarations = [...serviceCss.matchAll(/\.detail-index\s*\{([^}]*)\}/gs)]
+  .map(([, declarations]) => declarations)
+  .join("\n");
+assert.ok(detailIndexDeclarations, "service detail pages should define an index label");
+assert.match(detailIndexDeclarations, /color:\s*var\(--muted\)/, "the index label should use a neutral default color");
+assert.doesNotMatch(detailIndexDeclarations, /var\(--accent(?:-bright)?\)/, "the index label should not be blue by default");
+assert.match(serviceCss, /@media \(max-width:\s*1099px\)[\s\S]*?\.detail-hero\s*\{[^}]*grid-template-columns:\s*1fr/s);
+assert.match(serviceCss, /\.detail-copy h1\s*\{[^}]*overflow-wrap:\s*anywhere/s, "two-column headings should safely wrap long English words");
+assert.match(serviceCss, /@media \(max-width:\s*1099px\)[\s\S]*?\.detail-copy h1\s*\{[^}]*max-width:\s*none/s, "stacked headings should keep natural word wrapping");
 assert.doesNotMatch(serviceCss, /width:\s*100vw|transform:\s*scale\(/);
-assert.doesNotMatch(serviceCss, /\.detail-(?:hero|story|contact)\s*\{[^}]*border:\s*[^0]/s);
+assert.match(serviceCss, /\.detail-contact\s*\{[^}]*border-top:\s*1px solid var\(--line\)/s, "the contact separator should remain neutral");
+
+for (const [, selector, declarations] of serviceCss.matchAll(/(\.detail-[^{]+)\s*\{([^}]*)\}/gs)) {
+  if (!/:(?:hover|focus-visible|active)/.test(selector)) {
+    assert.doesNotMatch(
+      declarations,
+      /\bborder(?:-(?:top|right|bottom|left))?\s*:\s*[^;}]*var\(--accent(?:-bright)?\)/,
+      `${selector.trim()} should not use an accent-colored permanent border`
+    );
+  }
+}
