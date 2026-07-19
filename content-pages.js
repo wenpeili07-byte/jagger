@@ -37,15 +37,18 @@
   }
 
   function updateNavigation(language) {
+    const currentSection = document.body.dataset.section;
+
     navLinks.forEach((link) => {
       const pageName = link.getAttribute("href").split("/").pop();
+      const pageSection = pageName.replace(/\.html$/, "");
       const labels = navLabels[pageName];
 
       if (labels) {
         link.textContent = labels[language];
       }
 
-      if (window.location.pathname.endsWith(pageName)) {
+      if (currentSection === pageSection || window.location.pathname.endsWith(pageName)) {
         link.setAttribute("aria-current", "page");
       } else {
         link.removeAttribute("aria-current");

@@ -20,6 +20,10 @@ const publicPages = [
   "./pages/services/exhaust.html",
 ];
 
+for (const id of ["02", "03", "04", "05", "06"]) {
+  publicPages.push(`./pages/cases/case-${id}.html`);
+}
+
 // Task 2: shared canvas and cache coverage.
 assert.match(canvasCss, /--site-max-width:\s*1900px/, "canvas should define the 1900px site maximum");
 assert.match(canvasCss, /--site-header-height:\s*77px/, "canvas should define the 77px desktop header");

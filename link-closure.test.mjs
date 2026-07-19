@@ -80,12 +80,24 @@ assert.match(serviceCss, /@media \(max-width:\s*1099px\)[\s\S]*?\.detail-copy h1
 assert.doesNotMatch(serviceCss, /width:\s*100vw|transform:\s*scale\(/);
 assert.match(serviceCss, /\.detail-contact\s*\{[^}]*border-top:\s*1px solid var\(--line\)/s, "the contact separator should remain neutral");
 
-for (const [, selector, declarations] of serviceCss.matchAll(/(\.detail-[^{]+)\s*\{([^}]*)\}/gs)) {
-  if (!/:(?:hover|focus-visible|active)/.test(selector)) {
-    assert.doesNotMatch(
-      declarations,
-      /\bborder(?:-(?:top|right|bottom|left))?\s*:\s*[^;}]*var\(--accent(?:-bright)?\)/,
-      `${selector.trim()} should not use an accent-colored permanent border`
-    );
+function assertNoPermanentAccentBorders(css) {
+  for (const [, selectorGroup, declarations] of css.matchAll(/(\.detail-[^{]+)\s*\{([^}]*)\}/gs)) {
+    for (const selector of selectorGroup.split(",").map((part) => part.trim())) {
+      if (!/:(?:hover|focus-visible|active)/.test(selector)) {
+        assert.doesNotMatch(
+          declarations,
+          /\bborder(?:-(?:top|right|bottom|left))?\s*:\s*[^;}]*var\(--accent(?:-bright)?\)/,
+          `${selector} should not use an accent-colored permanent border`
+        );
+      }
+    }
   }
 }
+
+assert.throws(
+  () => assertNoPermanentAccentBorders(".detail-copy, .detail-copy:hover { border: 1px solid var(--accent); }"),
+  /\.detail-copy should not use an accent-colored permanent border/,
+  "interactive selector groups should still validate their permanent selectors"
+);
+
+assertNoPermanentAccentBorders(serviceCss);

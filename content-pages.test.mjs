@@ -217,3 +217,13 @@ assert.match(js, /new FormData\(contactForm\)/, "contact submit should use the v
 assert.match(js, /mailto:hello@lonmadynamic\.com/, "contact submit should open a prefilled email to LONMA");
 assert.match(js, /querySelectorAll\("\[data-service-row\]"\)/, "services should initialize the active process row");
 assert.match(js, /toggleAttribute\("data-active"/, "only one process row should remain active");
+assert.match(
+  js,
+  /const currentSection = document\.body\.dataset\.section/,
+  "detail pages should expose their parent navigation section"
+);
+assert.match(
+  js,
+  /currentSection === pageSection/,
+  "nested detail routes should mark their parent navigation item active"
+);
