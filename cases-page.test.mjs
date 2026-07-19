@@ -32,6 +32,30 @@ assert.match(html, /case-rail\.css\?v=hero-rail-20260709/, "cases page should lo
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
 assert.match(html, /<script src="\.\/cases\.js\?v=hero-rail-20260709"><\/script>/, "cases page should keep its archive filter script");
+assert.match(html, /<body data-section="cases">/, "cases page should expose its navigation section to the shared language controller");
+assert.match(html, /<script src="\.\.\/content-pages\.js\?v=cases-language-20260719"><\/script>/, "cases page should load the shared language controller");
+assert.match(html, /data-lang-option="zh"/, "cases page should identify the Chinese language option");
+assert.match(html, /data-lang-option="en"/, "cases page should identify the English language option");
+assert.match(
+  html,
+  /data-zh="改装案例总览 · 龙马态度"\s+data-en="MODIFIED CASE ARCHIVE · LONMA ATTITUDE"/,
+  "cases hero should provide both localized headings"
+);
+assert.equal(
+  (html.match(/class="slide[^"]*"[^>]*data-scene=[^>]*>[\s\S]*?<span data-zh=/g) || []).length,
+  6,
+  "all six rail labels should be bilingual"
+);
+assert.equal(
+  (html.match(/<h3 data-zh="[^"]+" data-en="[^"]+">/g) || []).length,
+  7,
+  "the vehicle filter and all six archive titles should be bilingual"
+);
+assert.equal(
+  (html.match(/<b data-zh="查看案例 →" data-en="VIEW CASE →">/g) || []).length,
+  6,
+  "all six archive actions should be bilingual"
+);
 assert.match(html, /function fadeToScene\(scene\)/, "cases page should keep a single inline scene fade controller");
 assert.doesNotMatch(html, /@keyframes sceneFadeIn/, "cases page should use the shared stylesheet fade animation instead of duplicating it inline");
 assert.equal((css.match(/@keyframes sceneFadeIn/g) || []).length, 1, "shared stylesheet should define the background fade-in animation once");
