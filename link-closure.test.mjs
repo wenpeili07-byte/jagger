@@ -5,6 +5,22 @@ const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const casesHtml = read("./pages/cases.html");
 const caseIds = ["01", "02", "03", "04", "05", "06"];
 const serviceIds = ["build", "parts", "photo", "ecu", "chassis", "exhaust"];
+const { caseDetails, serviceDetails } = await import("./detail-pages-data.mjs");
+
+assert.equal(caseDetails.length, 6, "case data should contain six records");
+assert.equal(serviceDetails.length, 6, "service data should contain six records");
+
+for (const record of [...caseDetails, ...serviceDetails]) {
+  assert.match(record.id, /^(?:0[1-6]|build|parts|photo|ecu|chassis|exhaust)$/);
+  assert.ok(record.title.zh && record.title.en, `${record.id} should have bilingual titles`);
+  assert.ok(record.intro.zh && record.intro.en, `${record.id} should have bilingual introductions`);
+  assert.match(record.image, /^assets\/images\/网页\/optimized\/case-0[1-6]\.jpg$/);
+}
+
+for (const record of caseDetails) {
+  assert.match(record.previous, /^0[1-6]$/);
+  assert.match(record.next, /^0[1-6]$/);
+}
 
 for (const id of caseIds) {
   const route = `./pages/cases/case-${id}.html`;
