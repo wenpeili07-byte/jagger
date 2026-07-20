@@ -75,3 +75,44 @@ for (const group of pageGroups) {
     });
   }
 }
+
+const footerLinks = new Map([
+  ["./index.html", "./pages/contact.html"],
+  ["./pages/about.html", "./contact.html"],
+  ["./pages/services.html", "./contact.html"],
+  ["./pages/cases.html", "./contact.html"],
+  ["./pages/contact.html", "./cases.html"],
+]);
+
+for (const number of ["01", "02", "03", "04", "05", "06"]) {
+  footerLinks.set(`./pages/cases/case-${number}.html`, "../contact.html");
+}
+
+for (const slug of ["build", "parts", "photo", "ecu", "chassis", "exhaust"]) {
+  footerLinks.set(`./pages/services/${slug}.html`, "../contact.html");
+}
+
+for (const [path, href] of footerLinks) {
+  test(`${path} exposes one bilingual global footer`, () => {
+    const html = read(path);
+    const footers = [...html.matchAll(/<footer class="content-footer">([\s\S]*?)<\/footer>/g)];
+
+    assert.equal(footers.length, 1);
+    assert.match(footers[0][1], /<span>LONMA DYNAMIC<\/span>/);
+    assert.match(
+      footers[0][1],
+      /data-zh="龙马态度 · 2026" data-en="AUTOMOTIVE ATTITUDE · 2026"/
+    );
+    assert.match(footers[0][1], new RegExp(`<a href="${escapeRegExp(href)}"`));
+    assert.match(footers[0][1], /<a [^>]*data-zh="[^"]+ →" data-en="[^"]+ →"/);
+  });
+}
+
+test("footer styling is global and not duplicated by content pages", () => {
+  const sharedCss = read("./styles.css");
+  const contentCss = read("./content-pages.css");
+
+  assert.match(sharedCss, /\.content-footer\s*\{[^}]*grid-template-columns:\s*1fr auto 1fr/s);
+  assert.match(sharedCss, /\.content-footer a:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s);
+  assert.doesNotMatch(contentCss, /\.content-footer/);
+});

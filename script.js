@@ -40,6 +40,8 @@ const translations = {
     "services.sectionLabel": "业务展示模块",
     "services.heading": "BUSINESS MODULES",
     "services.count": "06 SERVICES · 03 × 02",
+    "footer.attitude": "龙马态度 · 2026",
+    "footer.contact": "开始你的项目 →",
     "lang.next": "Switch to English"
   },
   en: {
@@ -58,6 +60,8 @@ const translations = {
     "services.sectionLabel": "Business service modules",
     "services.heading": "BUSINESS MODULES",
     "services.count": "06 SERVICES · 03 × 02",
+    "footer.attitude": "AUTOMOTIVE ATTITUDE · 2026",
+    "footer.contact": "START YOUR PROJECT →",
     "lang.next": "切换到中文"
   }
 };
