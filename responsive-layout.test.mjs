@@ -79,6 +79,11 @@ assert.match(
 );
 assert.match(
   mobileHeaderBlock,
+  /\.topbar\s*\{[^}]*padding:\s*7\.5px 18px/s,
+  "mobile topbar should total 104px: 44px + 44px rows, 7.5px vertical padding on each side, and 1px border"
+);
+assert.match(
+  mobileHeaderBlock,
   /\.nav\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)[^}]*width:\s*100%/s,
   "mobile should keep four navigation links on one row"
 );

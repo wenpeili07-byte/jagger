@@ -80,8 +80,8 @@ const reducedMotionBlock = mediaBlock(
 );
 assert.match(
   reducedMotionBlock,
-  /\.nav a,[\s\S]*?\.lang-toggle,[\s\S]*?\.content-footer a\s*\{[^}]*transition:\s*none/s,
-  "shell glow transitions should stop when reduced motion is requested"
+  /\.nav a,[\s\S]*?\.lang-toggle,[\s\S]*?\.lang-option,[\s\S]*?\.content-footer a\s*\{[^}]*transition:\s*none/s,
+  "shell glow transitions, including language options, should stop when reduced motion is requested"
 );
 assert.match(css, /grid-template-columns:\s*minmax\(310px,\s*0\.88fr\)\s+minmax\(440px,\s*1\.15fr\)/, "cover should remove the middle spine column");
 assert.match(css, /h1\s*\{[^}]*margin:\s*clamp\(6px,\s*2vw,\s*24px\)\s+0\s+0/s, "hero title should move upward");

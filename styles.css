@@ -216,6 +216,7 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .nav a,
   .lang-toggle,
+  .lang-option,
   .content-footer a {
     transition: none;
   }
@@ -850,7 +851,7 @@ h1 span {
     grid-template-rows: 44px 44px;
     gap: 0 14px;
     min-height: var(--site-header-height);
-    padding: 8px 18px;
+    padding: 7.5px 18px;
   }
 
   .brand {
