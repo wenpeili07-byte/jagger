@@ -6,6 +6,12 @@
   --site-gutter: clamp(20px, 4vw, 76px);
 }
 
+@media (max-width: 767px) {
+  :root {
+    --site-header-height: 104px;
+  }
+}
+
 .site-shell {
   width: 100%;
   max-width: var(--site-max-width);

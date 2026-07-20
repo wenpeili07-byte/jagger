@@ -5,6 +5,12 @@ const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const canvasCss = read("./layout-canvas.css");
 const sharedCss = read("./styles.css");
 const contentCss = read("./content-pages.css");
+const mediaBlock = (source, marker, message) => {
+  const start = source.indexOf(marker);
+  assert.notEqual(start, -1, message);
+  const nextMedia = source.indexOf("\n@media", start + marker.length);
+  return source.slice(start, nextMedia === -1 ? source.length : nextMedia);
+};
 const publicPages = [
   "./index.html",
   "./pages/about.html",
@@ -51,7 +57,51 @@ for (const path of publicPages) {
 // Task 3: compact header and services rules.
 assert.match(sharedCss, /\.topbar\s*\{[^}]*min-height:\s*var\(--site-header-height\)/s, "topbar should consume the shared header height");
 assert.match(contentCss, /@media \(min-width:\s*768px\) and \(max-width:\s*980px\)[\s\S]*?\.service-process-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*56%\)\s+minmax\(0,\s*44%\)/s, "790px services should keep the uploaded process-rail design with shrinkable columns");
-assert.match(sharedCss, /@media \(max-width:\s*980px\)[\s\S]*?\.topbar\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto/s, "compact headers should use two columns");
+const tabletHeaderBlock = mediaBlock(
+  sharedCss,
+  "@media (min-width: 768px) and (max-width: 980px)",
+  "shared styles should define the tablet header range"
+);
+assert.match(
+  tabletHeaderBlock,
+  /\.topbar\s*\{[^}]*grid-template-columns:\s*minmax\(150px,\s*1fr\)\s+auto\s+minmax\(120px,\s*1fr\)[^}]*min-height:\s*var\(--site-header-height\)/s,
+  "tablet and narrow split screens should retain a 77px three-column header"
+);
+const mobileHeaderBlock = mediaBlock(
+  sharedCss,
+  "@media (max-width: 767px)",
+  "shared styles should define the mobile header range"
+);
+assert.match(
+  mobileHeaderBlock,
+  /\.topbar\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto[^}]*grid-template-rows:\s*44px 44px[^}]*min-height:\s*var\(--site-header-height\)/s,
+  "mobile should use a stable two-row header"
+);
+assert.match(
+  mobileHeaderBlock,
+  /\.nav\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)[^}]*width:\s*100%/s,
+  "mobile should keep four navigation links on one row"
+);
+const smallPhoneBlock = mediaBlock(
+  sharedCss,
+  "@media (max-width: 620px)",
+  "shared styles should define the small-phone range"
+);
+assert.doesNotMatch(
+  smallPhoneBlock,
+  /\.nav\s*\{[^}]*grid-template-columns:\s*repeat\(2,/s,
+  "small phones must not collapse navigation into two columns"
+);
+const canvasMobileBlock = mediaBlock(
+  canvasCss,
+  "@media (max-width: 767px)",
+  "canvas should define the mobile header range"
+);
+assert.match(
+  canvasMobileBlock,
+  /:root\s*\{[^}]*--site-header-height:\s*104px/s,
+  "mobile canvas should expose the approved 104px header height"
+);
 const compactDesktopMarker = "@media (min-width: 900px) and (max-width: 1180px)";
 const compactDesktopStart = sharedCss.indexOf(compactDesktopMarker);
 assert.notEqual(compactDesktopStart, -1, "shared styles should define the 900-1180px compact-desktop range");

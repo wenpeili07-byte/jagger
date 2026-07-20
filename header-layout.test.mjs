@@ -4,6 +4,12 @@ import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
 const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const js = readFileSync(new URL("./script.js", import.meta.url), "utf8");
+const mediaBlock = (source, marker, message) => {
+  const start = source.indexOf(marker);
+  assert.notEqual(start, -1, message);
+  const nextMedia = source.indexOf("\n@media", start + marker.length);
+  return source.slice(start, nextMedia === -1 ? source.length : nextMedia);
+};
 
 const headerMatch = html.match(/<header class="topbar">([\s\S]*?)<\/header>/);
 const leftPanelMatch = html.match(/<div class="left-panel">([\s\S]*?)<h1>/);
@@ -62,5 +68,20 @@ assert.match(css, /\.brand\s*\{[^}]*font-size:\s*15\.6px/s, "header brand should
 assert.match(css, /\.nav\s*\{[^}]*justify-self:\s*center/s, "header navigation should sit centered in the middle column");
 assert.match(css, /\.nav a\s*\{[^}]*color:\s*var\(--ink\)[^}]*font-size:\s*15\.6px/s, "header navigation text should be white and about 30% larger");
 assert.match(css, /\.nav a:hover\s*\{[^}]*color:\s*var\(--ink\)[^}]*text-shadow:/s, "header navigation hover should stay white and glow without changing color");
+assert.match(
+  css,
+  /\.nav a:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)[^}]*outline-offset:\s*5px/s,
+  "navigation should keep a visible keyboard focus indicator"
+);
+const reducedMotionBlock = mediaBlock(
+  css,
+  "@media (prefers-reduced-motion: reduce)",
+  "shared styles should define a reduced-motion range"
+);
+assert.match(
+  reducedMotionBlock,
+  /\.nav a,[\s\S]*?\.lang-toggle,[\s\S]*?\.content-footer a\s*\{[^}]*transition:\s*none/s,
+  "shell glow transitions should stop when reduced motion is requested"
+);
 assert.match(css, /grid-template-columns:\s*minmax\(310px,\s*0\.88fr\)\s+minmax\(440px,\s*1\.15fr\)/, "cover should remove the middle spine column");
 assert.match(css, /h1\s*\{[^}]*margin:\s*clamp\(6px,\s*2vw,\s*24px\)\s+0\s+0/s, "hero title should move upward");
