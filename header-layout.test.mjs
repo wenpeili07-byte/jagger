@@ -22,6 +22,14 @@ const servicePages = [
   "./pages/services/chassis.html",
   "./pages/services/exhaust.html"
 ];
+const casePages = [
+  "./pages/cases/case-01.html",
+  "./pages/cases/case-02.html",
+  "./pages/cases/case-03.html",
+  "./pages/cases/case-04.html",
+  "./pages/cases/case-05.html",
+  "./pages/cases/case-06.html"
+];
 
 assert.ok(headerMatch, "topbar should exist");
 assert.ok(leftPanelMatch, "left panel should exist");
@@ -34,12 +42,12 @@ for (const pagePath of directPages) {
   assert.match(pageHtml, /<a class="brand" href="\.\.\/index\.html"/, `${pagePath} brand should link back to the homepage`);
   assert.match(pageHtml, /<a href="\.\/about\.html">ABOUT<\/a>[\s\S]*<a href="\.\/services\.html">SERVICES<\/a>[\s\S]*<a href="\.\/cases\.html">CASES<\/a>[\s\S]*<a href="\.\/contact\.html">CONTACT<\/a>/, `${pagePath} should keep same-level header links`);
 }
-for (const pagePath of servicePages) {
+for (const pagePath of [...casePages, ...servicePages]) {
   const pageHtml = readFileSync(new URL(pagePath, import.meta.url), "utf8");
   assert.match(pageHtml, /<link rel="stylesheet" href="\.\.\/\.\.\/styles\.css\?v=page-header-20260705" \/>/, `${pagePath} should load the shared stylesheet`);
   assert.match(pageHtml, /<header class="topbar">/, `${pagePath} should include the shared header`);
   assert.match(pageHtml, /<a class="brand" href="\.\.\/\.\.\/index\.html"/, `${pagePath} brand should link back to the homepage`);
-  assert.match(pageHtml, /<a href="\.\.\/about\.html">ABOUT<\/a>[\s\S]*<a href="\.\.\/services\.html">SERVICES<\/a>[\s\S]*<a href="\.\.\/cases\.html">CASES<\/a>[\s\S]*<a href="\.\.\/contact\.html">CONTACT<\/a>/, `${pagePath} should keep parent-level header links`);
+  assert.match(pageHtml, /<a href="\.\.\/about\.html">关于<\/a>[\s\S]*<a href="\.\.\/services\.html"(?: aria-current="page")?>业务<\/a>[\s\S]*<a href="\.\.\/cases\.html"(?: aria-current="page")?>案例<\/a>[\s\S]*<a href="\.\.\/contact\.html">联系<\/a>/, `${pagePath} should keep Chinese default labels on parent-level header links`);
 }
 assert.doesNotMatch(html, /class="spine"|CASE FILES|06\/36 EXP/, "vertical case-file spine should be removed");
 assert.doesNotMatch(headerMatch[1], /PERFORMANCE GARAGE · 06 CASES|性能车库|class="header-meta"|class="kicker"/, "header middle meta copy should be removed");
