@@ -40,7 +40,7 @@ for (const pagePath of directPages) {
   assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="\\.\\.\\/styles\\.css\\?v=${expectedStyleVersion}" \\/>`), `${pagePath} should load the shared stylesheet`);
   assert.match(pageHtml, /<header class="topbar">/, `${pagePath} should include the shared header`);
   assert.match(pageHtml, /<a class="brand" href="\.\.\/index\.html"/, `${pagePath} brand should link back to the homepage`);
-  assert.match(pageHtml, /<a href="\.\/about\.html">ABOUT<\/a>[\s\S]*<a href="\.\/services\.html">SERVICES<\/a>[\s\S]*<a href="\.\/cases\.html">CASES<\/a>[\s\S]*<a href="\.\/contact\.html">CONTACT<\/a>/, `${pagePath} should keep same-level header links`);
+  assert.match(pageHtml, /<a href="\.\/about\.html"(?: aria-current="page")?>ABOUT<\/a>[\s\S]*<a href="\.\/services\.html"(?: aria-current="page")?>SERVICES<\/a>[\s\S]*<a href="\.\/cases\.html"(?: aria-current="page")?>CASES<\/a>[\s\S]*<a href="\.\/contact\.html"(?: aria-current="page")?>CONTACT<\/a>/, `${pagePath} should keep same-level header links`);
 }
 for (const pagePath of [...casePages, ...servicePages]) {
   const pageHtml = readFileSync(new URL(pagePath, import.meta.url), "utf8");
