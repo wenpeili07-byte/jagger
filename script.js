@@ -350,23 +350,35 @@ function transitionSceneBackground(scene) {
 }
 
 function getInitialLanguage() {
-  const savedLanguage = localStorage.getItem("lonma-language");
-  if (supportedLanguages.includes(savedLanguage)) {
-    return savedLanguage;
+  try {
+    const savedLanguage = sessionStorage.getItem("lonma-language");
+    if (supportedLanguages.includes(savedLanguage)) {
+      return savedLanguage;
+    }
+  } catch {
+    // Storage can be unavailable in local previews without affecting page use.
   }
 
-  return document.documentElement.lang.toLowerCase().startsWith("en") ? "en" : "zh";
+  return "en";
+}
+
+function setStoredLanguage(language) {
+  try {
+    sessionStorage.setItem("lonma-language", language);
+  } catch {
+    // Keep the current page functional when storage is unavailable.
+  }
 }
 
 function translateStaticText(language) {
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     const key = element.dataset.i18n;
-    element.textContent = translations[language][key] || translations.zh[key] || element.textContent;
+    element.textContent = translations[language][key] || translations.en[key] || element.textContent;
   });
 
   document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
     const key = element.dataset.i18nAria;
-    element.setAttribute("aria-label", translations[language][key] || translations.zh[key] || "");
+    element.setAttribute("aria-label", translations[language][key] || translations.en[key] || "");
   });
 }
 
@@ -425,10 +437,10 @@ function updateLanguageToggle(language) {
 }
 
 function setLanguage(language) {
-  currentLanguage = supportedLanguages.includes(language) ? language : "zh";
+  currentLanguage = supportedLanguages.includes(language) ? language : "en";
   document.documentElement.lang = currentLanguage === "zh" ? "zh-CN" : "en";
   document.body.dataset.lang = currentLanguage;
-  localStorage.setItem("lonma-language", currentLanguage);
+  setStoredLanguage(currentLanguage);
 
   translateStaticText(currentLanguage);
   updateCardCopy(currentLanguage);
