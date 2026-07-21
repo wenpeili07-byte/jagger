@@ -28,7 +28,7 @@ assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should 
 assert.match(html, /36 MODIFIED-CAR CASE FILES/, "archive should be framed as a 36-case library");
 assert.match(html, /styles\.css\?v=global-shell-20260721/, "cases page should load the current shared stylesheet cache key");
 assert.match(html, /layout-canvas\.css\?v=canvas-20260721-2200/, "cases page should load the current shared 2200px design canvas");
-assert.match(html, /case-rail\.css\?v=hero-rail-20260709/, "cases page should load the hero rail stylesheet separately from the large main stylesheet");
+assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels/, "cases page should load the current hero rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
 assert.match(html, /<script src="\.\/cases\.js\?v=hero-rail-20260709"><\/script>/, "cases page should keep its archive filter script");
@@ -42,7 +42,7 @@ assert.match(
   "cases hero should provide both localized headings"
 );
 assert.equal(
-  (html.match(/class="slide[^"]*"[^>]*data-scene=[^>]*>[\s\S]*?<span data-zh=/g) || []).length,
+  (html.match(/class="slide[^"]*"[^>]*data-scene=[^>]*>[\s\S]*?<span class="slide-label" data-zh=/g) || []).length,
   6,
   "all six rail labels should be bilingual"
 );
@@ -84,7 +84,12 @@ assert.doesNotMatch(css, /\.mwg_effect060\s+\.content/, "effect 060 rail should 
 assert.match(css, /\.mwg_effect060\s+\.container\s*\{[^}]*background:\s*transparent/s, "right case module should not have its own background color");
 assert.match(css, /\.mwg_effect060\s+\.slides\s*\{[^}]*overflow-y:\s*auto[^}]*overscroll-behavior:\s*contain/s, "effect 060 slides should scroll independently inside the right module");
 assert.match(css, /\.mwg_effect060\s+\.slides\s*\{[^}]*scrollbar-width:\s*none/s, "effect 060 independent rail should keep the scrollbar hidden");
-assert.match(css, /\.mwg_effect060\s+\.slide\s*\{[^}]*height:\s*var\(--slot-h\)[^}]*clip-path:\s*inset\(12%\s+0\s+12%\s+0\)/s, "each effect 060 slide should sit inside a mask frame");
+assert.equal((html.match(/class="slide-mask"/g) || []).length, 6, "each case image should have its own mask layer");
+assert.equal((html.match(/class="slide-label"[^>]*data-zh=/g) || []).length, 6, "each case label should sit outside the image mask");
+assert.doesNotMatch(css, /\.mwg_effect060\s+\.slide\s*\{[^}]*clip-path:/s, "the slide button should not clip its text label");
+assert.match(css, /\.mwg_effect060\s+\.slide-mask\s*\{[^}]*clip-path:\s*inset\(12%\s+0\s+12%\s+0\)/s, "only the case image layer should use the effect 060 mask");
+assert.match(css, /\.mwg_effect060\s+\.slide-label\s*\{[^}]*z-index:\s*2/s, "case labels should remain above the masked image at compact sizes");
+assert.match(css, /\.mwg_effect060\s+\.slide:hover\s+\.slide-mask,[\s\S]*?clip-path:\s*inset\(0\s+0\s+0\s+0\)/s, "hover should still open the image mask without clipping the label");
 assert.match(css, /\.mwg_effect060\s+\.media\s*\{[^}]*object-fit:\s*cover[^}]*transform:\s*translateY\(-12%\)\s+scale\(1\.14\)/s, "effect 060 images should stay masked without scroll-driven transform changes");
 assert.match(css, /\.filter-option\.is-active/s, "active filter should have its own state styling");
 

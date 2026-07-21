@@ -67,21 +67,28 @@
   display: block;
   height: var(--slot-h);
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
   margin: 0;
   padding: 0;
-  border: 1px solid rgba(232, 231, 226, 0.18);
-  background: #0c0e10;
+  border: 0;
+  background: transparent;
   color: var(--ink);
   cursor: pointer;
-  clip-path: inset(12% 0 12% 0);
-  transition: border-color 180ms ease, box-shadow 180ms ease, clip-path 180ms ease;
 }
 
 .mwg_effect060 .slide.spacer {
-  border-color: transparent;
-  background: transparent;
   pointer-events: none;
+}
+
+.mwg_effect060 .slide-mask {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(232, 231, 226, 0.18);
+  background: #0c0e10;
+  clip-path: inset(12% 0 12% 0);
+  transition: border-color 180ms ease, box-shadow 180ms ease, clip-path 180ms ease;
 }
 
 .mwg_effect060 .media {
@@ -94,7 +101,7 @@
   transform-origin: center;
 }
 
-.mwg_effect060 .slide span {
+.mwg_effect060 .slide-label {
   position: absolute;
   right: 12px;
   bottom: 10px;
@@ -108,7 +115,7 @@
   text-shadow: 0 1px 14px rgba(0, 0, 0, 0.72);
 }
 
-.mwg_effect060 .slide::after {
+.mwg_effect060 .slide-mask::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -116,12 +123,15 @@
   pointer-events: none;
 }
 
-.mwg_effect060 .slide:hover,
-.mwg_effect060 .slide.is-active,
-.mwg_effect060 .slide:focus-visible {
+.mwg_effect060 .slide:hover .slide-mask,
+.mwg_effect060 .slide.is-active .slide-mask,
+.mwg_effect060 .slide:focus-visible .slide-mask {
   border-color: rgba(46, 125, 189, 0.72);
   box-shadow: 0 0 0 1px rgba(46, 125, 189, 0.34), 0 0 30px rgba(28, 93, 153, 0.34);
   clip-path: inset(0 0 0 0);
+}
+
+.mwg_effect060 .slide:focus-visible {
   outline: none;
 }
 
