@@ -51,7 +51,7 @@ assert.doesNotMatch(contentCss, /\.content-page\.site-shell\s*\{[^}]*max-width:/
 
 for (const path of publicPages) {
   const html = read(path);
-  assert.match(html, /layout-canvas\.css\?v=canvas-20260719-1900/, `${path} should load the 1900px canvas version`);
+  assert.match(html, /layout-canvas\.css\?v=canvas-20260721-1900/, `${path} should load the current 1900px canvas version`);
 }
 
 // Task 3: compact header and services rules.

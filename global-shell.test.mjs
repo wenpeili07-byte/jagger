@@ -114,5 +114,7 @@ test("footer styling is global and not duplicated by content pages", () => {
 
   assert.match(sharedCss, /\.content-footer\s*\{[^}]*grid-template-columns:\s*1fr auto 1fr/s);
   assert.match(sharedCss, /\.content-footer a:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s);
+  assert.match(sharedCss, /\.content-footer a:hover\s*\{[^}]*color:\s*var\(--ink\)/s);
+  assert.match(sharedCss, /\.content-footer a:focus-visible\s*\{[^}]*color:\s*var\(--ink\)/s);
   assert.doesNotMatch(contentCss, /\.content-footer/);
 });

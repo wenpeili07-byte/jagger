@@ -44,8 +44,8 @@ export const renderCasePage = (record) => `<!doctype html>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=page-header-20260705" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260719-1900" />
+    <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-1900" />
     <link rel="stylesheet" href="../../case-detail.css?v=case-detail-link-closure-20260719" />
   </head>
   <body data-section="cases">
@@ -87,8 +87,8 @@ export const renderServicePage = (record) => `<!doctype html>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${record.label} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=page-header-20260705" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260719-1900" />
+    <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-1900" />
     <link rel="stylesheet" href="../../service-detail.css?v=service-detail-20260719" />
   </head>
   <body data-section="services">

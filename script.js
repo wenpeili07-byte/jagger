@@ -26,6 +26,7 @@ window.addEventListener("load", removeDuplicateShells, { once: true });
 const translations = {
   zh: {
     "brand.home": "回到首页",
+    "nav.label": "主导航",
     "nav.about": "关于",
     "nav.services": "业务",
     "nav.cases": "案例",
@@ -46,6 +47,7 @@ const translations = {
   },
   en: {
     "brand.home": "Back to home",
+    "nav.label": "Main navigation",
     "nav.about": "ABOUT",
     "nav.services": "SERVICES",
     "nav.cases": "CASES",

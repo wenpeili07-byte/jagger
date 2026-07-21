@@ -26,8 +26,8 @@ assert.equal((html.match(/class="slide spacer"/g) || []).length, 4, "effect 060 
 assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive should use the current six cases as reference content");
 assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should not include the old scrolling masked image rail");
 assert.match(html, /36 MODIFIED-CAR CASE FILES/, "archive should be framed as a 36-case library");
-assert.match(html, /styles\.css\?v=cases-bg-visible-20260711/, "cases page should bust the stylesheet cache for background visibility fixes");
-assert.match(html, /layout-canvas\.css\?v=canvas-20260719-1900/, "cases page should load the shared 1900px design canvas");
+assert.match(html, /styles\.css\?v=global-shell-20260721/, "cases page should load the current shared stylesheet cache key");
+assert.match(html, /layout-canvas\.css\?v=canvas-20260721-1900/, "cases page should load the current shared 1900px design canvas");
 assert.match(html, /case-rail\.css\?v=hero-rail-20260709/, "cases page should load the hero rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
