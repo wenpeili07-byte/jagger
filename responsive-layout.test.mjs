@@ -87,6 +87,11 @@ assert.match(
   /\.nav\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)[^}]*width:\s*100%/s,
   "mobile should keep four navigation links on one row"
 );
+assert.match(
+  mobileHeaderBlock,
+  /\.nav a\[aria-current="page"\]::after\s*\{[^}]*position:\s*absolute[^}]*right:\s*12px[^}]*bottom:\s*4px[^}]*left:\s*12px[^}]*width:\s*auto[^}]*margin-top:\s*0/s,
+  "mobile current-page underline should not change the navigation label height"
+);
 const smallPhoneBlock = mediaBlock(
   sharedCss,
   "@media (max-width: 620px)",
@@ -122,6 +127,16 @@ assert.match(compactCanvasBlock, /\.cover,\s*\.cases-hero\s*\{[^}]*padding-inlin
 assert.match(compactCanvasBlock, /\.cover\s*\{[^}]*padding-block:\s*26px/s, "compact desktop homepage content should fit the 973px first screen");
 assert.match(sharedCss, /@media \(max-width:\s*899px\)[\s\S]*?\.cover\s*\{[^}]*grid-template-columns:\s*1fr/s, "split-screen layouts may collapse the homepage below the compact-desktop range");
 assert.match(sharedCss, /@media \(max-width:\s*899px\)[\s\S]*?\.cases-hero,\s*\.archive-layout\s*\{[^}]*grid-template-columns:\s*1fr/s, "split-screen layouts may collapse cases below the compact-desktop range");
+const lateCompactCasesBlock = mediaBlock(
+  sharedCss,
+  "@media (max-width: 1180px)",
+  "shared styles should define the late compact cases override"
+);
+assert.match(
+  lateCompactCasesBlock,
+  /\.cases-hero\s*\{[^}]*grid-template-columns:\s*minmax\(240px,\s*0\.76fr\)\s+minmax\(0,\s*1\.24fr\)[^}]*gap:\s*clamp\(16px,\s*2\.2vw,\s*28px\)/s,
+  "late cases styles should preserve shrinkable columns through the final cascade"
+);
 
 // Task 4: every large desktop should fit the complete homepage inside the shared 973px first screen.
 const largeDesktopMarker = "@media (min-width: 1700px)";

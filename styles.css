@@ -891,6 +891,15 @@ h1 span {
     white-space: nowrap;
   }
 
+  .nav a[aria-current="page"]::after {
+    position: absolute;
+    right: 12px;
+    bottom: 4px;
+    left: 12px;
+    width: auto;
+    margin-top: 0;
+  }
+
   .lang-toggle {
     min-width: 88px;
     min-height: 38px;
@@ -1390,6 +1399,11 @@ h1 span {
 }
 
 @media (max-width: 1180px) {
+  .cases-hero {
+    grid-template-columns: minmax(240px, 0.76fr) minmax(0, 1.24fr);
+    gap: clamp(16px, 2.2vw, 28px);
+  }
+
   .cases-hero-copy {
     max-width: 720px;
   }
