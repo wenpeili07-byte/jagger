@@ -53,6 +53,22 @@ test("all public pages ship English-first markup", () => {
     for (const match of directBilingualNodes) {
       assert.equal(match[4].trim(), decode(match[3]).trim(), `${path} should render data-en first`);
     }
+
+    let translatableAttributeCount = 0;
+    for (const match of html.matchAll(/<([a-z][\w-]*)\b([^>]*)>/gi)) {
+      for (const attribute of ["placeholder", "aria-label", "alt"]) {
+        const english = match[2].match(new RegExp(`\\bdata-en-${attribute}="([^"]*)"`));
+        if (!english) {
+          continue;
+        }
+
+        const live = match[2].match(new RegExp(`(?:^|\\s)${attribute}="([^"]*)"`));
+        assert.ok(live, `${path} should expose a live ${attribute}`);
+        assert.equal(live[1], decode(english[1]), `${path} should render English ${attribute} first`);
+        translatableAttributeCount += 1;
+      }
+    }
+    assert.ok(translatableAttributeCount > 0, `${path} should expose translatable live attributes`);
   }
 });
 
