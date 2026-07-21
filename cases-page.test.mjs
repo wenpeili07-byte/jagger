@@ -28,7 +28,7 @@ assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should 
 assert.match(html, /36 MODIFIED-CAR CASE FILES/, "archive should be framed as a 36-case library");
 assert.match(html, /styles\.css\?v=global-shell-20260721/, "cases page should load the current shared stylesheet cache key");
 assert.match(html, /layout-canvas\.css\?v=canvas-20260721-2200/, "cases page should load the current shared 2200px design canvas");
-assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels/, "cases page should load the current hero rail stylesheet separately from the large main stylesheet");
+assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
 assert.match(html, /<script src="\.\/cases\.js\?v=hero-rail-20260709"><\/script>/, "cases page should keep its archive filter script");
@@ -89,6 +89,7 @@ assert.equal((html.match(/class="slide-label"[^>]*data-zh=/g) || []).length, 6, 
 assert.doesNotMatch(css, /\.mwg_effect060\s+\.slide\s*\{[^}]*clip-path:/s, "the slide button should not clip its text label");
 assert.match(css, /\.mwg_effect060\s+\.slide-mask\s*\{[^}]*clip-path:\s*inset\(12%\s+0\s+12%\s+0\)/s, "only the case image layer should use the effect 060 mask");
 assert.match(css, /\.mwg_effect060\s+\.slide-label\s*\{[^}]*z-index:\s*2/s, "case labels should remain above the masked image at compact sizes");
+assert.match(css, /\.mwg_effect060\s+\.slide-label\s*\{[^}]*bottom:\s*22px/s, "case labels should sit clearly above the lower module edge");
 assert.match(css, /\.mwg_effect060\s+\.slide:hover\s+\.slide-mask,[\s\S]*?clip-path:\s*inset\(0\s+0\s+0\s+0\)/s, "hover should still open the image mask without clipping the label");
 assert.match(css, /\.mwg_effect060\s+\.media\s*\{[^}]*object-fit:\s*cover[^}]*transform:\s*translateY\(-12%\)\s+scale\(1\.14\)/s, "effect 060 images should stay masked without scroll-driven transform changes");
 assert.match(css, /\.filter-option\.is-active/s, "active filter should have its own state styling");
