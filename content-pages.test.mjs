@@ -70,7 +70,7 @@ for (const [name, html] of pages) {
   assert.match(html, /href="\.\.\/content-pages\.css\?v=/, `${name} should load the isolated content page stylesheet`);
   assert.match(html, /src="\.\.\/content-pages\.js\?v=/, `${name} should load shared page interactions`);
   assert.match(html, /<header class="topbar">/, `${name} should keep the shared site header`);
-  assert.match(html, /<button class="lang-toggle" type="button" aria-label="Switch language">/, `${name} should keep the language control`);
+  assert.match(html, /<button class="lang-toggle" type="button" aria-label="Switch to English">/, `${name} should keep the language control`);
   assert.match(html, /<footer class="content-footer">/, `${name} should include the shared content footer`);
 }
 

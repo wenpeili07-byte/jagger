@@ -32,14 +32,20 @@ const header = (section) => `<header class="topbar">
     </div>
   </header>`;
 
+const globalFooter = `<footer class="content-footer">
+        <span>LONMA DYNAMIC</span>
+        <span data-zh="龙马态度 · 2026" data-en="AUTOMOTIVE ATTITUDE · 2026">龙马态度 · 2026</span>
+        <a href="../contact.html" data-zh="开始你的项目 →" data-en="START YOUR PROJECT →">开始你的项目 →</a>
+      </footer>`;
+
 export const renderCasePage = (record) => `<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=page-header-20260705" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260719-1900" />
+    <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-1900" />
     <link rel="stylesheet" href="../../case-detail.css?v=case-detail-link-closure-20260719" />
   </head>
   <body data-section="cases">
@@ -68,6 +74,7 @@ export const renderCasePage = (record) => `<!doctype html>
         ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html"`)}
         ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html"`)}
       </nav>
+      ${globalFooter}
     </main>
     <script src="../../content-pages.js?v=detail-language-20260719"></script>
   </body>
@@ -80,8 +87,8 @@ export const renderServicePage = (record) => `<!doctype html>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${record.label} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=page-header-20260705" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260719-1900" />
+    <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-1900" />
     <link rel="stylesheet" href="../../service-detail.css?v=service-detail-20260719" />
   </head>
   <body data-section="services">
@@ -106,6 +113,7 @@ export const renderServicePage = (record) => `<!doctype html>
         ${i18n("h2", { zh: "开始你的项目", en: "START YOUR PROJECT" })}
         ${i18n("a", { zh: "提交车辆信息 →", en: "SEND VEHICLE DETAILS →" }, ' href="../contact.html"')}
       </section>
+      ${globalFooter}
     </main>
     <script src="../../content-pages.js?v=detail-language-20260719"></script>
   </body>

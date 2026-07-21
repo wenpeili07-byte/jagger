@@ -26,6 +26,7 @@ window.addEventListener("load", removeDuplicateShells, { once: true });
 const translations = {
   zh: {
     "brand.home": "回到首页",
+    "nav.label": "主导航",
     "nav.about": "关于",
     "nav.services": "业务",
     "nav.cases": "案例",
@@ -40,10 +41,13 @@ const translations = {
     "services.sectionLabel": "业务展示模块",
     "services.heading": "BUSINESS MODULES",
     "services.count": "06 SERVICES · 03 × 02",
+    "footer.attitude": "龙马态度 · 2026",
+    "footer.contact": "开始你的项目 →",
     "lang.next": "Switch to English"
   },
   en: {
     "brand.home": "Back to home",
+    "nav.label": "Main navigation",
     "nav.about": "ABOUT",
     "nav.services": "SERVICES",
     "nav.cases": "CASES",
@@ -58,6 +62,8 @@ const translations = {
     "services.sectionLabel": "Business service modules",
     "services.heading": "BUSINESS MODULES",
     "services.count": "06 SERVICES · 03 × 02",
+    "footer.attitude": "AUTOMOTIVE ATTITUDE · 2026",
+    "footer.contact": "START YOUR PROJECT →",
     "lang.next": "切换到中文"
   }
 };
