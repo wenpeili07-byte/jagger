@@ -31,7 +31,7 @@ for (const id of ["02", "03", "04", "05", "06"]) {
 }
 
 // Task 2: shared canvas and cache coverage.
-assert.match(canvasCss, /--site-max-width:\s*1900px/, "canvas should define the 1900px site maximum");
+assert.match(canvasCss, /--site-max-width:\s*2200px/, "canvas should define the 2200px site maximum");
 assert.match(canvasCss, /--site-header-height:\s*77px/, "canvas should define the 77px desktop header");
 assert.match(canvasCss, /--site-first-screen-max:\s*973px/, "canvas should cap first screens at 973px below the header");
 assert.match(canvasCss, /\.site-shell\s*\{[^}]*max-width:\s*var\(--site-max-width\)/s, "all shells should consume the shared maximum");
@@ -51,7 +51,7 @@ assert.doesNotMatch(contentCss, /\.content-page\.site-shell\s*\{[^}]*max-width:/
 
 for (const path of publicPages) {
   const html = read(path);
-  assert.match(html, /layout-canvas\.css\?v=canvas-20260721-1900/, `${path} should load the current 1900px canvas version`);
+  assert.match(html, /layout-canvas\.css\?v=canvas-20260721-2200/, `${path} should load the current 2200px canvas version`);
 }
 
 // Task 3: compact header and services rules.
