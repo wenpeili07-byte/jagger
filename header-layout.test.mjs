@@ -6,7 +6,7 @@ const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const js = readFileSync(new URL("./script.js", import.meta.url), "utf8");
 const renderer = readFileSync(new URL("./scripts/render-detail-pages.mjs", import.meta.url), "utf8");
 const shellVersion = "global-shell-20260721";
-const canvasVersion = "canvas-20260721-1900";
+const canvasVersion = "canvas-20260721-2200";
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
   assert.notEqual(start, -1, message);

@@ -1,6 +1,6 @@
-/* 1900 x 1050 shared design canvas. Loaded after styles.css. */
+/* 2200px shared desktop canvas. Loaded after styles.css. */
 :root {
-  --site-max-width: 1900px;
+  --site-max-width: 2200px;
   --site-header-height: 77px;
   --site-first-screen-max: 973px;
   --site-gutter: clamp(20px, 4vw, 76px);
