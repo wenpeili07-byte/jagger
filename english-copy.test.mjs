@@ -64,7 +64,7 @@ test("all public pages ship English-first markup", () => {
 
         const live = match[2].match(new RegExp(`(?:^|\\s)${attribute}="([^"]*)"`));
         assert.ok(live, `${path} should expose a live ${attribute}`);
-        assert.equal(live[1], decode(english[1]), `${path} should render English ${attribute} first`);
+        assert.equal(decode(live[1]), decode(english[1]), `${path} should render English ${attribute} first`);
         translatableAttributeCount += 1;
       }
     }
@@ -209,4 +209,21 @@ test("editorial pages use the approved English copy system", () => {
   assert.doesNotMatch(cases, />BENZ</);
   assert.match(contact, /SEND PROJECT INQUIRY/);
   assert.match(contact, /WHAT DO YOU WANT TO CHANGE\?/);
+});
+
+test("detail sources use approved case and service terminology", async () => {
+  const { caseDetails, serviceDetails } = await import("./detail-pages-data.mjs");
+  assert.deepEqual(serviceDetails.map((record) => record.title.en), [
+    "CUSTOM VEHICLE BUILDS",
+    "PERFORMANCE PARTS",
+    "AUTOMOTIVE PHOTOGRAPHY",
+    "ECU CALIBRATION",
+    "CHASSIS SETUP",
+    "INTAKE & EXHAUST",
+  ]);
+  assert.equal(caseDetails[3].subtitle.en, "POWER DELIVERY AND ROAD TESTING");
+  assert.equal(caseDetails[5].title.en, "BLUE PERFORMANCE BUILD");
+  for (const record of [...caseDetails, ...serviceDetails]) {
+    assert.ok(record.meta, `${record.id} needs an English meta description`);
+  }
 });

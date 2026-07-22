@@ -43,6 +43,7 @@ export const renderCasePage = (record) => `<!doctype html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
@@ -86,6 +87,7 @@ export const renderServicePage = (record) => `<!doctype html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>${record.label} | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
@@ -107,7 +109,7 @@ export const renderServicePage = (record) => `<!doctype html>
       </section>
       <section class="detail-story">
         ${i18n("p", record.scope)}
-        ${i18n("p", { zh: "沟通目标 · 规划方案 · 执行调整 · 完成复查", en: "DISCUSS · PLAN · EXECUTE · REVIEW" }, ' class="detail-process"')}
+        ${i18n("p", { zh: "沟通目标 · 规划方案 · 执行调整 · 完成复查", en: "ASSESS · PLAN · EXECUTE · VERIFY" }, ' class="detail-process"')}
       </section>
       <section class="detail-contact">
         ${i18n("h2", { zh: "开始你的项目", en: "START YOUR PROJECT" })}
