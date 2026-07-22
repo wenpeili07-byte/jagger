@@ -104,3 +104,93 @@ test("homepage uses canonical automotive service language", () => {
     assert.doesNotMatch(source, pattern, `remove ${pattern}`);
   }
 });
+
+test("homepage runtime records keep the approved English automotive copy", () => {
+  const source = read("./script.js");
+  const detailsSource = source.slice(source.indexOf("const details = ["), source.indexOf("\n];", source.indexOf("const details = [")));
+  const records = [...detailsSource.matchAll(/\n  \{([\s\S]*?)\n  \}(?:,|$)/g)].map((match) => match[1]);
+  const englishValue = (record, field, label) => {
+    const match = record.match(new RegExp(`(?:^|\\n)\\s{4}${field}:\\s*\\{[\\s\\S]*?\\ben:\\s*"([^"]*)"`));
+    assert.ok(match, `missing runtime ${field} for ${label}`);
+    return match[1];
+  };
+  const recordFor = (counter) => {
+    const record = records.find((entry) => entry.includes(`counter: "${counter}"`));
+    assert.ok(record, `missing runtime record ${counter}`);
+    return record;
+  };
+
+  for (const { counter, title, text } of [
+    {
+      counter: "S1",
+      title: "Custom Vehicle Builds",
+      text: "Exterior, wheels, suspension, and braking upgrades developed around one complete vehicle.",
+    },
+    {
+      counter: "S2",
+      title: "Performance Parts",
+      text: "A curated selection of performance, exterior, wheel, suspension, and OEM-grade components.",
+    },
+    {
+      counter: "S3",
+      title: "Automotive Photography",
+      text: "Still photography, rolling shots, short films, and social content created around the car.",
+    },
+    {
+      counter: "S4",
+      title: "ECU Calibration",
+      text: "Custom ECU calibration, data logging, road testing, and staged upgrade planning.",
+    },
+    {
+      counter: "S5",
+      title: "Chassis Setup",
+      text: "Ride height, wheel fitment, alignment, and chassis settings for street or track use.",
+    },
+    {
+      counter: "S6",
+      title: "Intake & Exhaust",
+      text: "Intake, downpipe, mid-pipe, and axle-back upgrades tuned for sound and response.",
+    },
+  ]) {
+    const record = recordFor(counter);
+    assert.equal(englishValue(record, "title", counter), title, `${counter} runtime service title`);
+    assert.equal(englishValue(record, "text", counter), text, `${counter} runtime service summary`);
+  }
+
+  for (const { counter, title, text } of [
+    {
+      counter: "01",
+      title: "Street Widebody",
+      text: "A street-focused widebody build shaped around daily drivability, wheel fitment, braking, and a more assertive stance.",
+    },
+    {
+      counter: "02",
+      title: "Road & Track Setup",
+      text: "Braking, chassis support, weight, and tire grip developed for repeatable performance on road and track.",
+    },
+    {
+      counter: "03",
+      title: "Low Stance",
+      text: "Ride height, wheel fitment, and body clearance tuned together for a clean, usable low stance.",
+    },
+    {
+      counter: "04",
+      title: "Turbo Tuning",
+      text: "Intake, exhaust, boost control, and ECU calibration matched for stronger, more predictable power delivery.",
+    },
+    {
+      counter: "05",
+      title: "Automotive Media Feature",
+      text: "Exterior detail, lighting, location, and motion planned as one complete automotive media feature.",
+    },
+    {
+      counter: "06",
+      title: "Blue Performance Build",
+      text: "Exterior, chassis, and power delivery developed around a single performance objective.",
+    },
+  ]) {
+    const record = recordFor(counter);
+    assert.equal(englishValue(record, "title", counter), title, `${counter} runtime case title`);
+    assert.equal(englishValue(record, "text", counter), text, `${counter} runtime case summary`);
+  }
+});
