@@ -4,13 +4,20 @@ import { readFileSync } from "node:fs";
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const css = read("./case-detail.css");
 
-for (const id of ["01", "02", "03", "04", "05", "06"]) {
+for (const id of ["01", "03", "04", "05", "06"]) {
   const html = read(`./pages/cases/case-${id}.html`);
   assert.match(html, /class="detail-hero"/);
   assert.match(html, /class="detail-story"/);
   assert.match(html, /class="detail-contact"/);
   assert.doesNotMatch(html, /<figcaption|case-spec-grid|case-section-kicker|case-detail-meta/);
 }
+
+const case02 = read("./pages/cases/case-02.html");
+assert.match(case02, /class="case02-showcase"/);
+assert.match(case02, /class="detail-story"/);
+assert.match(case02, /class="detail-contact"/);
+assert.match(case02, /class="detail-pagination"/);
+assert.doesNotMatch(case02, /<figcaption|case-spec-grid|case-section-kicker|case-detail-meta/);
 
 assert.match(css, /\.detail-hero\s*\{[^}]*grid-template-columns:/s);
 assert.match(css, /\.detail-hero-media img\s*\{[^}]*object-fit:\s*cover/s);

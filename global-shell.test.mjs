@@ -44,6 +44,11 @@ const pageGroups = [
     pages: ["./pages/contact.html"],
     currentHref: "./contact.html",
   },
+  {
+    section: "shop",
+    pages: ["./pages/shop.html"],
+    currentHref: "./shop.html",
+  },
 ];
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
@@ -58,7 +63,8 @@ for (const group of pageGroups) {
       assert.match(html, new RegExp(`<body[^>]*data-section="${group.section}"`));
       assert.match(header, /<a class="brand"[^>]*data-zh-aria-label="回到首页"[^>]*data-en-aria-label="Back to home"/);
       assert.match(header, /<nav class="nav"[^>]*data-zh-aria-label="主导航"[^>]*data-en-aria-label="Main navigation"/);
-      assert.equal((header.match(/<a href=/g) || []).length, 4);
+      assert.equal((header.match(/<a href=/g) || []).length, 5);
+      assert.match(header, /<a href="(?:\.\/|\.\.\/)?(?:pages\/)?shop\.html"[^>]*>SHOP<\/a>/);
       assert.match(header, /<button class="lang-toggle"[^>]*aria-label="切换到中文"/);
 
       const currentHref = typeof group.currentHref === "function"
@@ -82,6 +88,7 @@ const footerLinks = new Map([
   ["./pages/services.html", "./contact.html"],
   ["./pages/cases.html", "./contact.html"],
   ["./pages/contact.html", "./cases.html"],
+  ["./pages/shop.html", "./contact.html"],
 ]);
 
 for (const number of ["01", "02", "03", "04", "05", "06"]) {
@@ -117,4 +124,12 @@ test("footer styling is global and not duplicated by content pages", () => {
   assert.match(sharedCss, /\.content-footer a:hover\s*\{[^}]*color:\s*var\(--ink\)/s);
   assert.match(sharedCss, /\.content-footer a:focus-visible\s*\{[^}]*color:\s*var\(--ink\)/s);
   assert.doesNotMatch(contentCss, /\.content-footer/);
+});
+
+test("Shop and Case 02 expose their live and synchronized initial states", () => {
+  const shopHtml = read("./pages/shop.html");
+  const case02Html = read("./pages/cases/case-02.html");
+
+  assert.match(shopHtml, /data-results-status aria-live="polite"/);
+  assert.match(case02Html, /data-case-marker="01" aria-pressed="true" data-active/);
 });

@@ -1,15 +1,24 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import test from "node:test";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const canvasCss = read("./layout-canvas.css");
 const sharedCss = read("./styles.css");
 const contentCss = read("./content-pages.css");
+const shopCss = read("./shop.css");
+const case02Css = read("./case-02.css");
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
   assert.notEqual(start, -1, message);
   const nextMedia = source.indexOf("\n@media", start + marker.length);
   return source.slice(start, nextMedia === -1 ? source.length : nextMedia);
+};
+const ruleBlock = (source, selector, message) => {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = source.match(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`));
+  assert.ok(match, message);
+  return match[1];
 };
 const publicPages = [
   "./index.html",
@@ -17,6 +26,7 @@ const publicPages = [
   "./pages/services.html",
   "./pages/cases.html",
   "./pages/contact.html",
+  "./pages/shop.html",
   "./pages/cases/case-01.html",
   "./pages/services/build.html",
   "./pages/services/parts.html",
@@ -84,8 +94,8 @@ assert.match(
 );
 assert.match(
   mobileHeaderBlock,
-  /\.nav\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)[^}]*width:\s*100%/s,
-  "mobile should keep four navigation links on one row"
+  /\.nav\s*\{[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)[^}]*width:\s*100%/s,
+  "mobile should keep five navigation links on one row"
 );
 assert.match(
   mobileHeaderBlock,
@@ -127,6 +137,53 @@ assert.match(compactCanvasBlock, /\.cover,\s*\.cases-hero\s*\{[^}]*padding-inlin
 assert.match(compactCanvasBlock, /\.cover\s*\{[^}]*padding-block:\s*26px/s, "compact desktop homepage content should fit the 973px first screen");
 assert.match(sharedCss, /@media \(max-width:\s*899px\)[\s\S]*?\.cover\s*\{[^}]*grid-template-columns:\s*1fr/s, "split-screen layouts may collapse the homepage below the compact-desktop range");
 assert.match(sharedCss, /@media \(max-width:\s*899px\)[\s\S]*?\.cases-hero,\s*\.archive-layout\s*\{[^}]*grid-template-columns:\s*1fr/s, "split-screen layouts may collapse cases below the compact-desktop range");
+
+// Task 5: Shop and Case 02 responsive integration guards.
+assert.doesNotMatch(
+  `${shopCss}\n${case02Css}`,
+  /width:\s*100vw|transform:\s*scale\(/,
+  "Shop and Case 02 must not use viewport-width sizing or whole-element scaling"
+);
+assert.match(
+  shopCss,
+  /@media \(min-width:\s*768px\) and \(max-width:\s*1279px\)/,
+  "Shop should define the approved tablet and split-screen range"
+);
+assert.match(
+  shopCss,
+  /@media \(max-width:\s*767px\)[\s\S]*\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*1fr/s,
+  "Shop should use a single product column on mobile"
+);
+assert.match(
+  case02Css,
+  /@media \(max-width:\s*767px\)[\s\S]*\[data-case-marker\]\s*\{[^}]*display:\s*none/s,
+  "Case 02 should hide image markers on mobile"
+);
+test("Case 02 desktop showcase expands with intrinsic rail content", () => {
+  const case02ShowcaseRule = ruleBlock(
+    case02Css,
+    ".case02-showcase",
+    "Case 02 should define its desktop showcase"
+  );
+  assert.doesNotMatch(
+    case02ShowcaseRule,
+    /(?:^|\n)\s*height\s*:/,
+    "Case 02 desktop showcase should expand with intrinsic rail content on short viewports"
+  );
+});
+
+test("Case 02 tablet image preserves the approved 4:3 geometry", () => {
+  const case02TabletBlock = mediaBlock(
+    case02Css,
+    "@media (min-width: 768px) and (max-width: 1279px)",
+    "Case 02 should define the approved tablet range"
+  );
+  assert.match(
+    case02TabletBlock,
+    /\.case02-media\s*\{[^}]*aspect-ratio:\s*4\s*\/\s*3/s,
+    "Case 02 should preserve a 4:3 tablet image"
+  );
+});
 const lateCompactCasesBlock = mediaBlock(
   sharedCss,
   "@media (max-width: 1180px)",
