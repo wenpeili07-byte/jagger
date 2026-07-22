@@ -236,6 +236,41 @@
   gap: 12px;
 }
 
+.shop-empty-state {
+  margin-top: 12px;
+  padding: 32px;
+  border: 1px solid var(--line);
+}
+
+.shop-empty-state h2,
+.shop-empty-state p {
+  margin: 0;
+}
+
+.shop-empty-state h2,
+.shop-empty-state a {
+  color: var(--accent-bright);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.shop-empty-state p {
+  max-width: 540px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.shop-empty-state a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: end;
+  margin-top: 18px;
+  text-decoration: none;
+}
+
 .shop-product-card {
   display: flex;
   min-width: 0;

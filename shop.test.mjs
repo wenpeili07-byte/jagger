@@ -5,6 +5,8 @@ import { shopProducts, shopVehicles } from "./shop-data.mjs";
 import { renderShopPage } from "./scripts/render-shop-page.mjs";
 
 const html = readFileSync(new URL("./pages/shop.html", import.meta.url), "utf8");
+const js = readFileSync(new URL("./shop.js", import.meta.url), "utf8");
+const css = readFileSync(new URL("./shop.css", import.meta.url), "utf8");
 
 test("shop renders six truthful bilingual sample products", () => {
   assert.deepEqual(shopVehicles.makes, ["BMW", "AUDI", "MERCEDES-BENZ"]);
@@ -39,4 +41,19 @@ test("renderShopPage escapes product copy", () => {
   const output = renderShopPage([{ ...shopProducts[0], title: { en: "<unsafe>", zh: "<危险>" } }]);
   assert.doesNotMatch(output, /<unsafe>|<危险>/);
   assert.match(output, /&lt;unsafe&gt;/);
+});
+
+test("shop controller supports filters, query links, and dialog focus", () => {
+  assert.match(js, /new URLSearchParams\(window\.location\.search\)/);
+  assert.match(js, /querySelectorAll\("\[data-product-card\]"\)/);
+  assert.match(js, /querySelectorAll\("\[data-category-filter\]"\)/);
+  assert.match(js, /resultsStatus\.textContent/);
+  assert.match(js, /productDialog\.showModal\(\)/);
+  assert.match(js, /event\.key === "Escape"/);
+  assert.match(js, /lastDialogTrigger\.focus\(\)/);
+});
+
+test("shop provides reduced-motion and visible focus states", () => {
+  assert.match(css, /:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
 });

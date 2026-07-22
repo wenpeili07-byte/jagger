@@ -108,7 +108,7 @@ export const renderShopPage = (products = shopProducts) => {
     <title>Shop | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../styles.css?v=global-shell-20260722" />
     <link rel="stylesheet" href="../layout-canvas.css?v=canvas-20260721-2200" />
-    <link rel="stylesheet" href="../shop.css?v=shop-catalog-task2-20260722" />
+    <link rel="stylesheet" href="../shop.css?v=shop-catalog-task3-20260722" />
   </head>
   <body data-section="shop">
     <main class="site-shell shop-page" ${i18nAttribute("aria-label", { zh: "LONMA DYNAMIC 商店", en: "LONMA DYNAMIC shop" })}>
@@ -182,6 +182,14 @@ export const renderShopPage = (products = shopProducts) => {
           <div class="shop-product-grid">
             ${products.map(renderProductCard).join("\n            ")}
           </div>
+          <section class="shop-empty-state" data-results-empty hidden>
+            ${i18n("h2", { zh: "未找到示例结果", en: "NO SAMPLE RESULTS" })}
+            ${i18n("p", {
+              zh: "请调整分类，或联系 LONMA DYNAMIC 确认你的车型需求。",
+              en: "ADJUST THE CATEGORY OR CONTACT LONMA DYNAMIC TO CONFIRM YOUR VEHICLE REQUIREMENTS.",
+            })}
+            <a href="./contact.html" data-zh="联系 LONMA DYNAMIC →" data-en="CONTACT LONMA DYNAMIC →">CONTACT LONMA DYNAMIC →</a>
+          </section>
         </div>
       </section>
 
@@ -199,6 +207,7 @@ export const renderShopPage = (products = shopProducts) => {
       ${footer}
     </main>
     <script src="../content-pages.js?v=english-copy-20260721"></script>
+    <script src="../shop.js?v=shop-catalog-task3-20260722"></script>
   </body>
 </html>
 `;
