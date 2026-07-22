@@ -1,7 +1,7 @@
 # LONMA DYNAMIC Shop And Case 02 Design
 
 **Date:** 2026-07-22
-**Status:** Visual direction approved, pending written-spec review
+**Status:** Approved for implementation
 **Selected directions:** Shop option 1 and Case 02 adapted from option 3
 
 ## Goal
@@ -11,7 +11,7 @@ case page that connects a finished build to its component categories.
 
 The release must:
 
-- preserve the current English-first bilingual site and 1900px canvas;
+- preserve the current English-first bilingual site and 2200px canvas;
 - add a useful Shop page based on the approved model-first catalog image;
 - redesign only Case 02 around the approved photo-led `PARTS USED` layout;
 - keep the other five case detail pages unchanged;
@@ -158,7 +158,7 @@ No price or stock quantity appears in this release. Availability uses
 
 ### Wide Desktop: 1280px And Above
 
-- Keep the site centered within the existing 1900px maximum canvas.
+- Keep the site centered within the existing 2200px maximum canvas.
 - Shop uses a fixed-width filter rail and a three-column product grid.
 - Vehicle controls remain on one row when space permits.
 - Case 02 uses the approved image-left, parts-right composition.
@@ -254,7 +254,7 @@ Automated tests must verify:
 
 Browser verification must cover:
 
-- 1900 x 1050 wide desktop;
+- 2200 x 1050 wide desktop;
 - 1440 x 900 desktop;
 - approximately 1156 x 900 split-screen laptop;
 - 790 x 900 narrow split-screen;
