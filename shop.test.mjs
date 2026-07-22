@@ -44,6 +44,7 @@ test("renderShopPage escapes product copy", () => {
 });
 
 test("shop controller supports filters, query links, and dialog focus", () => {
+  assert.match(html, /shop\.js\?v=shop-case02-query-fix-20260722/);
   assert.match(js, /new URLSearchParams\(window\.location\.search\)/);
   assert.match(js, /querySelectorAll\("\[data-product-card\]"\)/);
   assert.match(js, /querySelectorAll\("\[data-category-filter\]"\)/);

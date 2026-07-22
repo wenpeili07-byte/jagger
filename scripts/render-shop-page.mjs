@@ -207,7 +207,7 @@ export const renderShopPage = (products = shopProducts) => {
       ${footer}
     </main>
     <script src="../content-pages.js?v=english-copy-20260721"></script>
-    <script src="../shop.js?v=shop-catalog-task3-20260722"></script>
+    <script src="../shop.js?v=shop-case02-query-fix-20260722"></script>
   </body>
 </html>
 `;

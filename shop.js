@@ -12,7 +12,9 @@
   const dialogDescription = document.querySelector("[data-dialog-description]");
   const dialogInquiry = document.querySelector("[data-dialog-inquiry]");
   const dialogClose = document.querySelector("[data-dialog-close]");
+  const queryOnlyCategories = new Set(["ecu"]);
   let lastDialogTrigger = null;
+  let selectedCategories = new Set();
 
   function language() {
     return document.documentElement.lang.startsWith("zh") ? "zh" : "en";
@@ -31,10 +33,12 @@
   }
 
   function activeCategories() {
-    return new Set(filters.filter((filter) => filter.checked).map((filter) => filter.value));
+    return new Set(selectedCategories);
   }
 
   function setCategoryFilters(categories) {
+    selectedCategories = new Set(categories);
+
     filters.forEach((filter) => {
       filter.checked = categories.has(filter.value);
     });
@@ -99,7 +103,7 @@
     query
       .getAll("category")
       .flatMap((value) => value.split(","))
-      .filter((value) => filters.some((filter) => filter.value === value))
+      .filter((value) => queryOnlyCategories.has(value) || filters.some((filter) => filter.value === value))
   );
 
   setCategoryFilters(queryCategories);
@@ -108,6 +112,7 @@
 
   filters.forEach((filter) => {
     filter.addEventListener("change", () => {
+      setCategoryFilters(new Set(filters.filter((item) => item.checked).map((item) => item.value)));
       const categories = activeCategories();
       updateCategoryQuery(categories);
       applyCatalogState();
