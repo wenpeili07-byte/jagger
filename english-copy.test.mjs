@@ -21,6 +21,7 @@ const publicPages = [
   "./pages/cases/case-05.html",
   "./pages/cases/case-06.html",
   "./pages/contact.html",
+  "./pages/shop.html",
 ];
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
@@ -101,6 +102,12 @@ test("content controller cache references use the English-first 2026-07-21 versi
   const { renderCasePage, renderServicePage } = await import("./scripts/render-detail-pages.mjs");
   assert.match(renderCasePage(caseDetails[0]), new RegExp(`content-pages\\.js\\?v=${englishFirstControllerVersion}`));
   assert.match(renderServicePage(serviceDetails[0]), new RegExp(`content-pages\\.js\\?v=${englishFirstControllerVersion}`));
+});
+
+test("shop navigation is bilingual in both controllers", () => {
+  assert.match(read("./script.js"), /"nav\.shop": "商店"/);
+  assert.match(read("./script.js"), /"nav\.shop": "SHOP"/);
+  assert.match(read("./content-pages.js"), /"shop\.html": \{ zh: "商店", en: "SHOP" \}/);
 });
 
 test("meaningful public accessibility attributes are English-first and bilingual", () => {

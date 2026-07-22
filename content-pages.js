@@ -14,6 +14,7 @@
     "services.html": { zh: "业务", en: "SERVICES" },
     "cases.html": { zh: "案例", en: "CASES" },
     "contact.html": { zh: "联系", en: "CONTACT" },
+    "shop.html": { zh: "商店", en: "SHOP" },
   };
   let currentLanguage = getInitialLanguage();
 

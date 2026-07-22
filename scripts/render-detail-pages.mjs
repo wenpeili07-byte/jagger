@@ -27,6 +27,7 @@ const header = (section) => `<header class="topbar">
       <a href="../services.html"${section === "services" ? ' aria-current="page"' : ""}>SERVICES</a>
       <a href="../cases.html"${section === "cases" ? ' aria-current="page"' : ""}>CASES</a>
       <a href="../contact.html">CONTACT</a>
+      <a href="../shop.html">SHOP</a>
     </nav>
     <div class="top-actions">
       <button class="lang-toggle" type="button" aria-label="切换到中文">

@@ -874,7 +874,7 @@ h1 span {
     grid-column: 1 / -1;
     grid-row: 2;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     align-items: center;
     justify-self: stretch;
     width: 100%;
@@ -885,7 +885,8 @@ h1 span {
     min-width: 0;
     padding-block: 10px;
     overflow: hidden;
-    font-size: 11px;
+    font-size: 10px;
+    letter-spacing: 0;
     text-align: center;
     text-overflow: clip;
     white-space: nowrap;

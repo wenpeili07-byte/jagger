@@ -22,7 +22,8 @@ const directPages = [
   "./pages/about.html",
   "./pages/services.html",
   "./pages/cases.html",
-  "./pages/contact.html"
+  "./pages/contact.html",
+  "./pages/shop.html"
 ];
 const servicePages = [
   "./pages/services/build.html",
@@ -49,14 +50,15 @@ assert.match(html, new RegExp(`<link rel="stylesheet" href="\\.\\/layout-canvas\
 assert.match(html, new RegExp(`<script src="\\.\\/script\\.js\\?v=${controllerVersion}"></script>`), "homepage should advance the controller cache key");
 for (const pagePath of directPages) {
   const pageHtml = readFileSync(new URL(pagePath, import.meta.url), "utf8");
-  assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="\\.\\.\\/styles\\.css\\?v=${shellVersion}" \\/>`), `${pagePath} should advance the shared stylesheet cache key`);
+  const pageShellVersion = pagePath === "./pages/shop.html" ? "global-shell-20260722" : shellVersion;
+  assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="\\.\\.\\/styles\\.css\\?v=${pageShellVersion}" \\/>`), `${pagePath} should use the expected shared stylesheet cache key`);
   assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="\\.\\.\\/layout-canvas\\.css\\?v=${canvasVersion}" \\/>`), `${pagePath} should advance the canvas cache key`);
-  if (pagePath !== "./pages/cases.html") {
+  if (pagePath !== "./pages/cases.html" && pagePath !== "./pages/shop.html") {
     assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="\\.\\.\\/content-pages\\.css\\?v=${shellVersion}" \\/>`), `${pagePath} should advance the content stylesheet cache key`);
   }
   assert.match(pageHtml, /<header class="topbar">/, `${pagePath} should include the shared header`);
   assert.match(pageHtml, /<a class="brand" href="\.\.\/index\.html"/, `${pagePath} brand should link back to the homepage`);
-  assert.match(pageHtml, /<a href="\.\/about\.html"(?: aria-current="page")?>ABOUT<\/a>[\s\S]*<a href="\.\/services\.html"(?: aria-current="page")?>SERVICES<\/a>[\s\S]*<a href="\.\/cases\.html"(?: aria-current="page")?>CASES<\/a>[\s\S]*<a href="\.\/contact\.html"(?: aria-current="page")?>CONTACT<\/a>/, `${pagePath} should keep same-level header links`);
+  assert.match(pageHtml, /<a href="\.\/about\.html"(?: aria-current="page")?>ABOUT<\/a>[\s\S]*<a href="\.\/services\.html"(?: aria-current="page")?>SERVICES<\/a>[\s\S]*<a href="\.\/cases\.html"(?: aria-current="page")?>CASES<\/a>[\s\S]*<a href="\.\/contact\.html"(?: aria-current="page")?>CONTACT<\/a>[\s\S]*<a href="\.\/shop\.html"(?: aria-current="page")?>SHOP<\/a>/, `${pagePath} should keep same-level header links`);
 }
 for (const pagePath of [...casePages, ...servicePages]) {
   const pageHtml = readFileSync(new URL(pagePath, import.meta.url), "utf8");
@@ -64,7 +66,7 @@ for (const pagePath of [...casePages, ...servicePages]) {
   assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="\\.\\.\\/\\.\\.\\/layout-canvas\\.css\\?v=${canvasVersion}" \\/>`), `${pagePath} should advance the canvas cache key`);
   assert.match(pageHtml, /<header class="topbar">/, `${pagePath} should include the shared header`);
   assert.match(pageHtml, /<a class="brand" href="\.\.\/\.\.\/index\.html"/, `${pagePath} brand should link back to the homepage`);
-  assert.match(pageHtml, /<a href="\.\.\/about\.html">ABOUT<\/a>[\s\S]*<a href="\.\.\/services\.html"(?: aria-current="page")?>SERVICES<\/a>[\s\S]*<a href="\.\.\/cases\.html"(?: aria-current="page")?>CASES<\/a>[\s\S]*<a href="\.\.\/contact\.html">CONTACT<\/a>/, `${pagePath} should keep English default labels on parent-level header links`);
+  assert.match(pageHtml, /<a href="\.\.\/about\.html">ABOUT<\/a>[\s\S]*<a href="\.\.\/services\.html"(?: aria-current="page")?>SERVICES<\/a>[\s\S]*<a href="\.\.\/cases\.html"(?: aria-current="page")?>CASES<\/a>[\s\S]*<a href="\.\.\/contact\.html">CONTACT<\/a>[\s\S]*<a href="\.\.\/shop\.html">SHOP<\/a>/, `${pagePath} should keep English default labels on parent-level header links`);
 }
 assert.match(renderer, new RegExp(`styles\\.css\\?v=${shellVersion}`), "detail renderer should preserve the shared stylesheet cache key");
 assert.match(renderer, new RegExp(`layout-canvas\\.css\\?v=${canvasVersion}`), "detail renderer should preserve the canvas cache key");
@@ -105,3 +107,8 @@ assert.match(js, /"nav\.label":\s*"主导航"/, "Chinese translations should inc
 assert.match(js, /"nav\.label":\s*"Main navigation"/, "English translations should include the main navigation label");
 assert.match(css, /grid-template-columns:\s*minmax\(310px,\s*0\.88fr\)\s+minmax\(440px,\s*1\.15fr\)/, "cover should remove the middle spine column");
 assert.match(css, /h1\s*\{[^}]*margin:\s*clamp\(6px,\s*2vw,\s*24px\)\s+0\s+0/s, "hero title should move upward");
+const mobileHeader = mediaBlock(css, "@media (max-width: 767px)", "mobile header range should exist");
+assert.match(
+  mobileHeader,
+  /\.nav\s*\{[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)/s,
+);
