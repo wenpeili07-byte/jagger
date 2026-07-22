@@ -33,9 +33,9 @@ assert.match(html, /layout-canvas\.css\?v=canvas-20260721-2200/, "cases page sho
 assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
-assert.match(html, /<script src="\.\/cases\.js\?v=hero-rail-20260709"><\/script>/, "cases page should keep its archive filter script");
+assert.match(html, /<script src="\.\/cases\.js\?v=english-copy-20260721"><\/script>/, "cases page should load the English-first archive filter script");
 assert.match(html, /<body data-section="cases">/, "cases page should expose its navigation section to the shared language controller");
-assert.match(html, /<script src="\.\.\/content-pages\.js\?v=cases-language-20260719"><\/script>/, "cases page should load the shared language controller");
+assert.match(html, /<script src="\.\.\/content-pages\.js\?v=english-copy-20260721"><\/script>/, "cases page should load the English-first shared language controller");
 assert.match(html, /data-lang-option="zh"/, "cases page should identify the Chinese language option");
 assert.match(html, /data-lang-option="en"/, "cases page should identify the English language option");
 assert.match(

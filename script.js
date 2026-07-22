@@ -25,6 +25,7 @@ window.addEventListener("load", removeDuplicateShells, { once: true });
 
 const translations = {
   zh: {
+    "site.label": "LONMA DYNAMIC 网站",
     "brand.home": "回到首页",
     "nav.label": "主导航",
     "nav.about": "关于",
@@ -46,6 +47,7 @@ const translations = {
     "lang.next": "Switch to English"
   },
   en: {
+    "site.label": "LONMA DYNAMIC website",
     "brand.home": "Back to home",
     "nav.label": "Main navigation",
     "nav.about": "ABOUT",

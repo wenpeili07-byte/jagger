@@ -10,8 +10,13 @@ const escapeAttribute = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+const escapeText = (value) =>
+  String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 const i18n = (tag, values, attributes = "") =>
-  `<${tag}${attributes} data-zh="${escapeAttribute(values.zh)}" data-en="${escapeAttribute(values.en)}">${values.en}</${tag}>`;
+  `<${tag}${attributes} data-zh="${escapeAttribute(values.zh)}" data-en="${escapeAttribute(values.en)}">${escapeText(values.en)}</${tag}>`;
 const i18nAttribute = (attribute, values) =>
   `${attribute}="${escapeAttribute(values.en)}" data-zh-${attribute}="${escapeAttribute(values.zh)}" data-en-${attribute}="${escapeAttribute(values.en)}"`;
 
@@ -77,7 +82,7 @@ export const renderCasePage = (record) => `<!doctype html>
       </nav>
       ${globalFooter}
     </main>
-    <script src="../../content-pages.js?v=detail-language-20260719"></script>
+    <script src="../../content-pages.js?v=english-copy-20260721"></script>
   </body>
 </html>
 `;
@@ -117,7 +122,7 @@ export const renderServicePage = (record) => `<!doctype html>
       </section>
       ${globalFooter}
     </main>
-    <script src="../../content-pages.js?v=detail-language-20260719"></script>
+    <script src="../../content-pages.js?v=english-copy-20260721"></script>
   </body>
 </html>
 `;

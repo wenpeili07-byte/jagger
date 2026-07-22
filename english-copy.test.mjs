@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import vm from "node:vm";
 
 const publicPages = [
   "./index.html",
@@ -31,6 +32,191 @@ const decode = (value) =>
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">");
 
+const englishFirstControllerVersion = "english-copy-20260721";
+const chineseText = /[\p{Script=Han}]/u;
+
+class FakeElement {
+  constructor({ attributes = {}, dataset = {} } = {}) {
+    this.attributes = new Map(Object.entries(attributes));
+    this.dataset = { ...dataset };
+    this.listeners = new Map();
+    this.classList = {
+      add() {},
+      remove() {},
+      toggle() {},
+    };
+    this.style = { setProperty() {} };
+    this.textContent = "";
+  }
+
+  addEventListener(name, listener) {
+    this.listeners.set(name, listener);
+  }
+
+  dispatch(name) {
+    this.listeners.get(name)?.();
+  }
+
+  getAttribute(name) {
+    return this.attributes.get(name) ?? null;
+  }
+
+  removeAttribute(name) {
+    this.attributes.delete(name);
+  }
+
+  setAttribute(name, value) {
+    this.attributes.set(name, value);
+  }
+}
+
+function createSessionStorage(language = "en") {
+  const values = new Map([["lonma-language", language]]);
+  return {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+  };
+}
+
+function attributeValue(attributes, name) {
+  return attributes.match(new RegExp(`(?:^|\\s)${name}="([^"]*)"`))?.[1] ?? null;
+}
+
+test("content controller cache references use the English-first 2026-07-21 version", async () => {
+  for (const path of publicPages.filter((path) => path !== "./index.html")) {
+    const html = read(path);
+    assert.match(
+      html,
+      new RegExp(`content-pages\\.js\\?v=${englishFirstControllerVersion}`),
+      `${path} should load the English-first content controller version`,
+    );
+    assert.doesNotMatch(html, /content-pages\.js\?v=(?!english-copy-20260721)/, `${path} should not retain a stale content controller version`);
+  }
+
+  const cases = read("./pages/cases.html");
+  assert.match(cases, new RegExp(`cases\\.js\\?v=${englishFirstControllerVersion}`));
+  assert.doesNotMatch(cases, /cases\.js\?v=(?!english-copy-20260721)/);
+
+  const { caseDetails, serviceDetails } = await import("./detail-pages-data.mjs");
+  const { renderCasePage, renderServicePage } = await import("./scripts/render-detail-pages.mjs");
+  assert.match(renderCasePage(caseDetails[0]), new RegExp(`content-pages\\.js\\?v=${englishFirstControllerVersion}`));
+  assert.match(renderServicePage(serviceDetails[0]), new RegExp(`content-pages\\.js\\?v=${englishFirstControllerVersion}`));
+});
+
+test("meaningful public accessibility attributes are English-first and bilingual", () => {
+  for (const path of publicPages) {
+    const html = read(path);
+    for (const [, tag, attributes] of html.matchAll(/<([a-z][\w-]*)\b([^>]*)>/gi)) {
+      const languageToggle = /\bclass="[^"]*\blang-toggle\b/.test(attributes);
+      for (const attribute of ["aria-label", "alt", "placeholder"]) {
+        const live = attributeValue(attributes, attribute);
+        if (live === null || live === "" || (languageToggle && attribute === "aria-label")) {
+          continue;
+        }
+
+        const chinese = attributeValue(attributes, `data-zh-${attribute}`);
+        const english = attributeValue(attributes, `data-en-${attribute}`);
+        assert.ok(chinese, `${path} <${tag}> ${attribute}="${live}" should have data-zh-${attribute}`);
+        assert.ok(english, `${path} <${tag}> ${attribute}="${live}" should have data-en-${attribute}`);
+        assert.equal(decode(live), decode(english), `${path} <${tag}> should render English ${attribute} first`);
+        assert.ok(!chineseText.test(decode(english)), `${path} <${tag}> should not pair Chinese live ${attribute} with Chinese data-en-${attribute}`);
+      }
+    }
+  }
+});
+
+test("homepage and content controllers switch paired accessibility attributes", () => {
+  const homepageLabel = new FakeElement({
+    attributes: { "aria-label": "LONMA DYNAMIC website" },
+    dataset: { i18nAria: "site.label" },
+  });
+  const homepageToggle = new FakeElement({ attributes: { "aria-label": "切换到中文" } });
+  const homepageShell = new FakeElement();
+  const homepageNodes = new Map([
+    [".site-shell", [homepageShell]],
+    ["[data-detail]", []],
+    [".film-card", []],
+    [".roll-row", []],
+    ["[data-lang-option]", []],
+    ["[data-i18n]", []],
+    ["[data-i18n-aria]", [homepageLabel]],
+  ]);
+  const homepageDocument = {
+    body: { dataset: {} },
+    documentElement: { lang: "en" },
+    head: { append() {} },
+    readyState: "complete",
+    addEventListener() {},
+    createElement: () => new FakeElement(),
+    querySelector(selector) {
+      if (selector === "[data-lang-toggle]") return homepageToggle;
+      if (["#activeLabel", "#detailTitle", "#detailText", "#stripCount"].includes(selector)) return new FakeElement();
+      return homepageNodes.get(selector)?.[0] ?? null;
+    },
+    querySelectorAll: (selector) => homepageNodes.get(selector) ?? [],
+  };
+  const homepageWindow = { addEventListener() {} };
+  vm.runInNewContext(read("./script.js"), {
+    document: homepageDocument,
+    getComputedStyle: () => ({ getPropertyValue: () => "" }),
+    sessionStorage: createSessionStorage(),
+    window: homepageWindow,
+  });
+  assert.equal(homepageLabel.getAttribute("aria-label"), "LONMA DYNAMIC website");
+  homepageToggle.dispatch("click");
+  assert.equal(homepageLabel.getAttribute("aria-label"), "LONMA DYNAMIC 网站");
+
+  const contentLabel = new FakeElement({
+    attributes: { "aria-label": "LONMA DYNAMIC about page" },
+    dataset: { zhAriaLabel: "LONMA DYNAMIC 关于页面", enAriaLabel: "LONMA DYNAMIC about page" },
+  });
+  const contentImage = new FakeElement({
+    attributes: { alt: "LONMA DYNAMIC night vehicle testing" },
+    dataset: { zhAlt: "LONMA DYNAMIC 夜间车辆测试现场", enAlt: "LONMA DYNAMIC night vehicle testing" },
+  });
+  const contentToggle = new FakeElement({ attributes: { "aria-label": "切换到中文" } });
+  const contentNodes = new Map([
+    [".lang-toggle", [contentToggle]],
+    ["[data-lang-option]", []],
+    ["[data-zh][data-en]", []],
+    ["[data-zh-placeholder][data-en-placeholder]", []],
+    ["[data-zh-aria-label][data-en-aria-label]", [contentLabel]],
+    ["[data-zh-alt][data-en-alt]", [contentImage]],
+    [".nav a", []],
+    ["[data-contact-form]", []],
+    ["[data-contact-status]", []],
+    ["[data-service-row]", []],
+  ]);
+  const contentDocument = {
+    body: { dataset: { section: "about" } },
+    documentElement: { lang: "en" },
+    querySelector: (selector) => contentNodes.get(selector)?.[0] ?? null,
+    querySelectorAll: (selector) => contentNodes.get(selector) ?? [],
+  };
+  vm.runInNewContext(read("./content-pages.js"), {
+    document: contentDocument,
+    sessionStorage: createSessionStorage(),
+    window: { location: { pathname: "/pages/about.html" } },
+  });
+  assert.equal(contentLabel.getAttribute("aria-label"), "LONMA DYNAMIC about page");
+  assert.equal(contentImage.getAttribute("alt"), "LONMA DYNAMIC night vehicle testing");
+  contentToggle.dispatch("click");
+  assert.equal(contentLabel.getAttribute("aria-label"), "LONMA DYNAMIC 关于页面");
+  assert.equal(contentImage.getAttribute("alt"), "LONMA DYNAMIC 夜间车辆测试现场");
+});
+
+test("detail renderer escapes bilingual element text", async () => {
+  const { serviceDetails } = await import("./detail-pages-data.mjs");
+  const { renderServicePage } = await import("./scripts/render-detail-pages.mjs");
+  const html = renderServicePage({
+    ...serviceDetails[0],
+    title: { zh: "改装 & <测试>", en: "BUILDS & <TESTING>" },
+  });
+
+  assert.match(html, /data-en="BUILDS &amp; &lt;TESTING&gt;">BUILDS &amp; &lt;TESTING&gt;<\/h1>/);
+  assert.doesNotMatch(html, />BUILDS & <TESTING><\/h1>/);
+});
+
 test("all public pages ship English-first markup", () => {
   for (const path of publicPages) {
     const html = read(path);
@@ -51,7 +237,7 @@ test("all public pages ship English-first markup", () => {
     ];
     assert.ok(directBilingualNodes.length > 0, `${path} should expose bilingual direct text`);
     for (const match of directBilingualNodes) {
-      assert.equal(match[4].trim(), decode(match[3]).trim(), `${path} should render data-en first`);
+      assert.equal(decode(match[4]).trim(), decode(match[3]).trim(), `${path} should render data-en first`);
     }
 
     let translatableAttributeCount = 0;
