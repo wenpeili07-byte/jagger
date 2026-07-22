@@ -9,6 +9,7 @@ import { renderCasePage } from "./scripts/render-detail-pages.mjs";
 const case02 = caseDetails.find((record) => record.id === "02");
 const html = readFileSync(new URL("./pages/cases/case-02.html", import.meta.url), "utf8");
 const shopController = readFileSync(new URL("./shop.js", import.meta.url), "utf8");
+const caseController = readFileSync(new URL("./case-02.js", import.meta.url), "utf8");
 
 class FakeNode {
   constructor({ dataset = {}, value = "" } = {}) {
@@ -146,7 +147,95 @@ test("Case 02 uses the approved special layout and real hero", () => {
   assert.equal((html.match(/data-case-part/g) || []).length, 4);
   assert.match(html, /PARTS USED/);
   assert.match(html, /href="\.\.\/shop\.html\?category=brakes"/);
+  assert.match(html, /case-02\.css\?v=case02-final-review-20260722/);
+  assert.match(html, /case-02\.js\?v=case02-final-review-20260722/);
   assert.doesNotMatch(html, /\$\s?\d|IN STOCK|data-price/i);
+});
+
+test("Case 02 complete build action targets its stable editorial section", () => {
+  const target = html.match(/class="case02-shop-all" href="#([^"]+)"/)?.[1];
+
+  assert.ok(target, "VIEW COMPLETE BUILD LIST should use a same-page fragment");
+  assert.match(html, new RegExp(`<section class="detail-story" id="${target}">`));
+});
+
+function runMarkerReveal({ markerTop, reducedMotion }) {
+  class CaseNode {
+    constructor({ marker, part, top = 100 } = {}) {
+      this.attributes = new Map();
+      this.dataset = {};
+      this.listeners = new Map();
+      this.scrollCalls = [];
+      this.top = top;
+
+      if (marker) this.dataset.caseMarker = marker;
+      if (part) this.dataset.casePart = part;
+    }
+
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener);
+    }
+
+    getBoundingClientRect() {
+      return { bottom: this.top + 32, top: this.top };
+    }
+
+    matches(selector) {
+      return selector === "button" && Boolean(this.dataset.caseMarker);
+    }
+
+    scrollIntoView(options) {
+      this.scrollCalls.push(options);
+    }
+
+    setAttribute(name, value) {
+      this.attributes.set(name, value);
+    }
+
+    toggleAttribute(name, enabled) {
+      if (enabled) this.attributes.set(name, "");
+      else this.attributes.delete(name);
+    }
+  }
+
+  const marker = new CaseNode({ marker: "02", top: markerTop });
+  const part = new CaseNode({ part: "02" });
+  const document = {
+    documentElement: { clientHeight: 900 },
+    querySelectorAll(selector) {
+      if (selector === "[data-case-marker]") return [marker];
+      if (selector === "[data-case-part]") return [part];
+      return [];
+    },
+  };
+
+  vm.runInNewContext(caseController, {
+    document,
+    window: {
+      innerHeight: 900,
+      matchMedia: () => ({ matches: reducedMotion }),
+    },
+  });
+  part.listeners.get("focus")();
+
+  return { marker, part };
+}
+
+test("Case 02 reveals a matching marker only when it is outside the viewport", () => {
+  const visible = runMarkerReveal({ markerTop: 120, reducedMotion: false });
+  const hidden = runMarkerReveal({ markerTop: -40, reducedMotion: false });
+
+  assert.equal(visible.marker.scrollCalls.length, 0);
+  assert.equal(hidden.marker.scrollCalls.length, 1);
+  assert.equal(hidden.marker.scrollCalls[0].behavior, "smooth");
+  assert.equal(hidden.marker.scrollCalls[0].block, "nearest");
+});
+
+test("Case 02 marker reveal is instant when reduced motion is requested", () => {
+  const { marker } = runMarkerReveal({ markerTop: 920, reducedMotion: true });
+
+  assert.equal(marker.scrollCalls.length, 1);
+  assert.equal(marker.scrollCalls[0].behavior, "auto");
 });
 
 test("other cases retain the generic template", () => {

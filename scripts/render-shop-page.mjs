@@ -56,6 +56,11 @@ const renderProductCard = (product) => {
             data-title-zh="${escapeAttribute(product.title.zh)}"
             data-description-en="${escapeAttribute(product.description.en)}"
             data-description-zh="${escapeAttribute(product.description.zh)}"
+            data-compatibility-en="${escapeAttribute(product.compatibility.en)}"
+            data-compatibility-zh="${escapeAttribute(product.compatibility.zh)}"
+            data-inquiry-subject-en="${escapeAttribute(product.inquirySubject.en)}"
+            data-inquiry-subject-zh="${escapeAttribute(product.inquirySubject.zh)}"
+            data-shopify-product-id="${escapeAttribute(product.shopifyProductId ?? "")}"
             data-image="../${escapeAttribute(product.image)}"
             data-alt-en="${escapeAttribute(product.alt.en)}"
             data-alt-zh="${escapeAttribute(product.alt.zh)}"
@@ -106,9 +111,9 @@ export const renderShopPage = (products = shopProducts) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Browse sample performance-part categories for a selected vehicle and contact LONMA DYNAMIC for fitment and installation details." />
     <title>Shop | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../styles.css?v=global-shell-20260722" />
+    <link rel="stylesheet" href="../styles.css?v=shop-case02-20260722-2" />
     <link rel="stylesheet" href="../layout-canvas.css?v=canvas-20260721-2200" />
-    <link rel="stylesheet" href="../shop.css?v=shop-catalog-task3-20260722" />
+    <link rel="stylesheet" href="../shop.css?v=shop-final-review-20260722" />
   </head>
   <body data-section="shop">
     <main class="site-shell shop-page" ${i18nAttribute("aria-label", { zh: "LONMA DYNAMIC 商店", en: "LONMA DYNAMIC shop" })}>
@@ -194,20 +199,24 @@ export const renderShopPage = (products = shopProducts) => {
       </section>
 
       <dialog class="shop-dialog" data-product-dialog aria-labelledby="shop-dialog-title">
-        <button type="button" data-dialog-close aria-label="Close product details" data-zh-aria-label="关闭产品详情" data-en-aria-label="Close product details">×</button>
-        <img data-dialog-image src="../${escapeAttribute(firstProduct.image)}" ${i18nAttribute("alt", firstProduct.alt)} />
-        ${i18n("p", categoryLabels[firstProduct.category], ' data-dialog-category')}
-        ${i18n("h2", firstProduct.title, ' id="shop-dialog-title" data-dialog-title')}
-        ${i18n("p", {
-          zh: "用于设计预览的轮毂分类示例。",
-          en: "A sample wheel category shown for design review.",
-        }, ' data-dialog-description')}
-        <a data-dialog-inquiry href="./contact.html?product=${escapeAttribute(firstProduct.id)}" data-zh="咨询详情 →" data-en="REQUEST DETAILS →">REQUEST DETAILS →</a>
+        <div class="shop-dialog-panel">
+          <button type="button" data-dialog-close aria-label="Close product details" data-zh-aria-label="关闭产品详情" data-en-aria-label="Close product details">×</button>
+          <img data-dialog-image src="../${escapeAttribute(firstProduct.image)}" ${i18nAttribute("alt", firstProduct.alt)} />
+          <div class="shop-dialog-copy">
+            ${i18n("p", categoryLabels[firstProduct.category], ' data-dialog-category')}
+            ${i18n("h2", firstProduct.title, ' id="shop-dialog-title" data-dialog-title')}
+            ${i18n("p", firstProduct.compatibility, ' class="shop-dialog-compatibility" data-dialog-compatibility')}
+            ${i18n("p", firstProduct.description, ' data-dialog-description')}
+          </div>
+          <div class="shop-dialog-footer">
+            <a data-dialog-inquiry href="${escapeAttribute(`./contact.html?product=${encodeURIComponent(firstProduct.id)}&subject=${encodeURIComponent(firstProduct.inquirySubject.en)}`)}" data-zh="咨询详情 →" data-en="REQUEST DETAILS →">REQUEST DETAILS →</a>
+          </div>
+        </div>
       </dialog>
       ${footer}
     </main>
-    <script src="../content-pages.js?v=english-copy-20260721"></script>
-    <script src="../shop.js?v=shop-integration-20260722"></script>
+    <script src="../content-pages.js?v=shop-case02-20260722-2"></script>
+    <script src="../shop.js?v=shop-final-review-20260722"></script>
   </body>
 </html>
 `;

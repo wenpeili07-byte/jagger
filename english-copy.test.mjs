@@ -33,7 +33,8 @@ const decode = (value) =>
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">");
 
-const englishFirstControllerVersion = "english-copy-20260721";
+const sharedAssetVersion = "shop-case02-20260722-2";
+const casesControllerVersion = "english-copy-20260721";
 const chineseText = /[\p{Script=Han}]/u;
 
 class FakeElement {
@@ -83,25 +84,25 @@ function attributeValue(attributes, name) {
   return attributes.match(new RegExp(`(?:^|\\s)${name}="([^"]*)"`))?.[1] ?? null;
 }
 
-test("content controller cache references use the English-first 2026-07-21 version", async () => {
+test("content controller cache references use the current shared asset version", async () => {
   for (const path of publicPages.filter((path) => path !== "./index.html")) {
     const html = read(path);
     assert.match(
       html,
-      new RegExp(`content-pages\\.js\\?v=${englishFirstControllerVersion}`),
-      `${path} should load the English-first content controller version`,
+      new RegExp(`content-pages\\.js\\?v=${sharedAssetVersion}`),
+      `${path} should load the current shared content controller version`,
     );
-    assert.doesNotMatch(html, /content-pages\.js\?v=(?!english-copy-20260721)/, `${path} should not retain a stale content controller version`);
+    assert.doesNotMatch(html, /content-pages\.js\?v=(?!shop-case02-20260722-2)/, `${path} should not retain a stale content controller version`);
   }
 
   const cases = read("./pages/cases.html");
-  assert.match(cases, new RegExp(`cases\\.js\\?v=${englishFirstControllerVersion}`));
+  assert.match(cases, new RegExp(`cases\\.js\\?v=${casesControllerVersion}`));
   assert.doesNotMatch(cases, /cases\.js\?v=(?!english-copy-20260721)/);
 
   const { caseDetails, serviceDetails } = await import("./detail-pages-data.mjs");
   const { renderCasePage, renderServicePage } = await import("./scripts/render-detail-pages.mjs");
-  assert.match(renderCasePage(caseDetails[0]), new RegExp(`content-pages\\.js\\?v=${englishFirstControllerVersion}`));
-  assert.match(renderServicePage(serviceDetails[0]), new RegExp(`content-pages\\.js\\?v=${englishFirstControllerVersion}`));
+  assert.match(renderCasePage(caseDetails[0]), new RegExp(`content-pages\\.js\\?v=${sharedAssetVersion}`));
+  assert.match(renderServicePage(serviceDetails[0]), new RegExp(`content-pages\\.js\\?v=${sharedAssetVersion}`));
 });
 
 test("shop navigation is bilingual in both controllers", () => {

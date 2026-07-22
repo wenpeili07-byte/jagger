@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import test from "node:test";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const canvasCss = read("./layout-canvas.css");
@@ -12,6 +13,12 @@ const mediaBlock = (source, marker, message) => {
   assert.notEqual(start, -1, message);
   const nextMedia = source.indexOf("\n@media", start + marker.length);
   return source.slice(start, nextMedia === -1 ? source.length : nextMedia);
+};
+const ruleBlock = (source, selector, message) => {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = source.match(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`));
+  assert.ok(match, message);
+  return match[1];
 };
 const publicPages = [
   "./index.html",
@@ -152,6 +159,31 @@ assert.match(
   /@media \(max-width:\s*767px\)[\s\S]*\[data-case-marker\]\s*\{[^}]*display:\s*none/s,
   "Case 02 should hide image markers on mobile"
 );
+test("Case 02 desktop showcase expands with intrinsic rail content", () => {
+  const case02ShowcaseRule = ruleBlock(
+    case02Css,
+    ".case02-showcase",
+    "Case 02 should define its desktop showcase"
+  );
+  assert.doesNotMatch(
+    case02ShowcaseRule,
+    /(?:^|\n)\s*height\s*:/,
+    "Case 02 desktop showcase should expand with intrinsic rail content on short viewports"
+  );
+});
+
+test("Case 02 tablet image preserves the approved 4:3 geometry", () => {
+  const case02TabletBlock = mediaBlock(
+    case02Css,
+    "@media (min-width: 768px) and (max-width: 1279px)",
+    "Case 02 should define the approved tablet range"
+  );
+  assert.match(
+    case02TabletBlock,
+    /\.case02-media\s*\{[^}]*aspect-ratio:\s*4\s*\/\s*3/s,
+    "Case 02 should preserve a 4:3 tablet image"
+  );
+});
 const lateCompactCasesBlock = mediaBlock(
   sharedCss,
   "@media (max-width: 1180px)",

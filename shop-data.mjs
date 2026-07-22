@@ -16,6 +16,9 @@ export const shopProducts = [
     },
     image: "assets/images/shop/forged-wheel.webp",
     alt: { en: "Forged performance wheel sample", zh: "锻造性能轮毂示例" },
+    compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
+    inquirySubject: { en: "FORGED WHEEL INQUIRY", zh: "锻造轮毂咨询" },
+    shopifyProductId: null,
   },
   {
     id: "carbon-intake",
@@ -27,6 +30,9 @@ export const shopProducts = [
     },
     image: "assets/images/shop/carbon-intake.webp",
     alt: { en: "Carbon intake system sample", zh: "碳纤维进气系统示例" },
+    compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
+    inquirySubject: { en: "CARBON INTAKE SYSTEM INQUIRY", zh: "碳纤维进气系统咨询" },
+    shopifyProductId: null,
   },
   {
     id: "coilover-kit",
@@ -38,6 +44,9 @@ export const shopProducts = [
     },
     image: "assets/images/shop/coilover-kit.webp",
     alt: { en: "Performance coilover kit sample", zh: "性能绞牙避震套件示例" },
+    compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
+    inquirySubject: { en: "COILOVER KIT INQUIRY", zh: "绞牙避震套件咨询" },
+    shopifyProductId: null,
   },
   {
     id: "brake-kit",
@@ -49,6 +58,9 @@ export const shopProducts = [
     },
     image: "assets/images/shop/brake-kit.webp",
     alt: { en: "Performance brake kit sample", zh: "高性能刹车套件示例" },
+    compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
+    inquirySubject: { en: "BIG BRAKE KIT INQUIRY", zh: "高性能刹车套件咨询" },
+    shopifyProductId: null,
   },
   {
     id: "carbon-aero",
@@ -60,6 +72,9 @@ export const shopProducts = [
     },
     image: "assets/images/shop/carbon-aero.webp",
     alt: { en: "Carbon aerodynamic component sample", zh: "碳纤维空气动力部件示例" },
+    compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
+    inquirySubject: { en: "CARBON AERO INQUIRY", zh: "碳纤维空气动力套件咨询" },
+    shopifyProductId: null,
   },
   {
     id: "performance-exhaust",
@@ -71,5 +86,8 @@ export const shopProducts = [
     },
     image: "assets/images/shop/performance-exhaust.webp",
     alt: { en: "Performance exhaust system sample", zh: "性能排气系统示例" },
+    compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
+    inquirySubject: { en: "PERFORMANCE EXHAUST INQUIRY", zh: "性能排气系统咨询" },
+    shopifyProductId: null,
   },
 ];

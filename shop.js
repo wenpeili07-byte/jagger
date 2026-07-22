@@ -9,6 +9,7 @@
   const dialogImage = document.querySelector("[data-dialog-image]");
   const dialogCategory = document.querySelector("[data-dialog-category]");
   const dialogTitle = document.querySelector("[data-dialog-title]");
+  const dialogCompatibility = document.querySelector("[data-dialog-compatibility]");
   const dialogDescription = document.querySelector("[data-dialog-description]");
   const dialogInquiry = document.querySelector("[data-dialog-inquiry]");
   const dialogClose = document.querySelector("[data-dialog-close]");
@@ -101,8 +102,17 @@
     setBilingualAlt(dialogImage, { en: card.dataset.altEn, zh: card.dataset.altZh });
     setBilingualText(dialogCategory, { en: category.dataset.en, zh: category.dataset.zh });
     setBilingualText(dialogTitle, { en: card.dataset.titleEn, zh: card.dataset.titleZh });
+    setBilingualText(dialogCompatibility, {
+      en: card.dataset.compatibilityEn,
+      zh: card.dataset.compatibilityZh,
+    });
     setBilingualText(dialogDescription, { en: card.dataset.descriptionEn, zh: card.dataset.descriptionZh });
-    dialogInquiry.href = `./contact.html?product=${encodeURIComponent(card.dataset.productId)}`;
+    const inquirySubject = language() === "zh"
+      ? card.dataset.inquirySubjectZh
+      : card.dataset.inquirySubjectEn;
+    dialogInquiry.href = `./contact.html?product=${encodeURIComponent(card.dataset.productId)}&subject=${encodeURIComponent(inquirySubject)}`;
+    productDialog.dataset.productId = card.dataset.productId;
+    productDialog.dataset.shopifyProductId = card.dataset.shopifyProductId;
     productDialog.showModal();
   }
 
@@ -153,6 +163,12 @@
   });
 
   dialogClose.addEventListener("click", () => productDialog.close());
+
+  productDialog.addEventListener("click", (event) => {
+    if (event.target === productDialog) {
+      productDialog.close();
+    }
+  });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && productDialog.open) {

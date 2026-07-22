@@ -339,26 +339,41 @@
 
 .shop-dialog {
   width: min(680px, calc(100% - 36px));
-  padding: 0 0 32px;
-  border: 1px solid var(--line);
+  max-height: calc(100dvh - 36px);
+  padding: 0;
+  border: 0;
   border-radius: 0;
   color: var(--ink);
-  background: #111315;
+  background: transparent;
+  overflow: visible;
 }
 
 .shop-dialog::backdrop {
   background: rgba(0, 0, 0, 0.78);
 }
 
-.shop-dialog img {
+.shop-dialog-panel {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: min(680px, calc(100dvh - 36px));
+  border: 1px solid var(--line);
+  background: #111315;
+  overflow: hidden;
+}
+
+.shop-dialog img {
+  display: block;
+  width: 100%;
+  height: min(42vh, 380px);
   object-fit: cover;
 }
 
-.shop-dialog > :not(img):not([data-dialog-close]) {
-  margin-right: 32px;
-  margin-left: 32px;
+.shop-dialog-copy {
+  min-height: 0;
+  padding: 24px 32px 18px;
+  overflow: auto;
 }
 
 .shop-dialog [data-dialog-close] {
@@ -375,18 +390,37 @@
 }
 
 .shop-dialog [data-dialog-category] {
+  margin: 0 0 10px;
   color: var(--accent-bright);
   font-size: 11px;
 }
 
 .shop-dialog h2 {
+  margin: 0 0 14px;
   font-size: 28px;
 }
 
+.shop-dialog [data-dialog-compatibility] {
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 700;
+}
+
 .shop-dialog [data-dialog-description] {
+  margin: 0;
   color: var(--muted);
   font-family: var(--sans);
   line-height: 1.6;
+}
+
+.shop-dialog-footer {
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 9px 32px 10px;
+  border-top: 1px solid var(--line);
+  background: #111315;
 }
 
 .shop-dialog [data-dialog-inquiry] {

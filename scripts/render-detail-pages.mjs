@@ -51,7 +51,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
+    <link rel="stylesheet" href="../../styles.css?v=shop-case02-20260722-2" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
     <link rel="stylesheet" href="../../case-detail.css?v=case-detail-link-closure-20260719" />
   </head>
@@ -83,7 +83,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
       </nav>
       ${globalFooter}
     </main>
-    <script src="../../content-pages.js?v=english-copy-20260721"></script>
+    <script src="../../content-pages.js?v=shop-case02-20260722-2"></script>
   </body>
 </html>
 `;
@@ -110,10 +110,10 @@ export const renderCase02Page = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
+    <link rel="stylesheet" href="../../styles.css?v=shop-case02-20260722-2" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
     <link rel="stylesheet" href="../../case-detail.css?v=case-detail-link-closure-20260719" />
-    <link rel="stylesheet" href="../../case-02.css?v=case02-20260722" />
+    <link rel="stylesheet" href="../../case-02.css?v=case02-final-review-20260722" />
   </head>
   <body data-section="cases">
     <main class="site-shell case-detail-page case02-page" data-detail-page>
@@ -131,10 +131,10 @@ export const renderCase02Page = (record) => `<!doctype html>
         <aside class="case02-parts" aria-labelledby="case02-parts-title">
           ${i18n("h2", { zh: "使用部件", en: "PARTS USED" }, ' id="case02-parts-title"')}
           ${record.partsUsed.map(renderCase02Part).join("\n          ")}
-          ${i18n("a", { zh: "查看完整改装目录 →", en: "VIEW COMPLETE BUILD LIST →" }, ' class="case02-shop-all" href="../shop.html"')}
+          ${i18n("a", { zh: "查看完整改装目录 →", en: "VIEW COMPLETE BUILD LIST →" }, ' class="case02-shop-all" href="#case-02-editorial"')}
         </aside>
       </section>
-      <section class="detail-story">
+      <section class="detail-story" id="case-02-editorial">
         ${i18n("p", record.story)}
       </section>
       <section class="detail-contact">
@@ -147,8 +147,8 @@ export const renderCase02Page = (record) => `<!doctype html>
       </nav>
       ${globalFooter}
     </main>
-    <script src="../../content-pages.js?v=english-copy-20260721"></script>
-    <script src="../../case-02.js?v=case02-20260722"></script>
+    <script src="../../content-pages.js?v=shop-case02-20260722-2"></script>
+    <script src="../../case-02.js?v=case02-final-review-20260722"></script>
   </body>
 </html>
 `;
@@ -163,7 +163,7 @@ export const renderServicePage = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>${record.label} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
+    <link rel="stylesheet" href="../../styles.css?v=shop-case02-20260722-2" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
     <link rel="stylesheet" href="../../service-detail.css?v=service-detail-20260719" />
   </head>
@@ -191,7 +191,7 @@ export const renderServicePage = (record) => `<!doctype html>
       </section>
       ${globalFooter}
     </main>
-    <script src="../../content-pages.js?v=english-copy-20260721"></script>
+    <script src="../../content-pages.js?v=shop-case02-20260722-2"></script>
   </body>
 </html>
 `;
