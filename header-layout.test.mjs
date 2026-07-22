@@ -6,6 +6,7 @@ const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const js = readFileSync(new URL("./script.js", import.meta.url), "utf8");
 const renderer = readFileSync(new URL("./scripts/render-detail-pages.mjs", import.meta.url), "utf8");
 const shellVersion = "global-shell-20260721";
+const controllerVersion = "global-shell-20260721-2";
 const canvasVersion = "canvas-20260721-2200";
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
@@ -45,7 +46,7 @@ assert.ok(leftPanelMatch, "left panel should exist");
 assert.deepEqual(navLinks, directPages, "header middle navigation should link to blank pages");
 assert.match(html, new RegExp(`<link rel="stylesheet" href="\\.\\/styles\\.css\\?v=${shellVersion}" \\/>`), "homepage should advance the shared stylesheet cache key");
 assert.match(html, new RegExp(`<link rel="stylesheet" href="\\.\\/layout-canvas\\.css\\?v=${canvasVersion}" \\/>`), "homepage should advance the canvas cache key");
-assert.match(html, new RegExp(`<script src="\\.\\/script\\.js\\?v=${shellVersion}"></script>`), "homepage should advance the controller cache key");
+assert.match(html, new RegExp(`<script src="\\.\\/script\\.js\\?v=${controllerVersion}"></script>`), "homepage should advance the controller cache key");
 for (const pagePath of directPages) {
   const pageHtml = readFileSync(new URL(pagePath, import.meta.url), "utf8");
   assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="\\.\\.\\/styles\\.css\\?v=${shellVersion}" \\/>`), `${pagePath} should advance the shared stylesheet cache key`);

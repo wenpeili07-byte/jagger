@@ -81,3 +81,26 @@ test("language controllers keep preference within one tab only", () => {
     assert.match(source, /supportedLanguages\.includes\(language\) \? language : "en"/);
   }
 });
+
+test("homepage uses canonical automotive service language", () => {
+  const source = `${read("./index.html")}\n${read("./script.js")}`;
+  for (const phrase of [
+    "CORE SERVICES",
+    "Custom Vehicle Builds",
+    "Performance Parts",
+    "Automotive Photography",
+    "ECU Calibration",
+    "Chassis Setup",
+    "Intake & Exhaust",
+  ]) {
+    assert.match(source, new RegExp(phrase.replace(/[&]/g, "&(?:amp;)?"), "i"), `missing ${phrase}`);
+  }
+  for (const pattern of [
+    /BUSINESS MODULES/i,
+    /en:\s*"Automotive Photo"/i,
+    /performance release/i,
+    /road refinement/i,
+  ]) {
+    assert.doesNotMatch(source, pattern, `remove ${pattern}`);
+  }
+});
