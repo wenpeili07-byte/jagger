@@ -194,3 +194,19 @@ test("homepage runtime records keep the approved English automotive copy", () =>
     assert.equal(englishValue(record, "text", counter), text, `${counter} runtime case summary`);
   }
 });
+
+test("editorial pages use the approved English copy system", () => {
+  const about = read("./pages/about.html");
+  const services = read("./pages/services.html");
+  const cases = `${read("./pages/cases.html")}\n${read("./pages/cases.js")}`;
+  const contact = read("./pages/contact.html");
+
+  assert.match(about, /BUILT THROUGH ITERATION\./);
+  assert.match(services, /FROM VISION TO COMPLETE BUILD/);
+  assert.match(cases, /PROJECT ARCHIVE · LONMA ATTITUDE/);
+  assert.match(cases, /ALL MAKES/);
+  assert.match(cases, /MERCEDES-BENZ/);
+  assert.doesNotMatch(cases, />BENZ</);
+  assert.match(contact, /SEND PROJECT INQUIRY/);
+  assert.match(contact, /WHAT DO YOU WANT TO CHANGE\?/);
+});

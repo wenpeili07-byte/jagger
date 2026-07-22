@@ -2,8 +2,16 @@ const filterButtons = [...document.querySelectorAll("[data-filter]")];
 const archiveCards = [...document.querySelectorAll("[data-brand]")];
 const activeFilterLabel = document.querySelector("[data-active-filter]");
 
+function getFilterLabel(filter) {
+  if (filter !== "all") {
+    return filter === "benz" ? "MERCEDES-BENZ" : filter.toUpperCase();
+  }
+
+  return document.body.dataset.lang === "zh" ? "全部品牌" : "ALL MAKES";
+}
+
 function setArchiveFilter(filter) {
-  const label = filter === "all" ? "BBA" : filter.toUpperCase();
+  const label = getFilterLabel(filter);
 
   filterButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.filter === filter);

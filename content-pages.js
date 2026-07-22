@@ -116,7 +116,7 @@
       ].join("\n");
 
       if (contactStatus) {
-        contactStatus.textContent = currentLanguage === "zh" ? "正在打开邮件应用…" : "Opening your email app…";
+        contactStatus.textContent = currentLanguage === "zh" ? "正在打开邮件应用…" : "Opening your email application…";
       }
 
       window.location.href = `mailto:hello@lonmadynamic.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

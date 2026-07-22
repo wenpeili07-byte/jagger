@@ -12,7 +12,7 @@ const js = readFileSync(new URL("./pages/cases.js", import.meta.url), "utf8");
 assert.match(html, /<section class="cases-hero"/, "cases page should include the PLAN A hero section");
 assert.match(html, /<section class="case-archive"/, "cases page should include the archive section below the hero");
 assert.match(html, /<div class="cases-gap" aria-hidden="true"><\/div>/, "cases page should separate hero and archive with a dedicated gap");
-assert.match(html, /data-filter="benz"[\s\S]*BENZ/, "filter sidebar should include BENZ");
+assert.match(html, /data-filter="benz"[\s\S]*MERCEDES-BENZ/, "filter sidebar should include Mercedes-Benz");
 assert.match(html, /data-filter="bmw"[\s\S]*BMW/, "filter sidebar should include BMW");
 assert.match(html, /data-filter="audi"[\s\S]*AUDI/, "filter sidebar should include AUDI");
 assert.doesNotMatch(html, /class="case-feature-card/, "PLAN A hero should no longer use the six large case modules");
@@ -25,7 +25,7 @@ assert.doesNotMatch(html, /assets\/images\/网页\/案例[1-6]\//, "cases page s
 assert.equal((html.match(/class="slide spacer"/g) || []).length, 4, "effect 060 rail should include spacer slides so five positions stay visible");
 assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive should use the current six cases as reference content");
 assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should not include the old scrolling masked image rail");
-assert.match(html, /36 MODIFIED-CAR CASE FILES/, "archive should be framed as a 36-case library");
+assert.match(html, /36 PERFORMANCE PROJECTS/, "archive should be framed as 36 performance projects");
 assert.match(html, /styles\.css\?v=global-shell-20260721/, "cases page should load the current shared stylesheet cache key");
 assert.match(html, /layout-canvas\.css\?v=canvas-20260721-2200/, "cases page should load the current shared 2200px design canvas");
 assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
@@ -38,7 +38,7 @@ assert.match(html, /data-lang-option="zh"/, "cases page should identify the Chin
 assert.match(html, /data-lang-option="en"/, "cases page should identify the English language option");
 assert.match(
   html,
-  /data-zh="改装案例总览 · 龙马态度"\s+data-en="MODIFIED CASE ARCHIVE · LONMA ATTITUDE"/,
+  /data-zh="改装案例总览 · 龙马态度"\s+data-en="PROJECT ARCHIVE · LONMA ATTITUDE"/,
   "cases hero should provide both localized headings"
 );
 assert.equal(

@@ -75,7 +75,7 @@ for (const [name, html] of pages) {
 }
 
 assert.match(aboutHtml, /class="content-hero about-hero"/, "about should use the selected cinematic hero");
-assert.match(aboutHtml, /MADE BY ITERATION\./, "about should use the selected process-led headline");
+assert.match(aboutHtml, /BUILT THROUGH ITERATION\./, "about should use the approved process-led headline");
 assert.match(aboutHtml, /在修改与测试中成形/, "about should include the selected Chinese headline");
 assert.equal((aboutHtml.match(/class="process-step"/g) || []).length, 4, "about should show four process stages");
 assert.match(aboutHtml, /OBSERVE[\s\S]*MODIFY[\s\S]*TEST[\s\S]*REFINE/, "about process should follow the selected stage order");
