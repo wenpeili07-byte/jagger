@@ -170,7 +170,7 @@ export const renderShopPage = (products = shopProducts) => {
 
         <div class="shop-products">
           <div class="shop-results-bar">
-            <p data-results-status aria-live="polite">06 SAMPLE RESULTS</p>
+            ${i18n("p", { zh: "06 项示例结果", en: "06 SAMPLE RESULTS" }, ' data-results-status aria-live="polite"')}
             <label class="shop-sort">
               ${i18n("span", { zh: "排序", en: "SORT BY" })}
               <select data-shop-sort>
@@ -190,7 +190,10 @@ export const renderShopPage = (products = shopProducts) => {
         <img data-dialog-image src="../${escapeAttribute(firstProduct.image)}" ${i18nAttribute("alt", firstProduct.alt)} />
         ${i18n("p", categoryLabels[firstProduct.category], ' data-dialog-category')}
         ${i18n("h2", firstProduct.title, ' id="shop-dialog-title" data-dialog-title')}
-        <p data-dialog-description>A sample wheel category shown for design review.</p>
+        ${i18n("p", {
+          zh: "用于设计预览的轮毂分类示例。",
+          en: "A sample wheel category shown for design review.",
+        }, ' data-dialog-description')}
         <a data-dialog-inquiry href="./contact.html?product=${escapeAttribute(firstProduct.id)}" data-zh="咨询详情 →" data-en="REQUEST DETAILS →">REQUEST DETAILS →</a>
       </dialog>
       ${footer}
