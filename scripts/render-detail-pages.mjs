@@ -44,7 +44,7 @@ const globalFooter = `<footer class="content-footer">
         <a href="../contact.html" data-zh="开始你的项目 →" data-en="START YOUR PROJECT →">START YOUR PROJECT →</a>
       </footer>`;
 
-export const renderCasePage = (record) => `<!doctype html>
+const renderGenericCasePage = (record) => `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -87,6 +87,74 @@ export const renderCasePage = (record) => `<!doctype html>
   </body>
 </html>
 `;
+
+const renderCase02Marker = (part) => `<button class="case02-marker" type="button" data-case-marker="${escapeAttribute(part.number)}" aria-pressed="${part.number === "01"}" ${part.number === "01" ? "data-active " : ""}${i18nAttribute("aria-label", { zh: `突出显示${part.label.zh}`, en: `Highlight ${part.label.en}` })}>
+            <span aria-hidden="true">${Number(part.number)}</span>
+          </button>`;
+
+const renderCase02Part = (part) => `<a class="case02-part" data-case-part="${escapeAttribute(part.number)}" ${part.number === "01" ? "data-active " : ""}href="../shop.html?category=${escapeAttribute(part.category)}" ${i18nAttribute("aria-label", { zh: `查看${part.title.zh}分类`, en: `View ${part.title.en} category` })}>
+          <span class="case02-part-number" aria-hidden="true">${Number(part.number)}</span>
+          <img src="../../${escapeAttribute(part.image)}" ${i18nAttribute("alt", { zh: `${part.title.zh}分类参考`, en: `${part.title.en} category reference` })} />
+          <span class="case02-part-copy">
+            ${i18n("span", part.label, ' class="case02-part-label"')}
+            ${i18n("strong", part.title)}
+            ${i18n("span", part.note, ' class="case02-part-note"')}
+          </span>
+          <span class="case02-part-arrow" aria-hidden="true">→</span>
+        </a>`;
+
+export const renderCase02Page = (record) => `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="${escapeAttribute(record.meta)}" />
+    <title>Case ${record.id} | LONMA DYNAMIC</title>
+    <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
+    <link rel="stylesheet" href="../../case-detail.css?v=case-detail-link-closure-20260719" />
+    <link rel="stylesheet" href="../../case-02.css?v=case02-20260722" />
+  </head>
+  <body data-section="cases">
+    <main class="site-shell case-detail-page case02-page" data-detail-page>
+      ${header("cases")}
+      <section class="case02-showcase">
+        <div class="case02-media">
+          <img src="../../${record.image}" ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
+          <div class="case02-heading">
+            ${i18n("a", { zh: "← 返回案例", en: "← BACK TO CASES" }, ' class="detail-back" href="../cases.html"')}
+            <p>CASE ${record.id} /</p>
+            ${i18n("h1", record.title)}
+          </div>
+          ${record.partsUsed.map(renderCase02Marker).join("\n          ")}
+        </div>
+        <aside class="case02-parts" aria-labelledby="case02-parts-title">
+          ${i18n("h2", { zh: "使用部件", en: "PARTS USED" }, ' id="case02-parts-title"')}
+          ${record.partsUsed.map(renderCase02Part).join("\n          ")}
+          ${i18n("a", { zh: "查看完整改装目录 →", en: "VIEW COMPLETE BUILD LIST →" }, ' class="case02-shop-all" href="../shop.html"')}
+        </aside>
+      </section>
+      <section class="detail-story">
+        ${i18n("p", record.story)}
+      </section>
+      <section class="detail-contact">
+        ${i18n("h2", { zh: "讨论你的下一台车", en: "DISCUSS YOUR NEXT BUILD" })}
+        ${i18n("a", { zh: "开始咨询 →", en: "START AN INQUIRY →" }, ' href="../contact.html"')}
+      </section>
+      <nav class="detail-pagination" ${i18nAttribute("aria-label", { zh: "案例分页", en: "Case pagination" })}>
+        ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html"`)}
+        ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html"`)}
+      </nav>
+      ${globalFooter}
+    </main>
+    <script src="../../content-pages.js?v=english-copy-20260721"></script>
+    <script src="../../case-02.js?v=case02-20260722"></script>
+  </body>
+</html>
+`;
+
+export const renderCasePage = (record) =>
+  record.id === "02" ? renderCase02Page(record) : renderGenericCasePage(record);
 
 export const renderServicePage = (record) => `<!doctype html>
 <html lang="en">
