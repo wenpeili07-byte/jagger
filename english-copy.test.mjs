@@ -211,19 +211,147 @@ test("editorial pages use the approved English copy system", () => {
   assert.match(contact, /WHAT DO YOU WANT TO CHANGE\?/);
 });
 
-test("detail sources use approved case and service terminology", async () => {
+test("detail sources retain every approved English canonical field", async () => {
   const { caseDetails, serviceDetails } = await import("./detail-pages-data.mjs");
-  assert.deepEqual(serviceDetails.map((record) => record.title.en), [
-    "CUSTOM VEHICLE BUILDS",
-    "PERFORMANCE PARTS",
-    "AUTOMOTIVE PHOTOGRAPHY",
-    "ECU CALIBRATION",
-    "CHASSIS SETUP",
-    "INTAKE & EXHAUST",
-  ]);
-  assert.equal(caseDetails[3].subtitle.en, "POWER DELIVERY AND ROAD TESTING");
-  assert.equal(caseDetails[5].title.en, "BLUE PERFORMANCE BUILD");
-  for (const record of [...caseDetails, ...serviceDetails]) {
-    assert.ok(record.meta, `${record.id} needs an English meta description`);
+  const approvedCases = [
+    {
+      id: "01",
+      title: "STREET WIDEBODY",
+      subtitle: "A VISUAL BENCHMARK FOR THE LONMA LINEUP",
+      intro: "Body proportions, wheel fitment, and ride height establish one complete direction for a street-focused build.",
+      story: "The process began with the car's overall silhouette. Each change was evaluated, test-fitted, and road-tested before becoming part of the final build.",
+      meta: "LONMA DYNAMIC Case 01 STREET WIDEBODY focuses on body proportions, wheel fitment, and ride height.",
+      primaryFocus: "body proportions, wheel fitment, and ride height",
+    },
+    {
+      id: "02",
+      title: "ROAD & TRACK SETUP",
+      subtitle: "BALANCING ROAD AND TRACK",
+      intro: "Braking, chassis feedback, and repeatable performance define a clearer road-and-track setup.",
+      story: "There is no fixed answer. Vehicle feedback, tire condition, and real-world testing continue to shape each adjustment.",
+      meta: "LONMA DYNAMIC Case 02 ROAD & TRACK SETUP focuses on braking, chassis feedback, and repeatable performance.",
+      primaryFocus: "braking, chassis feedback, and repeatable performance",
+    },
+    {
+      id: "03",
+      title: "LOW STANCE",
+      subtitle: "PROPORTION, RIDE HEIGHT, AND WHEEL FITMENT",
+      intro: "Ride height, wheel fitment, and body clearance create a low, cohesive side profile.",
+      story: "A low stance still has to work. Every change to ride height or fitment is checked for steering clearance, road usability, and visual balance.",
+      meta: "LONMA DYNAMIC Case 03 LOW STANCE focuses on ride height, wheel fitment, and body clearance.",
+      primaryFocus: "ride height, wheel fitment, and body clearance",
+    },
+    {
+      id: "04",
+      title: "TURBO TUNING",
+      subtitle: "POWER DELIVERY AND ROAD TESTING",
+      intro: "Staged calibration developed through vehicle health checks, data logging, and road testing.",
+      story: "A calibration is not finished after one flash. Data logging, review, and road feedback determine each revision.",
+      meta: "LONMA DYNAMIC Case 04 TURBO TUNING focuses on staged calibration, data logging, and road testing.",
+      primaryFocus: "staged calibration, data logging, and road testing",
+    },
+    {
+      id: "05",
+      title: "AUTOMOTIVE MEDIA FEATURE",
+      subtitle: "TURNING VEHICLE CHARACTER INTO VISUAL CONTENT",
+      intro: "Still photography, rolling shots, and short films capture the finished car's stance and details.",
+      story: "Automotive media is not an afterthought. Camera angle, location, and motion reveal the car's proportions and character.",
+      meta: "LONMA DYNAMIC Case 05 AUTOMOTIVE MEDIA FEATURE focuses on still photography, rolling shots, and short films.",
+      primaryFocus: "still photography, rolling shots, and short films",
+    },
+    {
+      id: "06",
+      title: "BLUE PERFORMANCE BUILD",
+      subtitle: "ONE DIRECTION FOR PERFORMANCE AND DESIGN",
+      intro: "Exterior, chassis, and power delivery are developed around one driving objective.",
+      story: "A complete build is more than a parts list. The goal comes first, followed by repeated testing that keeps only the changes that improve the car.",
+      meta: "LONMA DYNAMIC Case 06 BLUE PERFORMANCE BUILD focuses on exterior, chassis, and power delivery.",
+      primaryFocus: "exterior, chassis, and power delivery",
+    },
+  ];
+
+  const approvedServices = [
+    {
+      id: "build",
+      title: "CUSTOM VEHICLE BUILDS",
+      intro: "Exterior, wheels, suspension, and braking upgrades developed around one complete vehicle.",
+      scope: "We begin with the goal and visual references, then select components, test-fit, adjust, and review them on the actual vehicle.",
+      meta: "LONMA DYNAMIC CUSTOM VEHICLE BUILDS develops exterior, wheel, suspension, and braking upgrades around a complete vehicle.",
+    },
+    {
+      id: "parts",
+      title: "PERFORMANCE PARTS",
+      intro: "Curated performance, exterior, wheel, suspension, and OEM-grade components selected for the vehicle.",
+      scope: "We match each part to the platform, intended use, current setup, and complete build direction before installation.",
+      meta: "LONMA DYNAMIC PERFORMANCE PARTS selects performance, exterior, wheel, suspension, and OEM-grade components for each vehicle.",
+    },
+    {
+      id: "photo",
+      title: "AUTOMOTIVE PHOTOGRAPHY",
+      intro: "Still photography, rolling shots, short films, and social media content created around the car.",
+      scope: "Location, timing, light, and vehicle presentation are planned as one visual direction across stills and motion.",
+      meta: "LONMA DYNAMIC AUTOMOTIVE PHOTOGRAPHY creates stills, rolling shots, short films, and social media content around the car.",
+    },
+    {
+      id: "ecu",
+      title: "ECU CALIBRATION",
+      intro: "Custom ECU calibration, data logging, road testing, and staged upgrade planning.",
+      scope: "We confirm the vehicle's condition and performance goals first, then refine throttle response and power delivery through data and road testing.",
+      meta: "LONMA DYNAMIC ECU CALIBRATION focuses on custom calibration, data logging, road testing, and staged upgrades.",
+    },
+    {
+      id: "chassis",
+      title: "CHASSIS SETUP",
+      intro: "Ride height, wheel fitment, alignment, and chassis settings for street or track use.",
+      scope: "Ride height, clearance, and alignment are adjusted from real vehicle feedback so the stance supports both appearance and driving goals.",
+      meta: "LONMA DYNAMIC CHASSIS SETUP focuses on ride height, wheel fitment, alignment, and chassis settings for road or track use.",
+    },
+    {
+      id: "exhaust",
+      title: "INTAKE & EXHAUST",
+      intro: "Intake, downpipe, mid-pipe, and axle-back upgrades for sound, flow, and response.",
+      scope: "We select and review each combination around the desired sound, intended road use, and current powertrain setup.",
+      meta: "LONMA DYNAMIC INTAKE & EXHAUST focuses on intake, downpipe, mid-pipe, and axle-back upgrades for sound, flow, and response.",
+    },
+  ];
+
+  assert.deepEqual(
+    caseDetails.map(({ id, title, subtitle, intro, story, meta }) => ({
+      id,
+      title: title.en,
+      subtitle: subtitle.en,
+      intro: intro.en,
+      story: story.en,
+      meta,
+    })),
+    approvedCases.map(({ primaryFocus, ...record }) => record),
+  );
+  assert.deepEqual(
+    serviceDetails.map(({ id, title, intro, scope, meta }) => ({
+      id,
+      title: title.en,
+      intro: intro.en,
+      scope: scope.en,
+      meta,
+    })),
+    approvedServices,
+  );
+
+  for (const { id, title, primaryFocus, meta } of approvedCases) {
+    const record = caseDetails.find((candidate) => candidate.id === id);
+    assert.equal(record.meta, meta, `${id} meta should match the approved fixture`);
+    assert.ok(record.meta.includes("LONMA DYNAMIC"), `${id} meta should name LONMA DYNAMIC`);
+    assert.ok(record.meta.includes(id), `${id} meta should contain its two-digit case number`);
+    assert.ok(record.meta.includes(title), `${id} meta should contain its approved title`);
+    assert.ok(record.meta.includes(primaryFocus), `${id} meta should contain its primary technical focus`);
   }
+});
+
+test("service detail renderer keeps the approved process line", async () => {
+  const { serviceDetails } = await import("./detail-pages-data.mjs");
+  const { renderServicePage } = await import("./scripts/render-detail-pages.mjs");
+  assert.match(
+    renderServicePage(serviceDetails[0]),
+    /<p class="detail-process" data-zh="[^"]+" data-en="ASSESS · PLAN · EXECUTE · VERIFY">ASSESS · PLAN · EXECUTE · VERIFY<\/p>/,
+  );
 });
