@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import test from "node:test";
+import vm from "node:vm";
 
 const html = readFileSync(new URL("./pages/cases.html", import.meta.url), "utf8");
 const css = [
@@ -112,3 +114,89 @@ assert.doesNotMatch(js, /ScrollTrigger/, "cases script should not depend on Scro
 assert.doesNotMatch(js, /--cases-active-scene/, "cases filter script should not update the hero background");
 assert.doesNotMatch(js, /scene-is-fading/, "cases filter script should not animate background scene changes");
 assert.doesNotMatch(js, /scene-fade-layer/, "cases script should not create the old fade layer animation");
+
+test("selected make survives a shared language switch", () => {
+  class FakeElement {
+    constructor({ dataset = {} } = {}) {
+      this.dataset = dataset;
+      this.hidden = false;
+      this.listeners = new Map();
+      this.textContent = "";
+      this.attributes = new Map();
+      this.classList = { toggle: () => {} };
+    }
+
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener);
+    }
+
+    dispatch(name) {
+      this.listeners.get(name)?.();
+    }
+
+    setAttribute(name, value) {
+      this.attributes.set(name, value);
+    }
+
+    getAttribute(name) {
+      return this.attributes.get(name) ?? null;
+    }
+
+    removeAttribute(name) {
+      this.attributes.delete(name);
+    }
+  }
+
+  const filters = ["all", "bmw", "audi", "benz"].map((filter) => new FakeElement({ dataset: { filter } }));
+  const activeFilterLabel = new FakeElement({ dataset: { zh: "全部品牌", en: "ALL MAKES" } });
+  const langToggle = new FakeElement();
+  const nodesBySelector = new Map([
+    ["[data-filter]", filters],
+    ["[data-brand]", filters.slice(1).map((button) => new FakeElement({ dataset: { brand: button.dataset.filter } }))],
+    ["[data-active-filter]", [activeFilterLabel]],
+    [".mwg_effect060 .slides", []],
+    [".lang-toggle", [langToggle]],
+    ["[data-lang-option]", []],
+    ["[data-zh][data-en]", [activeFilterLabel]],
+    ["[data-zh-placeholder][data-en-placeholder]", []],
+    ["[data-zh-aria-label][data-en-aria-label]", []],
+    ["[data-zh-alt][data-en-alt]", []],
+    [".nav a", []],
+    ["[data-contact-form]", []],
+    ["[data-contact-status]", []],
+    ["[data-service-row]", []],
+  ]);
+  const document = {
+    body: { dataset: { section: "cases" } },
+    documentElement: { lang: "en" },
+    querySelector: (selector) => nodesBySelector.get(selector)?.[0] ?? null,
+    querySelectorAll: (selector) => nodesBySelector.get(selector) ?? [],
+  };
+  const sessionStorage = new Map();
+  const context = {
+    document,
+    sessionStorage: {
+      getItem: (key) => sessionStorage.get(key) ?? null,
+      setItem: (key, value) => sessionStorage.set(key, value),
+    },
+    window: {
+      location: { pathname: "/pages/cases.html" },
+      matchMedia: () => ({ matches: false }),
+    },
+  };
+
+  vm.runInNewContext(js, context);
+  vm.runInNewContext(readFileSync(new URL("./content-pages.js", import.meta.url), "utf8"), context);
+
+  for (const [filter, label] of [["bmw", "BMW"], ["audi", "AUDI"], ["benz", "MERCEDES-BENZ"]]) {
+    filters.find((button) => button.dataset.filter === filter).dispatch("click");
+
+    assert.equal(activeFilterLabel.textContent, label);
+    assert.equal(activeFilterLabel.dataset.en, label);
+    assert.equal(activeFilterLabel.dataset.zh, label);
+
+    langToggle.dispatch("click");
+    assert.equal(activeFilterLabel.textContent, label);
+    langToggle.dispatch("click");
+  }
+});
