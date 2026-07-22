@@ -291,7 +291,7 @@
     font-size: clamp(48px, 17cqw, 72px);
   }
 
-  .case02-marker {
+  [data-case-marker] {
     display: none;
   }
 

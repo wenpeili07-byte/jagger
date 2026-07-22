@@ -125,3 +125,11 @@ test("footer styling is global and not duplicated by content pages", () => {
   assert.match(sharedCss, /\.content-footer a:focus-visible\s*\{[^}]*color:\s*var\(--ink\)/s);
   assert.doesNotMatch(contentCss, /\.content-footer/);
 });
+
+test("Shop and Case 02 expose their live and synchronized initial states", () => {
+  const shopHtml = read("./pages/shop.html");
+  const case02Html = read("./pages/cases/case-02.html");
+
+  assert.match(shopHtml, /data-results-status aria-live="polite"/);
+  assert.match(case02Html, /data-case-marker="01" aria-pressed="true" data-active/);
+});

@@ -73,6 +73,11 @@ function runShopQuery(category) {
     ["[data-dialog-description]", new FakeNode()],
     ["[data-dialog-inquiry]", new FakeNode()],
     ["[data-dialog-close]", new FakeNode()],
+    ["[data-shop-make]", new FakeNode({ value: "BMW" })],
+    ["[data-shop-model]", new FakeNode({ value: "G80 M3" })],
+    ["[data-shop-year]", new FakeNode({ value: "2024" })],
+    ["[data-shop-chassis]", new FakeNode({ value: "G8X" })],
+    ["[data-find-parts]", new FakeNode()],
   ]);
   const document = {
     documentElement: { lang: "en" },

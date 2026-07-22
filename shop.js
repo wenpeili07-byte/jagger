@@ -12,9 +12,17 @@
   const dialogDescription = document.querySelector("[data-dialog-description]");
   const dialogInquiry = document.querySelector("[data-dialog-inquiry]");
   const dialogClose = document.querySelector("[data-dialog-close]");
+  const makeControl = document.querySelector("[data-shop-make]");
+  const modelControl = document.querySelector("[data-shop-model]");
+  const yearControl = document.querySelector("[data-shop-year]");
+  const chassisControl = document.querySelector("[data-shop-chassis]");
+  const findButton = document.querySelector("[data-find-parts]");
+  const dependentVehicleControls = [modelControl, yearControl, chassisControl];
+  const sampleVehicleValues = dependentVehicleControls.map((control) => control.value);
   const queryOnlyCategories = new Set(["ecu"]);
   let lastDialogTrigger = null;
   let selectedCategories = new Set();
+  let vehicleMatchesSample = true;
 
   function language() {
     return document.documentElement.lang.startsWith("zh") ? "zh" : "en";
@@ -71,7 +79,7 @@
     let visibleCount = 0;
 
     cards.forEach((card) => {
-      const visible = active.size === 0 || active.has(card.dataset.category);
+      const visible = vehicleMatchesSample && (active.size === 0 || active.has(card.dataset.category));
       card.hidden = !visible;
       visibleCount += Number(visible);
     });
@@ -109,6 +117,21 @@
   setCategoryFilters(queryCategories);
   sortCards();
   applyCatalogState();
+
+  makeControl.addEventListener("change", () => {
+    const sampleMakeSelected = makeControl.value === "BMW";
+
+    dependentVehicleControls.forEach((control, index) => {
+      control.value = sampleMakeSelected ? sampleVehicleValues[index] : "";
+      control.disabled = !sampleMakeSelected;
+    });
+  });
+
+  findButton.addEventListener("click", () => {
+    vehicleMatchesSample = makeControl.value === "BMW"
+      && dependentVehicleControls.every((control, index) => control.value === sampleVehicleValues[index]);
+    applyCatalogState();
+  });
 
   filters.forEach((filter) => {
     filter.addEventListener("change", () => {
