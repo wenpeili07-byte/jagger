@@ -70,12 +70,12 @@ for (const [name, html] of pages) {
   assert.match(html, /href="\.\.\/content-pages\.css\?v=/, `${name} should load the isolated content page stylesheet`);
   assert.match(html, /src="\.\.\/content-pages\.js\?v=/, `${name} should load shared page interactions`);
   assert.match(html, /<header class="topbar">/, `${name} should keep the shared site header`);
-  assert.match(html, /<button class="lang-toggle" type="button" aria-label="Switch to English">/, `${name} should keep the language control`);
+  assert.match(html, /<button class="lang-toggle" type="button" aria-label="切换到中文">/, `${name} should keep the language control`);
   assert.match(html, /<footer class="content-footer">/, `${name} should include the shared content footer`);
 }
 
 assert.match(aboutHtml, /class="content-hero about-hero"/, "about should use the selected cinematic hero");
-assert.match(aboutHtml, /MADE BY ITERATION\./, "about should use the selected process-led headline");
+assert.match(aboutHtml, /BUILT THROUGH ITERATION\./, "about should use the approved process-led headline");
 assert.match(aboutHtml, /在修改与测试中成形/, "about should include the selected Chinese headline");
 assert.equal((aboutHtml.match(/class="process-step"/g) || []).length, 4, "about should show four process stages");
 assert.match(aboutHtml, /OBSERVE[\s\S]*MODIFY[\s\S]*TEST[\s\S]*REFINE/, "about process should follow the selected stage order");
@@ -212,7 +212,7 @@ test("services reduces the square preview to a simple fade", () => {
   assert.match(reducedMotion.body, /\.service-process-row:hover \.service-process-preview,\s*\.service-process-row:focus-visible \.service-process-preview\s*\{[^}]*transform:\s*none/s, "reduced motion hover and focus should stay still");
 });
 
-assert.match(js, /localStorage\.setItem\("lonma-language"/, "language choice should persist across pages");
+assert.match(js, /sessionStorage\.setItem\("lonma-language", language\)/, "language choice should persist within one tab");
 assert.match(js, /querySelectorAll\("\[data-zh\]\[data-en\]"\)/, "content copy should switch between Chinese and English");
 assert.match(js, /new FormData\(contactForm\)/, "contact submit should use the visible form values");
 assert.match(js, /mailto:hello@lonmadynamic\.com/, "contact submit should open a prefilled email to LONMA");
@@ -260,7 +260,7 @@ test("detail language controller updates accessible names and image alternatives
     }
   }
 
-  const langToggle = new FakeElement({ attributes: { "aria-label": "Switch to English" } });
+  const langToggle = new FakeElement({ attributes: { "aria-label": "切换到中文" } });
   const brand = new FakeElement({
     attributes: { "aria-label": "回到首页" },
     dataset: { zhAriaLabel: "回到首页", enAriaLabel: "Back to home" },
@@ -302,14 +302,14 @@ test("detail language controller updates accessible names and image alternatives
     querySelector: (selector) => nodesBySelector.get(selector)?.[0] ?? null,
     querySelectorAll: (selector) => nodesBySelector.get(selector) ?? [],
   };
-  const localStorage = new Map();
+  const sessionStorage = new Map([["lonma-language", "zh"]]);
   const window = { location: { pathname: "/pages/cases/case-01.html" } };
 
   vm.runInNewContext(js, {
     document,
-    localStorage: {
-      getItem: (key) => localStorage.get(key) ?? null,
-      setItem: (key, value) => localStorage.set(key, value),
+    sessionStorage: {
+      getItem: (key) => sessionStorage.get(key) ?? null,
+      setItem: (key, value) => sessionStorage.set(key, value),
     },
     window,
   });

@@ -59,7 +59,7 @@ for (const group of pageGroups) {
       assert.match(header, /<a class="brand"[^>]*data-zh-aria-label="回到首页"[^>]*data-en-aria-label="Back to home"/);
       assert.match(header, /<nav class="nav"[^>]*data-zh-aria-label="主导航"[^>]*data-en-aria-label="Main navigation"/);
       assert.equal((header.match(/<a href=/g) || []).length, 4);
-      assert.match(header, /<button class="lang-toggle"[^>]*aria-label="Switch to English"/);
+      assert.match(header, /<button class="lang-toggle"[^>]*aria-label="切换到中文"/);
 
       const currentHref = typeof group.currentHref === "function"
         ? group.currentHref(path)

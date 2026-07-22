@@ -19,20 +19,20 @@
 
   function getInitialLanguage() {
     try {
-      const savedLanguage = localStorage.getItem("lonma-language");
+      const savedLanguage = sessionStorage.getItem("lonma-language");
       if (supportedLanguages.includes(savedLanguage)) {
         return savedLanguage;
       }
     } catch {
-      // File previews can block storage without affecting page use.
+      // Storage can be unavailable in local previews without affecting page use.
     }
 
-    return document.documentElement.lang.toLowerCase().startsWith("en") ? "en" : "zh";
+    return "en";
   }
 
   function setStoredLanguage(language) {
     try {
-      localStorage.setItem("lonma-language", language);
+      sessionStorage.setItem("lonma-language", language);
     } catch {
       // Keep the current page functional when storage is unavailable.
     }
@@ -69,7 +69,7 @@
   }
 
   function setLanguage(language) {
-    currentLanguage = supportedLanguages.includes(language) ? language : "zh";
+    currentLanguage = supportedLanguages.includes(language) ? language : "en";
     document.documentElement.lang = currentLanguage === "zh" ? "zh-CN" : "en";
     document.body.dataset.lang = currentLanguage;
 
@@ -116,7 +116,7 @@
       ].join("\n");
 
       if (contactStatus) {
-        contactStatus.textContent = currentLanguage === "zh" ? "正在打开邮件应用…" : "Opening your email app…";
+        contactStatus.textContent = currentLanguage === "zh" ? "正在打开邮件应用…" : "Opening your email application…";
       }
 
       window.location.href = `mailto:hello@lonmadynamic.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

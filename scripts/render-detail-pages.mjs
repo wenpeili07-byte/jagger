@@ -10,39 +10,45 @@ const escapeAttribute = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+const escapeText = (value) =>
+  String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 const i18n = (tag, values, attributes = "") =>
-  `<${tag}${attributes} data-zh="${escapeAttribute(values.zh)}" data-en="${escapeAttribute(values.en)}">${values.zh}</${tag}>`;
+  `<${tag}${attributes} data-zh="${escapeAttribute(values.zh)}" data-en="${escapeAttribute(values.en)}">${escapeText(values.en)}</${tag}>`;
 const i18nAttribute = (attribute, values) =>
-  `${attribute}="${escapeAttribute(values.zh)}" data-zh-${attribute}="${escapeAttribute(values.zh)}" data-en-${attribute}="${escapeAttribute(values.en)}"`;
+  `${attribute}="${escapeAttribute(values.en)}" data-zh-${attribute}="${escapeAttribute(values.zh)}" data-en-${attribute}="${escapeAttribute(values.en)}"`;
 
 const header = (section) => `<header class="topbar">
     <a class="brand" href="../../index.html" ${i18nAttribute("aria-label", { zh: "回到首页", en: "Back to home" })}>LONMA DYNAMIC</a>
     <nav class="nav" ${i18nAttribute("aria-label", { zh: "主导航", en: "Main navigation" })}>
-      <a href="../about.html">关于</a>
-      <a href="../services.html"${section === "services" ? ' aria-current="page"' : ""}>业务</a>
-      <a href="../cases.html"${section === "cases" ? ' aria-current="page"' : ""}>案例</a>
-      <a href="../contact.html">联系</a>
+      <a href="../about.html">ABOUT</a>
+      <a href="../services.html"${section === "services" ? ' aria-current="page"' : ""}>SERVICES</a>
+      <a href="../cases.html"${section === "cases" ? ' aria-current="page"' : ""}>CASES</a>
+      <a href="../contact.html">CONTACT</a>
     </nav>
     <div class="top-actions">
-      <button class="lang-toggle" type="button" aria-label="Switch to English">
-        <span class="lang-option is-current" data-lang-option="zh">中</span>
+      <button class="lang-toggle" type="button" aria-label="切换到中文">
+        <span class="lang-option" data-lang-option="zh">中</span>
         <span class="lang-separator" aria-hidden="true">/</span>
-        <span class="lang-option" data-lang-option="en">EN</span>
+        <span class="lang-option is-current" data-lang-option="en">EN</span>
       </button>
     </div>
   </header>`;
 
 const globalFooter = `<footer class="content-footer">
         <span>LONMA DYNAMIC</span>
-        <span data-zh="龙马态度 · 2026" data-en="AUTOMOTIVE ATTITUDE · 2026">龙马态度 · 2026</span>
-        <a href="../contact.html" data-zh="开始你的项目 →" data-en="START YOUR PROJECT →">开始你的项目 →</a>
+        <span data-zh="龙马态度 · 2026" data-en="AUTOMOTIVE ATTITUDE · 2026">AUTOMOTIVE ATTITUDE · 2026</span>
+        <a href="../contact.html" data-zh="开始你的项目 →" data-en="START YOUR PROJECT →">START YOUR PROJECT →</a>
       </footer>`;
 
 export const renderCasePage = (record) => `<!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
@@ -76,16 +82,17 @@ export const renderCasePage = (record) => `<!doctype html>
       </nav>
       ${globalFooter}
     </main>
-    <script src="../../content-pages.js?v=detail-language-20260719"></script>
+    <script src="../../content-pages.js?v=english-copy-20260721"></script>
   </body>
 </html>
 `;
 
 export const renderServicePage = (record) => `<!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>${record.label} | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../../styles.css?v=global-shell-20260721" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
@@ -107,7 +114,7 @@ export const renderServicePage = (record) => `<!doctype html>
       </section>
       <section class="detail-story">
         ${i18n("p", record.scope)}
-        ${i18n("p", { zh: "沟通目标 · 规划方案 · 执行调整 · 完成复查", en: "DISCUSS · PLAN · EXECUTE · REVIEW" }, ' class="detail-process"')}
+        ${i18n("p", { zh: "沟通目标 · 规划方案 · 执行调整 · 完成复查", en: "ASSESS · PLAN · EXECUTE · VERIFY" }, ' class="detail-process"')}
       </section>
       <section class="detail-contact">
         ${i18n("h2", { zh: "开始你的项目", en: "START YOUR PROJECT" })}
@@ -115,7 +122,7 @@ export const renderServicePage = (record) => `<!doctype html>
       </section>
       ${globalFooter}
     </main>
-    <script src="../../content-pages.js?v=detail-language-20260719"></script>
+    <script src="../../content-pages.js?v=english-copy-20260721"></script>
   </body>
 </html>
 `;

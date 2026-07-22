@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import test from "node:test";
+import vm from "node:vm";
 
 const html = readFileSync(new URL("./pages/cases.html", import.meta.url), "utf8");
 const css = [
@@ -12,7 +14,7 @@ const js = readFileSync(new URL("./pages/cases.js", import.meta.url), "utf8");
 assert.match(html, /<section class="cases-hero"/, "cases page should include the PLAN A hero section");
 assert.match(html, /<section class="case-archive"/, "cases page should include the archive section below the hero");
 assert.match(html, /<div class="cases-gap" aria-hidden="true"><\/div>/, "cases page should separate hero and archive with a dedicated gap");
-assert.match(html, /data-filter="benz"[\s\S]*BENZ/, "filter sidebar should include BENZ");
+assert.match(html, /data-filter="benz"[\s\S]*MERCEDES-BENZ/, "filter sidebar should include Mercedes-Benz");
 assert.match(html, /data-filter="bmw"[\s\S]*BMW/, "filter sidebar should include BMW");
 assert.match(html, /data-filter="audi"[\s\S]*AUDI/, "filter sidebar should include AUDI");
 assert.doesNotMatch(html, /class="case-feature-card/, "PLAN A hero should no longer use the six large case modules");
@@ -25,20 +27,20 @@ assert.doesNotMatch(html, /assets\/images\/网页\/案例[1-6]\//, "cases page s
 assert.equal((html.match(/class="slide spacer"/g) || []).length, 4, "effect 060 rail should include spacer slides so five positions stay visible");
 assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive should use the current six cases as reference content");
 assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should not include the old scrolling masked image rail");
-assert.match(html, /36 MODIFIED-CAR CASE FILES/, "archive should be framed as a 36-case library");
+assert.match(html, /36 PERFORMANCE PROJECTS/, "archive should be framed as 36 performance projects");
 assert.match(html, /styles\.css\?v=global-shell-20260721/, "cases page should load the current shared stylesheet cache key");
 assert.match(html, /layout-canvas\.css\?v=canvas-20260721-2200/, "cases page should load the current shared 2200px design canvas");
 assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
-assert.match(html, /<script src="\.\/cases\.js\?v=hero-rail-20260709"><\/script>/, "cases page should keep its archive filter script");
+assert.match(html, /<script src="\.\/cases\.js\?v=english-copy-20260721"><\/script>/, "cases page should load the English-first archive filter script");
 assert.match(html, /<body data-section="cases">/, "cases page should expose its navigation section to the shared language controller");
-assert.match(html, /<script src="\.\.\/content-pages\.js\?v=cases-language-20260719"><\/script>/, "cases page should load the shared language controller");
+assert.match(html, /<script src="\.\.\/content-pages\.js\?v=english-copy-20260721"><\/script>/, "cases page should load the English-first shared language controller");
 assert.match(html, /data-lang-option="zh"/, "cases page should identify the Chinese language option");
 assert.match(html, /data-lang-option="en"/, "cases page should identify the English language option");
 assert.match(
   html,
-  /data-zh="改装案例总览 · 龙马态度"\s+data-en="MODIFIED CASE ARCHIVE · LONMA ATTITUDE"/,
+  /data-zh="改装案例总览 · 龙马态度"\s+data-en="PROJECT ARCHIVE · LONMA ATTITUDE"/,
   "cases hero should provide both localized headings"
 );
 assert.equal(
@@ -112,3 +114,89 @@ assert.doesNotMatch(js, /ScrollTrigger/, "cases script should not depend on Scro
 assert.doesNotMatch(js, /--cases-active-scene/, "cases filter script should not update the hero background");
 assert.doesNotMatch(js, /scene-is-fading/, "cases filter script should not animate background scene changes");
 assert.doesNotMatch(js, /scene-fade-layer/, "cases script should not create the old fade layer animation");
+
+test("selected make survives a shared language switch", () => {
+  class FakeElement {
+    constructor({ dataset = {} } = {}) {
+      this.dataset = dataset;
+      this.hidden = false;
+      this.listeners = new Map();
+      this.textContent = "";
+      this.attributes = new Map();
+      this.classList = { toggle: () => {} };
+    }
+
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener);
+    }
+
+    dispatch(name) {
+      this.listeners.get(name)?.();
+    }
+
+    setAttribute(name, value) {
+      this.attributes.set(name, value);
+    }
+
+    getAttribute(name) {
+      return this.attributes.get(name) ?? null;
+    }
+
+    removeAttribute(name) {
+      this.attributes.delete(name);
+    }
+  }
+
+  const filters = ["all", "bmw", "audi", "benz"].map((filter) => new FakeElement({ dataset: { filter } }));
+  const activeFilterLabel = new FakeElement({ dataset: { zh: "全部品牌", en: "ALL MAKES" } });
+  const langToggle = new FakeElement();
+  const nodesBySelector = new Map([
+    ["[data-filter]", filters],
+    ["[data-brand]", filters.slice(1).map((button) => new FakeElement({ dataset: { brand: button.dataset.filter } }))],
+    ["[data-active-filter]", [activeFilterLabel]],
+    [".mwg_effect060 .slides", []],
+    [".lang-toggle", [langToggle]],
+    ["[data-lang-option]", []],
+    ["[data-zh][data-en]", [activeFilterLabel]],
+    ["[data-zh-placeholder][data-en-placeholder]", []],
+    ["[data-zh-aria-label][data-en-aria-label]", []],
+    ["[data-zh-alt][data-en-alt]", []],
+    [".nav a", []],
+    ["[data-contact-form]", []],
+    ["[data-contact-status]", []],
+    ["[data-service-row]", []],
+  ]);
+  const document = {
+    body: { dataset: { section: "cases" } },
+    documentElement: { lang: "en" },
+    querySelector: (selector) => nodesBySelector.get(selector)?.[0] ?? null,
+    querySelectorAll: (selector) => nodesBySelector.get(selector) ?? [],
+  };
+  const sessionStorage = new Map();
+  const context = {
+    document,
+    sessionStorage: {
+      getItem: (key) => sessionStorage.get(key) ?? null,
+      setItem: (key, value) => sessionStorage.set(key, value),
+    },
+    window: {
+      location: { pathname: "/pages/cases.html" },
+      matchMedia: () => ({ matches: false }),
+    },
+  };
+
+  vm.runInNewContext(js, context);
+  vm.runInNewContext(readFileSync(new URL("./content-pages.js", import.meta.url), "utf8"), context);
+
+  for (const [filter, label] of [["bmw", "BMW"], ["audi", "AUDI"], ["benz", "MERCEDES-BENZ"]]) {
+    filters.find((button) => button.dataset.filter === filter).dispatch("click");
+
+    assert.equal(activeFilterLabel.textContent, label);
+    assert.equal(activeFilterLabel.dataset.en, label);
+    assert.equal(activeFilterLabel.dataset.zh, label);
+
+    langToggle.dispatch("click");
+    assert.equal(activeFilterLabel.textContent, label);
+    langToggle.dispatch("click");
+  }
+});
