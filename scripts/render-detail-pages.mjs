@@ -51,7 +51,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=shop-case02-20260722-2" />
+    <link rel="stylesheet" href="../../styles.css?v=contact-form-20260723" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
   </head>
@@ -83,7 +83,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
       </nav>
       ${globalFooter}
     </main>
-    <script src="../../content-pages.js?v=shop-case02-20260722-2"></script>
+    <script src="../../content-pages.js?v=contact-form-20260723"></script>
   </body>
 </html>
 `;
@@ -110,7 +110,7 @@ export const renderCase02Page = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=shop-case02-20260722-2" />
+    <link rel="stylesheet" href="../../styles.css?v=contact-form-20260723" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
     <link rel="stylesheet" href="../../case-02.css?v=case02-final-review-20260722" />
@@ -147,7 +147,7 @@ export const renderCase02Page = (record) => `<!doctype html>
       </nav>
       ${globalFooter}
     </main>
-    <script src="../../content-pages.js?v=shop-case02-20260722-2"></script>
+    <script src="../../content-pages.js?v=contact-form-20260723"></script>
     <script src="../../case-02.js?v=case02-final-review-20260722"></script>
   </body>
 </html>
@@ -163,7 +163,7 @@ export const renderServicePage = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>${record.label} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=shop-case02-20260722-2" />
+    <link rel="stylesheet" href="../../styles.css?v=contact-form-20260723" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
     <link rel="stylesheet" href="../../service-detail.css?v=mobile-spacing-20260722" />
   </head>
@@ -191,7 +191,7 @@ export const renderServicePage = (record) => `<!doctype html>
       </section>
       ${globalFooter}
     </main>
-    <script src="../../content-pages.js?v=shop-case02-20260722-2"></script>
+    <script src="../../content-pages.js?v=contact-form-20260723"></script>
   </body>
 </html>
 `;

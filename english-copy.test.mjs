@@ -33,7 +33,7 @@ const decode = (value) =>
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">");
 
-const sharedAssetVersion = "shop-case02-20260722-2";
+const sharedAssetVersion = "contact-form-20260723";
 const casesControllerVersion = "english-copy-20260721";
 const chineseText = /[\p{Script=Han}]/u;
 
@@ -92,7 +92,7 @@ test("content controller cache references use the current shared asset version",
       new RegExp(`content-pages\\.js\\?v=${sharedAssetVersion}`),
       `${path} should load the current shared content controller version`,
     );
-    assert.doesNotMatch(html, /content-pages\.js\?v=(?!shop-case02-20260722-2)/, `${path} should not retain a stale content controller version`);
+    assert.doesNotMatch(html, /content-pages\.js\?v=(?!contact-form-20260723)/, `${path} should not retain a stale content controller version`);
   }
 
   const cases = read("./pages/cases.html");

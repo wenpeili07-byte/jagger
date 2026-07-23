@@ -5,7 +5,7 @@ import { caseDetails, serviceDetails } from "./detail-pages-data.mjs";
 import { renderCasePage, renderServicePage } from "./scripts/render-detail-pages.mjs";
 import { renderShopPage } from "./scripts/render-shop-page.mjs";
 
-const sharedAssetVersion = "shop-case02-20260722-2";
+const sharedAssetVersion = "contact-form-20260723";
 const publicPages = [
   "./index.html",
   "./pages/about.html",
@@ -27,6 +27,9 @@ const publicPages = [
   "./pages/shop.html",
 ];
 const staleWarmCacheKeys = new Set([
+  "styles.css?v=shop-case02-20260722-2",
+  "content-pages.js?v=shop-case02-20260722-2",
+  "script.js?v=shop-case02-20260722-2",
   "styles.css?v=global-shell-20260721",
   "styles.css?v=global-shell-20260722",
   "content-pages.js?v=english-copy-20260721",

@@ -10,6 +10,7 @@ const css = [
   readFileSync(new URL("./case-rail.css", import.meta.url), "utf8")
 ].join("\n");
 const js = readFileSync(new URL("./pages/cases.js", import.meta.url), "utf8");
+const sharedAssetVersion = "contact-form-20260723";
 
 assert.match(html, /<section class="cases-hero"/, "cases page should include the PLAN A hero section");
 assert.match(html, /<section class="case-archive"/, "cases page should include the archive section below the hero");
@@ -28,14 +29,14 @@ assert.equal((html.match(/class="slide spacer"/g) || []).length, 4, "effect 060 
 assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive should use the current six cases as reference content");
 assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should not include the old scrolling masked image rail");
 assert.match(html, /36 PERFORMANCE PROJECTS/, "archive should be framed as 36 performance projects");
-assert.match(html, /styles\.css\?v=shop-case02-20260722-2/, "cases page should load the current shared stylesheet cache key");
+assert.match(html, new RegExp(`styles\\.css\\?v=${sharedAssetVersion}`), "cases page should load the current shared stylesheet cache key");
 assert.match(html, /layout-canvas\.css\?v=canvas-20260721-2200/, "cases page should load the current shared 2200px design canvas");
 assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
 assert.match(html, /<script src="\.\/cases\.js\?v=english-copy-20260721"><\/script>/, "cases page should load the English-first archive filter script");
 assert.match(html, /<body data-section="cases">/, "cases page should expose its navigation section to the shared language controller");
-assert.match(html, /<script src="\.\.\/content-pages\.js\?v=shop-case02-20260722-2"><\/script>/, "cases page should load the current shared language controller");
+assert.match(html, new RegExp(`<script src="\\.\\.\\/content-pages\\.js\\?v=${sharedAssetVersion}"><\\/script>`), "cases page should load the current shared language controller");
 assert.match(html, /data-lang-option="zh"/, "cases page should identify the Chinese language option");
 assert.match(html, /data-lang-option="en"/, "cases page should identify the English language option");
 assert.match(
