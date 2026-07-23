@@ -67,7 +67,7 @@ function contrastRatio(firstColor, secondColor) {
 
 for (const [name, html] of pages) {
   assert.match(html, /class="site-shell content-page/, `${name} should use the content-page shell`);
-  assert.match(html, /href="\.\.\/content-pages\.css\?v=mobile-spacing-20260722"/, `${name} should load the current isolated content page stylesheet`);
+  assert.match(html, /href="\.\.\/content-pages\.css\?v=contact-form-20260723"/, `${name} should load the current isolated content page stylesheet`);
   assert.match(html, /src="\.\.\/content-pages\.js\?v=/, `${name} should load shared page interactions`);
   assert.match(html, /<header class="topbar">/, `${name} should keep the shared site header`);
   assert.match(html, /<button class="lang-toggle" type="button" aria-label="切换到中文">/, `${name} should keep the language control`);

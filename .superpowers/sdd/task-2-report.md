@@ -66,3 +66,12 @@ Also ran `git diff --check` before commit; it completed with no whitespace error
   ```
 
   Exact summary: `tests 14`, `pass 14`, `fail 0`, `cancelled 0`, `skipped 0`, `todo 0`.
+
+## Resolved Cross-Task Risk
+
+Task 3 closed the shared cache risk introduced by Task 2's changes to
+`content-pages.css`: the three public content pages now use
+`content-pages.css?v=contact-form-20260723`, and the shared cache test scans all
+public occurrences while rejecting the stale `mobile-spacing-20260722` key.
+This keeps the Task 2 honeypot and pending/error styles reachable for clients
+with warm caches.

@@ -6,7 +6,7 @@ const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const js = readFileSync(new URL("./script.js", import.meta.url), "utf8");
 const renderer = readFileSync(new URL("./scripts/render-detail-pages.mjs", import.meta.url), "utf8");
 const sharedAssetVersion = "contact-form-20260723";
-const contentStylesVersion = "mobile-spacing-20260722";
+const contentStylesVersion = "contact-form-20260723";
 const canvasVersion = "canvas-20260721-2200";
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
