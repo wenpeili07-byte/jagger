@@ -19,6 +19,13 @@ Required Vercel environment variables:
 - `CONTACT_TO_EMAIL=lonmadynamic@gmail.com`
 - `CONTACT_FROM_EMAIL=LONMA DYNAMIC <onboarding@resend.dev>`
 
+`onboarding@resend.dev` can only send to the email address associated with that Resend account.
+To deliver to `lonmadynamic@gmail.com`, that Gmail address must be associated with the Resend account
+and API key. Otherwise,
+use a verified domain sender owned by LONMA DYNAMIC. If the sender restriction is
+not satisfied, Resend can return `403`; the Contact API maps that provider refusal
+to `502` for the browser.
+
 After changing environment variables, redeploy Production. Submit one inquiry
 from `/pages/contact`, confirm the inline success message, verify receipt at
 `lonmadynamic@gmail.com`, and reply to confirm the customer's address is used.

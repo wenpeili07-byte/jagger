@@ -11,6 +11,10 @@
       en: "UNABLE TO SEND. PLEASE CHECK YOUR CONNECTION AND TRY AGAIN.",
       zh: "暂时无法发送，请检查网络后重试。",
     },
+    validation: {
+      en: "PLEASE CHECK THE FORM DETAILS AND TRY AGAIN.",
+      zh: "请检查填写内容后重试。",
+    },
   };
   let submitting = false;
 
@@ -41,12 +45,14 @@
         },
         body: JSON.stringify(payload),
       });
-      if (!response.ok) throw new Error("contact_request_failed");
+      if (!response.ok) {
+        throw new Error(response.status === 400 ? "invalid_submission" : "contact_request_failed");
+      }
 
       form.reset();
       setStatus("success");
-    } catch {
-      setStatus("error");
+    } catch (error) {
+      setStatus(error?.message === "invalid_submission" ? "validation" : "error");
     } finally {
       submitting = false;
       form.removeAttribute("aria-busy");

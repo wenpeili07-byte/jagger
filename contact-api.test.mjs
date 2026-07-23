@@ -123,6 +123,55 @@ test("handler rejects bodies larger than 16 KiB", async () => {
   assert.equal(response.statusCode, 413);
 });
 
+test("handler rejects a valid parsed body whose Content-Length exceeds 16 KiB before fetch", async () => {
+  let called = false;
+  const response = createResponse();
+  await createContactHandler({
+    env: configuredEnv,
+    fetchImpl: async () => {
+      called = true;
+      return { ok: true };
+    },
+  })(
+    {
+      method: "POST",
+      body: validPayload,
+      headers: { "content-length": "50000" },
+    },
+    response,
+  );
+
+  assert.equal(response.statusCode, 413);
+  assert.equal(response.payload.code, "payload_too_large");
+  assert.equal(called, false);
+});
+
+test("handler reads Content-Length from a Headers-like request object", async () => {
+  const response = createResponse();
+  await createContactHandler({ env: configuredEnv })(
+    {
+      method: "POST",
+      body: validPayload,
+      headers: { get: (name) => (name === "content-length" ? "50000" : null) },
+    },
+    response,
+  );
+
+  assert.equal(response.statusCode, 413);
+  assert.equal(response.payload.code, "payload_too_large");
+});
+
+test("handler returns invalid_submission for non-object JSON bodies", async () => {
+  for (const body of ["null", "[]", '"plain value"']) {
+    const response = createResponse();
+    await assert.doesNotReject(async () => {
+      await createContactHandler({ env: configuredEnv })({ method: "POST", body }, response);
+    });
+    assert.equal(response.statusCode, 400);
+    assert.equal(response.payload.code, "invalid_submission");
+  }
+});
+
 test("handler silently accepts the filled honeypot without sending", async () => {
   let called = false;
   const response = createResponse();

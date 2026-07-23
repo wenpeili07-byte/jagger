@@ -10,7 +10,14 @@ const formJsUrl = new URL("./contact-form.js", import.meta.url);
 test("contact form targets the same-site API and includes a honeypot", () => {
   assert.match(html, /action="\/api\/contact" method="post"/);
   assert.match(html, /name="company"[^>]*tabindex="-1"/);
-  assert.match(html, /src="\.\.\/contact-form\.js\?v=contact-form-20260723"/);
+  assert.match(html, /src="\.\.\/contact-form\.js\?v=contact-form-final-review-20260723"/);
+});
+
+test("contact fields mirror the API validation limits", () => {
+  assert.match(html, /name="name"[\s\S]*?minlength="2"[\s\S]*?maxlength="100"/);
+  assert.match(html, /name="email"[\s\S]*?minlength="3"[\s\S]*?maxlength="254"/);
+  assert.match(html, /name="vehicle"[\s\S]*?minlength="2"[\s\S]*?maxlength="120"/);
+  assert.match(html, /name="message"[\s\S]*?minlength="10"[\s\S]*?maxlength="3000"/);
 });
 
 test("shared page controller no longer opens a mail client", () => {
@@ -151,6 +158,18 @@ test("contact controller preserves values and localizes provider errors", async 
   assert.equal(harness.form.resetCount, 0);
   assert.equal(harness.status.dataset.state, "error");
   assert.match(harness.status.textContent, /暂时无法发送/);
+});
+
+test("contact controller preserves values and localizes validation failures", async () => {
+  const harness = runController({
+    language: "zh",
+    fetchImpl: async () => ({ ok: false, status: 400 }),
+  });
+  await harness.form.dispatch("submit", { preventDefault() {} });
+
+  assert.equal(harness.form.resetCount, 0);
+  assert.equal(harness.status.dataset.state, "validation");
+  assert.match(harness.status.textContent, /请检查填写内容/);
 });
 
 test("contact status follows the shared language toggle after a status is set", async () => {

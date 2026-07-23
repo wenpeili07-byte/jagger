@@ -116,6 +116,10 @@ for (const name of ["name", "email", "vehicle", "service", "message"]) {
 }
 assert.match(contactHtml, /type="email"[^>]*required/, "contact email should be required");
 assert.match(contactHtml, /data-contact-status/, "contact should expose a status message for form feedback");
+assert.match(contactHtml, /name="name"[\s\S]*?minlength="2"[\s\S]*?maxlength="100"/, "contact name should match API validation limits");
+assert.match(contactHtml, /name="email"[\s\S]*?minlength="3"[\s\S]*?maxlength="254"/, "contact email should match API validation limits");
+assert.match(contactHtml, /name="vehicle"[\s\S]*?minlength="2"[\s\S]*?maxlength="120"/, "contact vehicle should match API validation limits");
+assert.match(contactHtml, /name="message"[\s\S]*?minlength="10"[\s\S]*?maxlength="3000"/, "contact message should match API validation limits");
 
 const contentPageShellBlock = css.match(/\.content-page\.site-shell\s*\{[^}]*\}/s)?.[0] || "";
 assert.match(contentPageShellBlock, /\.content-page\.site-shell\s*\{/, "content pages should keep a scoped visual block");

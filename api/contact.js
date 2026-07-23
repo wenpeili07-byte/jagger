@@ -27,6 +27,16 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function getContentLength(headers) {
+  if (!headers) return null;
+
+  const value = typeof headers.get === "function"
+    ? headers.get("content-length")
+    : headers["content-length"] ?? headers["Content-Length"];
+  const contentLength = Number(value);
+  return Number.isFinite(contentLength) && contentLength >= 0 ? contentLength : null;
+}
+
 function validateContactPayload(input = {}) {
   const payload = {
     name: clean(input.name),
@@ -74,7 +84,8 @@ function createContactHandler({
     }
 
     const rawBody = req.body ?? {};
-    const bodySize = Buffer.byteLength(
+    const contentLength = getContentLength(req.headers);
+    const bodySize = contentLength ?? Buffer.byteLength(
       typeof rawBody === "string" ? rawBody : JSON.stringify(rawBody),
       "utf8",
     );
@@ -87,6 +98,10 @@ function createContactHandler({
       body = typeof rawBody === "string" ? JSON.parse(rawBody) : rawBody;
     } catch {
       return res.status(400).json({ ok: false, code: "invalid_json" });
+    }
+
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return res.status(400).json({ ok: false, code: "invalid_submission" });
     }
 
     const { ok, payload } = validateContactPayload(body);
