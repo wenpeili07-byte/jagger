@@ -152,3 +152,73 @@ test("contact controller preserves values and localizes provider errors", async 
   assert.equal(harness.status.dataset.state, "error");
   assert.match(harness.status.textContent, /暂时无法发送/);
 });
+
+test("contact status follows the shared language toggle after a status is set", async () => {
+  const sharedSource = readFileSync(new URL("./content-pages.js", import.meta.url), "utf8");
+  const formSource = readFileSync(formJsUrl, "utf8");
+  const status = new FakeNode();
+  const button = new FakeNode();
+  const form = new FakeNode();
+  const langToggle = new FakeNode();
+  form.action = "/api/contact";
+  form.values = {
+    name: "Jordan Lee",
+    email: "jordan@example.com",
+    vehicle: "2024 BMW G80 M3",
+    service: "Custom Vehicle Builds",
+    message: "Street setup with daily usability.",
+    company: "",
+  };
+  form.querySelector = (selector) => selector === 'button[type="submit"]' ? button : null;
+  form.reportValidity = () => true;
+  form.reset = () => {};
+
+  class FakeFormData {
+    constructor() {}
+    entries() {
+      return Object.entries(form.values);
+    }
+  }
+
+  const translatedNodes = [status];
+  const nodesBySelector = new Map([
+    [".lang-toggle", [langToggle]],
+    ["[data-lang-option]", []],
+    ["[data-zh][data-en]", translatedNodes],
+    ["[data-zh-placeholder][data-en-placeholder]", []],
+    ["[data-zh-aria-label][data-en-aria-label]", []],
+    ["[data-zh-alt][data-en-alt]", []],
+    [".nav a", []],
+    ["[data-service-row]", []],
+    ["[data-contact-form]", [form]],
+    ["[data-contact-status]", [status]],
+  ]);
+  const document = {
+    body: { dataset: { lang: "en" } },
+    documentElement: { lang: "en" },
+    querySelector: (selector) => nodesBySelector.get(selector)?.[0] ?? null,
+    querySelectorAll: (selector) => nodesBySelector.get(selector) ?? [],
+  };
+
+  vm.runInNewContext(sharedSource, {
+    document,
+    sessionStorage: { getItem: () => null, setItem: () => {} },
+    window: { location: { pathname: "/pages/contact.html" } },
+  });
+  vm.runInNewContext(formSource, {
+    document,
+    fetch: async () => new Promise(() => {}),
+    FormData: FakeFormData,
+    JSON,
+    Object,
+    Promise,
+  });
+
+  form.dispatch("submit", { preventDefault() {} });
+  await Promise.resolve();
+  assert.equal(status.textContent, "SENDING YOUR INQUIRY…");
+
+  langToggle.dispatch("click");
+
+  assert.equal(status.textContent, "正在发送项目需求…");
+});

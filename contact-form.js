@@ -16,6 +16,8 @@
 
   function setStatus(state) {
     const language = document.body.dataset.lang === "zh" ? "zh" : "en";
+    status.dataset.en = messages[state].en;
+    status.dataset.zh = messages[state].zh;
     status.dataset.state = state;
     status.textContent = messages[state][language];
   }
