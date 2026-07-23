@@ -22,6 +22,14 @@
   background: #111315;
 }
 
+.shop-mobile-vehicle-summary {
+  display: none;
+}
+
+.shop-selector-fields {
+  display: contents;
+}
+
 .shop-selector-heading,
 .shop-field,
 .shop-find-button {
@@ -504,24 +512,83 @@
 
 @media (max-width: 767px) {
   .shop-selector {
-    grid-template-columns: 1fr;
+    display: block;
+    min-height: 0;
   }
 
   .shop-selector-heading,
-  .shop-field,
-  .shop-find-button {
+  .shop-mobile-vehicle-summary,
+  .shop-selector-fields {
     border-right: 0;
     border-bottom: 1px solid var(--line);
   }
 
   .shop-selector-heading {
-    min-height: 96px;
-    padding: 20px 18px;
+    min-height: 74px;
+    padding: 16px 18px;
+  }
+
+  .shop-mobile-vehicle-summary {
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    min-height: 108px;
+    padding: 12px 18px;
+    background: #111315;
+  }
+
+  .shop-mobile-vehicle-summary img {
+    width: 84px;
+    height: 68px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    filter: saturate(0.9) contrast(1.08) brightness(0.78);
+  }
+
+  .shop-mobile-vehicle-summary p {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .shop-mobile-vehicle-summary p > span {
+    color: var(--accent-bright);
+    font-size: 12px;
+  }
+
+  .shop-mobile-vehicle-summary button {
+    min-width: 54px;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid var(--accent-bright);
+    color: var(--accent-bright);
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .shop-selector-fields {
+    display: none;
+  }
+
+  .shop-selector.is-editing .shop-selector-fields {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 
   .shop-field {
-    min-height: 82px;
+    min-height: 72px;
     padding: 12px 18px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
 
   .shop-find-button {
@@ -541,8 +608,14 @@
   .shop-filter > summary {
     display: flex;
     align-items: center;
-    min-height: 64px;
+    justify-content: center;
+    min-height: 56px;
+    margin: 16px 18px;
     padding: 0 18px;
+    border: 1px solid rgba(46, 125, 189, 0.72);
+    color: var(--ink);
+    background: #1c5d99;
+    box-shadow: 0 0 24px var(--accent-glow);
   }
 
   .shop-filter-body {
@@ -555,7 +628,7 @@
   }
 
   .shop-products {
-    padding: 28px 18px 48px;
+    padding: 22px 18px 48px;
   }
 
   .shop-results-bar {

@@ -11,6 +11,7 @@ const css = readFileSync(new URL("./shop.css", import.meta.url), "utf8");
 
 class RuntimeNode {
   constructor({ dataset = {}, value = "" } = {}) {
+    this.attributes = new Map();
     this.alt = "";
     this.checked = false;
     this.dataset = { ...dataset };
@@ -24,6 +25,16 @@ class RuntimeNode {
     this.src = "";
     this.textContent = "";
     this.value = value;
+    const classes = new Set();
+    this.classList = {
+      contains: (name) => classes.has(name),
+      toggle: (name, force) => {
+        const active = force ?? !classes.has(name);
+        if (active) classes.add(name);
+        else classes.delete(name);
+        return active;
+      },
+    };
   }
 
   addEventListener(name, listener) {
@@ -42,7 +53,13 @@ class RuntimeNode {
     this.focusCount += 1;
   }
 
-  setAttribute() {}
+  getAttribute(name) {
+    return this.attributes.get(name) ?? null;
+  }
+
+  setAttribute(name, value) {
+    this.attributes.set(name, String(value));
+  }
 
   showModal() {
     this.open = true;
@@ -78,6 +95,13 @@ function createDialogHarness() {
   const dialogInquiry = new RuntimeNode();
   const dialogClose = new RuntimeNode();
   const documentListeners = new Map();
+  const shopSelector = new RuntimeNode();
+  const mobileVehicleEdit = new RuntimeNode();
+  const mobileMake = new RuntimeNode();
+  const mobileModel = new RuntimeNode();
+  const mobileYear = new RuntimeNode();
+  const mobileChassis = new RuntimeNode();
+  const findButton = new RuntimeNode();
   const singleNodes = new Map([
     ["[data-results-status]", new RuntimeNode()],
     ["[data-results-empty]", new RuntimeNode()],
@@ -95,7 +119,13 @@ function createDialogHarness() {
     ["[data-shop-model]", new RuntimeNode({ value: "G80 M3" })],
     ["[data-shop-year]", new RuntimeNode({ value: "2024" })],
     ["[data-shop-chassis]", new RuntimeNode({ value: "G8X" })],
-    ["[data-find-parts]", new RuntimeNode()],
+    [".shop-selector", shopSelector],
+    ["[data-mobile-vehicle-edit]", mobileVehicleEdit],
+    ["[data-mobile-vehicle-make]", mobileMake],
+    ["[data-mobile-vehicle-model]", mobileModel],
+    ["[data-mobile-vehicle-year]", mobileYear],
+    ["[data-mobile-vehicle-chassis]", mobileChassis],
+    ["[data-find-parts]", findButton],
   ]);
   const locationUrl = new URL("https://example.test/pages/shop.html");
   const location = {
@@ -141,8 +171,15 @@ function createDialogHarness() {
     dialogCompatibility,
     dialogInquiry,
     documentListeners,
+    findButton,
+    mobileChassis,
+    mobileMake,
+    mobileModel,
+    mobileVehicleEdit,
+    mobileYear,
     open: () => trigger.listeners.get("click")(),
     productDialog,
+    shopSelector,
     trigger,
   };
 }
@@ -155,6 +192,35 @@ test("shop renders six truthful bilingual sample products", () => {
   assert.match(html, /data-zh="示例车型" data-en="SAMPLE VEHICLE"/);
   assert.doesNotMatch(html, /\$\s?\d|IN STOCK|data-price|sku|part number/i);
   assert.equal((html.match(/data-en="INQUIRE"/g) || []).length, 6);
+});
+
+test("shop renders the approved compact mobile vehicle summary", () => {
+  assert.match(html, /class="shop-mobile-vehicle-summary"[^>]*data-mobile-vehicle-summary/);
+  assert.match(html, /data-mobile-vehicle-make>BMW<\/span>/);
+  assert.match(html, /data-mobile-vehicle-model>G80 M3<\/span>/);
+  assert.match(html, /data-mobile-vehicle-year>2024<\/span>/);
+  assert.match(html, /data-mobile-vehicle-chassis>G8X<\/span>/);
+  assert.match(html, /data-mobile-vehicle-edit[^>]*aria-expanded="false"/);
+  assert.match(css, /@media \(max-width:\s*767px\)[\s\S]*\.shop-mobile-vehicle-summary\s*\{[^}]*display:\s*grid/s);
+  assert.match(css, /@media \(max-width:\s*767px\)[\s\S]*\.shop-selector-fields\s*\{[^}]*display:\s*none/s);
+  assert.match(css, /@media \(max-width:\s*767px\)[\s\S]*\.shop-selector\.is-editing \.shop-selector-fields\s*\{[^}]*display:\s*grid/s);
+});
+
+test("shop mobile editor synchronizes values and collapses after search", () => {
+  const harness = createDialogHarness();
+
+  assert.deepEqual(
+    [harness.mobileMake, harness.mobileModel, harness.mobileYear, harness.mobileChassis].map((node) => node.textContent),
+    ["BMW", "G80 M3", "2024", "G8X"]
+  );
+
+  harness.mobileVehicleEdit.listeners.get("click")();
+  assert.equal(harness.shopSelector.classList.contains("is-editing"), true);
+  assert.equal(harness.mobileVehicleEdit.getAttribute("aria-expanded"), "true");
+
+  harness.findButton.listeners.get("click")();
+  assert.equal(harness.shopSelector.classList.contains("is-editing"), false);
+  assert.equal(harness.mobileVehicleEdit.getAttribute("aria-expanded"), "false");
 });
 
 test("shop initial status and dialog description switch to Chinese", () => {

@@ -123,31 +123,41 @@ export const renderShopPage = (products = shopProducts) => {
           ${i18n("p", { zh: "示例车型", en: "SAMPLE VEHICLE" })}
           ${i18n("h1", { zh: "选择你的车型", en: "SELECT YOUR VEHICLE" })}
         </div>
-        <label class="shop-field" for="shop-make">
-          ${i18n("span", { zh: "品牌", en: "MAKE" })}
-          <select id="shop-make" data-shop-make>
-              ${renderOptions(shopVehicles.makes)}
-          </select>
-        </label>
-        <label class="shop-field" for="shop-model">
-          ${i18n("span", { zh: "车型", en: "MODEL" })}
-          <select id="shop-model" data-shop-model>
-              ${renderOptions(shopVehicles.models.BMW)}
-          </select>
-        </label>
-        <label class="shop-field" for="shop-year">
-          ${i18n("span", { zh: "年份", en: "YEAR" })}
-          <select id="shop-year" data-shop-year>
-              ${renderOptions(shopVehicles.years["G80 M3"])}
-          </select>
-        </label>
-        <label class="shop-field" for="shop-chassis">
-          ${i18n("span", { zh: "底盘", en: "CHASSIS" })}
-          <select id="shop-chassis" data-shop-chassis>
-              ${renderOptions(shopVehicles.chassis["G80 M3"])}
-          </select>
-        </label>
-        ${i18n("button", { zh: "查找部件", en: "FIND PARTS" }, ' class="shop-find-button" type="button" data-find-parts')}
+        <div class="shop-mobile-vehicle-summary" data-mobile-vehicle-summary>
+          <img src="../assets/images/网页/optimized/case-01.jpg" alt="BMW G80 M3 sample vehicle" data-zh-alt="BMW G80 M3 示例车型" data-en-alt="BMW G80 M3 sample vehicle" />
+          <p>
+            <strong><span data-mobile-vehicle-make>BMW</span> <span data-mobile-vehicle-model>G80 M3</span></strong>
+            <span><span data-mobile-vehicle-year>2024</span> · <span data-mobile-vehicle-chassis>G8X</span></span>
+          </p>
+          ${i18n("button", { zh: "编辑", en: "EDIT" }, ' type="button" data-mobile-vehicle-edit aria-expanded="false" aria-controls="shop-vehicle-fields"')}
+        </div>
+        <div class="shop-selector-fields" id="shop-vehicle-fields">
+          <label class="shop-field" for="shop-make">
+            ${i18n("span", { zh: "品牌", en: "MAKE" })}
+            <select id="shop-make" data-shop-make>
+                ${renderOptions(shopVehicles.makes)}
+            </select>
+          </label>
+          <label class="shop-field" for="shop-model">
+            ${i18n("span", { zh: "车型", en: "MODEL" })}
+            <select id="shop-model" data-shop-model>
+                ${renderOptions(shopVehicles.models.BMW)}
+            </select>
+          </label>
+          <label class="shop-field" for="shop-year">
+            ${i18n("span", { zh: "年份", en: "YEAR" })}
+            <select id="shop-year" data-shop-year>
+                ${renderOptions(shopVehicles.years["G80 M3"])}
+            </select>
+          </label>
+          <label class="shop-field" for="shop-chassis">
+            ${i18n("span", { zh: "底盘", en: "CHASSIS" })}
+            <select id="shop-chassis" data-shop-chassis>
+                ${renderOptions(shopVehicles.chassis["G80 M3"])}
+            </select>
+          </label>
+          ${i18n("button", { zh: "查找部件", en: "FIND PARTS" }, ' class="shop-find-button" type="button" data-find-parts')}
+        </div>
       </section>
 
       <section class="shop-catalog" ${i18nAttribute("aria-label", { zh: "性能部件示例目录", en: "Sample performance parts catalog" })}>

@@ -67,7 +67,7 @@ function contrastRatio(firstColor, secondColor) {
 
 for (const [name, html] of pages) {
   assert.match(html, /class="site-shell content-page/, `${name} should use the content-page shell`);
-  assert.match(html, /href="\.\.\/content-pages\.css\?v=/, `${name} should load the isolated content page stylesheet`);
+  assert.match(html, /href="\.\.\/content-pages\.css\?v=mobile-spacing-20260722"/, `${name} should load the current isolated content page stylesheet`);
   assert.match(html, /src="\.\.\/content-pages\.js\?v=/, `${name} should load shared page interactions`);
   assert.match(html, /<header class="topbar">/, `${name} should keep the shared site header`);
   assert.match(html, /<button class="lang-toggle" type="button" aria-label="切换到中文">/, `${name} should keep the language control`);
@@ -181,6 +181,52 @@ test("services stacks through 767px and starts its tablet layout at 768px", () =
   assert.match(mobileServices.body, /\.service-process-row:hover \.service-process-media,\s*\.service-process-row:focus-visible \.service-process-media\s*\{[^}]*opacity:\s*1/s, "mobile should never hide the only visible service image");
   assert.match(sharedMobile.body, /\.content-page \.topbar\s*\{[^}]*position:\s*relative/s, "the shared About and Contact mobile breakpoint should remain at 760px");
   assert.doesNotMatch(sharedMobile.body, /\.(?:services-|service-process-)/, "Services responsive rules should not remain in the shared 760px block");
+});
+
+test("contact uses the approved compact mobile first screen", () => {
+  const mobileContent = findCssBlock(css, "@media (max-width: 760px)");
+
+  assert.match(
+    mobileContent.body,
+    /\.contact-hero\s*\{[^}]*min-height:\s*470px/s,
+    "mobile Contact should use the shorter approved hero"
+  );
+  assert.match(
+    mobileContent.body,
+    /\.contact-hero \.content-hero-media img\s*\{[^}]*position:\s*absolute[^}]*top:\s*-22%[^}]*height:\s*136%/s,
+    "mobile Contact should crop the source image letterboxing outside the hero"
+  );
+  assert.match(
+    mobileContent.body,
+    /\.contact-inquiry\s*\{[^}]*display:\s*block[^}]*padding:\s*38px 22px 96px/s,
+    "mobile Contact should reveal the inquiry content earlier"
+  );
+  assert.match(
+    mobileContent.body,
+    /\.contact-intro\s*\{[^}]*position:\s*absolute[^}]*width:\s*1px[^}]*height:\s*1px[^}]*overflow:\s*hidden[^}]*clip:\s*rect\(0,\s*0,\s*0,\s*0\)/s,
+    "mobile Contact should keep the inquiry heading accessible without delaying the form"
+  );
+});
+
+test("about and services use the approved compact mobile spacing", () => {
+  const mobileServices = findCssBlock(css, "@media (max-width: 767px)");
+  const mobileContent = findCssBlock(css, "@media (max-width: 760px)");
+
+  assert.match(
+    mobileContent.body,
+    /\.about-hero\s*\{[^}]*min-height:\s*540px/s,
+    "mobile About should bring the process section into view sooner"
+  );
+  assert.match(
+    mobileServices.body,
+    /\.services-intro\s*\{[^}]*min-height:\s*0[^}]*padding:\s*40px 24px 24px/s,
+    "mobile Services should remove the oversized editorial intro gap"
+  );
+  assert.match(
+    mobileServices.body,
+    /\.services-intro-signature\s*\{[^}]*margin-top:\s*24px[^}]*padding-top:\s*20px/s,
+    "mobile Services should keep a compact signature transition"
+  );
 });
 
 test("services gates hover visuals to fine pointers while active and focus states remain global", () => {

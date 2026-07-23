@@ -18,6 +18,12 @@
   const yearControl = document.querySelector("[data-shop-year]");
   const chassisControl = document.querySelector("[data-shop-chassis]");
   const findButton = document.querySelector("[data-find-parts]");
+  const shopSelector = document.querySelector(".shop-selector");
+  const mobileVehicleEdit = document.querySelector("[data-mobile-vehicle-edit]");
+  const mobileVehicleMake = document.querySelector("[data-mobile-vehicle-make]");
+  const mobileVehicleModel = document.querySelector("[data-mobile-vehicle-model]");
+  const mobileVehicleYear = document.querySelector("[data-mobile-vehicle-year]");
+  const mobileVehicleChassis = document.querySelector("[data-mobile-vehicle-chassis]");
   const dependentVehicleControls = [modelControl, yearControl, chassisControl];
   const sampleVehicleValues = dependentVehicleControls.map((control) => control.value);
   const queryOnlyCategories = new Set(["ecu"]);
@@ -43,6 +49,21 @@
 
   function activeCategories() {
     return new Set(selectedCategories);
+  }
+
+  function updateMobileVehicleSummary() {
+    const values = [makeControl, modelControl, yearControl, chassisControl];
+    const summaries = [mobileVehicleMake, mobileVehicleModel, mobileVehicleYear, mobileVehicleChassis];
+
+    summaries.forEach((node, index) => {
+      if (node) node.textContent = values[index].value || "—";
+    });
+  }
+
+  function setMobileVehicleEditor(open) {
+    if (!shopSelector || !mobileVehicleEdit) return;
+    shopSelector.classList.toggle("is-editing", open);
+    mobileVehicleEdit.setAttribute("aria-expanded", String(open));
   }
 
   function setCategoryFilters(categories) {
@@ -127,6 +148,14 @@
   setCategoryFilters(queryCategories);
   sortCards();
   applyCatalogState();
+  updateMobileVehicleSummary();
+
+  mobileVehicleEdit?.addEventListener("click", () => {
+    const open = !shopSelector.classList.contains("is-editing");
+    setMobileVehicleEditor(open);
+
+    if (open) makeControl.focus();
+  });
 
   makeControl.addEventListener("change", () => {
     const sampleMakeSelected = makeControl.value === "BMW";
@@ -135,12 +164,19 @@
       control.value = sampleMakeSelected ? sampleVehicleValues[index] : "";
       control.disabled = !sampleMakeSelected;
     });
+    updateMobileVehicleSummary();
+  });
+
+  dependentVehicleControls.forEach((control) => {
+    control.addEventListener("change", updateMobileVehicleSummary);
   });
 
   findButton.addEventListener("click", () => {
     vehicleMatchesSample = makeControl.value === "BMW"
       && dependentVehicleControls.every((control, index) => control.value === sampleVehicleValues[index]);
     applyCatalogState();
+    updateMobileVehicleSummary();
+    setMobileVehicleEditor(false);
   });
 
   filters.forEach((filter) => {

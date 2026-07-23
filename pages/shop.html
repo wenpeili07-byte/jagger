@@ -33,33 +33,43 @@
           <p data-zh="示例车型" data-en="SAMPLE VEHICLE">SAMPLE VEHICLE</p>
           <h1 data-zh="选择你的车型" data-en="SELECT YOUR VEHICLE">SELECT YOUR VEHICLE</h1>
         </div>
-        <label class="shop-field" for="shop-make">
-          <span data-zh="品牌" data-en="MAKE">MAKE</span>
-          <select id="shop-make" data-shop-make>
-              <option value="BMW">BMW</option>
+        <div class="shop-mobile-vehicle-summary" data-mobile-vehicle-summary>
+          <img src="../assets/images/网页/optimized/case-01.jpg" alt="BMW G80 M3 sample vehicle" data-zh-alt="BMW G80 M3 示例车型" data-en-alt="BMW G80 M3 sample vehicle" />
+          <p>
+            <strong><span data-mobile-vehicle-make>BMW</span> <span data-mobile-vehicle-model>G80 M3</span></strong>
+            <span><span data-mobile-vehicle-year>2024</span> · <span data-mobile-vehicle-chassis>G8X</span></span>
+          </p>
+          <button type="button" data-mobile-vehicle-edit aria-expanded="false" aria-controls="shop-vehicle-fields" data-zh="编辑" data-en="EDIT">EDIT</button>
+        </div>
+        <div class="shop-selector-fields" id="shop-vehicle-fields">
+          <label class="shop-field" for="shop-make">
+            <span data-zh="品牌" data-en="MAKE">MAKE</span>
+            <select id="shop-make" data-shop-make>
+                <option value="BMW">BMW</option>
               <option value="AUDI">AUDI</option>
               <option value="MERCEDES-BENZ">MERCEDES-BENZ</option>
-          </select>
-        </label>
-        <label class="shop-field" for="shop-model">
-          <span data-zh="车型" data-en="MODEL">MODEL</span>
-          <select id="shop-model" data-shop-model>
-              <option value="G80 M3">G80 M3</option>
-          </select>
-        </label>
-        <label class="shop-field" for="shop-year">
-          <span data-zh="年份" data-en="YEAR">YEAR</span>
-          <select id="shop-year" data-shop-year>
-              <option value="2024">2024</option>
-          </select>
-        </label>
-        <label class="shop-field" for="shop-chassis">
-          <span data-zh="底盘" data-en="CHASSIS">CHASSIS</span>
-          <select id="shop-chassis" data-shop-chassis>
-              <option value="G8X">G8X</option>
-          </select>
-        </label>
-        <button class="shop-find-button" type="button" data-find-parts data-zh="查找部件" data-en="FIND PARTS">FIND PARTS</button>
+            </select>
+          </label>
+          <label class="shop-field" for="shop-model">
+            <span data-zh="车型" data-en="MODEL">MODEL</span>
+            <select id="shop-model" data-shop-model>
+                <option value="G80 M3">G80 M3</option>
+            </select>
+          </label>
+          <label class="shop-field" for="shop-year">
+            <span data-zh="年份" data-en="YEAR">YEAR</span>
+            <select id="shop-year" data-shop-year>
+                <option value="2024">2024</option>
+            </select>
+          </label>
+          <label class="shop-field" for="shop-chassis">
+            <span data-zh="底盘" data-en="CHASSIS">CHASSIS</span>
+            <select id="shop-chassis" data-shop-chassis>
+                <option value="G8X">G8X</option>
+            </select>
+          </label>
+          <button class="shop-find-button" type="button" data-find-parts data-zh="查找部件" data-en="FIND PARTS">FIND PARTS</button>
+        </div>
       </section>
 
       <section class="shop-catalog" aria-label="Sample performance parts catalog" data-zh-aria-label="性能部件示例目录" data-en-aria-label="Sample performance parts catalog">

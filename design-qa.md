@@ -1,5 +1,32 @@
 # Design QA
 
+## Mobile Spacing Refinement
+
+- Reference: the existing Cases mobile page and the before captures in `audit/mobile-spacing-20260722/` established the target rhythm. The corresponding after captures live in `audit/mobile-spacing-20260722/after/`.
+- Implemented viewport: 390 x 844, English default state, with the shared fixed bottom navigation visible.
+- About: the first image-led section is 540px tall and the process section begins at y=598, 50px earlier than before.
+- Services: the editorial introduction is content-led rather than fixed-height; the first service begins at y=553, 88px earlier than before.
+- Case detail: the lead copy is 420px tall and the first project image begins at y=478, 53px earlier than before.
+- Service detail: the lead copy is 390px tall and the first service image begins at y=448, 80px earlier than before.
+- Cases: intentionally unchanged so its approved masked rail rhythm and label placement remain intact.
+- Desktop regression: all four affected routes were rechecked at 1440 x 900. Their 1440px canvas, desktop navigation, image geometry, and zero horizontal overflow remain unchanged.
+- No unresolved P0/P1/P2 spacing, clipping, or overflow findings remain.
+
+final result: passed
+
+## Mobile Navigation And First Screens
+
+- Reference: approved Home / Shop / Contact mobile direction in `exec-b0c6694e-5a1f-46bd-ab32-b6834e4e90a9.png`.
+- Implemented viewport: 390 x 844 in the in-app browser, English default state.
+- Shared shell: all seven checked routes use a 56px single-row header and a fixed five-item 65px bottom navigation module. English and Chinese labels fit without horizontal overflow.
+- Home: the original automotive hero and case content remain intact while the primary navigation moves to the bottom module.
+- Shop: the selected vehicle is summarized in a compact editable block, the existing filter action remains functional, and the first square product image enters the first viewport.
+- Contact: the source image letterboxing is cropped outside the 470px hero, the secondary introduction remains available to assistive technology without delaying the form, and the first two fields are visible above the bottom navigation.
+- Desktop regression: at 1440 x 900 the navigation returns to the header, uses static positioning, and the page has no horizontal overflow.
+- Remaining P3 difference: the implementation preserves the site's real vehicle and product photography, so crops and visual density differ slightly from the concept composite.
+
+final result: passed
+
 ## Shop
 
 - Reference viewport and state: approved Option 1 image at 1487 x 1058, reviewed against the equivalent 1440 x 1024 English default catalog state. The extra bottom reference edge was disregarded; no horizontal crop was used.

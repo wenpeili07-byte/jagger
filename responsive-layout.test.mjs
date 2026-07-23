@@ -84,23 +84,38 @@ const mobileHeaderBlock = mediaBlock(
 );
 assert.match(
   mobileHeaderBlock,
-  /\.topbar\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto[^}]*grid-template-rows:\s*44px 44px[^}]*min-height:\s*var\(--site-header-height\)/s,
-  "mobile should use a stable two-row header"
+  /\.topbar\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto[^}]*grid-template-rows:\s*56px[^}]*min-height:\s*var\(--site-header-height\)/s,
+  "mobile should use the approved one-row 56px header"
 );
 assert.match(
   mobileHeaderBlock,
-  /\.topbar\s*\{[^}]*padding:\s*7\.5px 18px/s,
-  "mobile topbar should total 104px: 44px + 44px rows, 7.5px vertical padding on each side, and 1px border"
+  /\.topbar\s*\{[^}]*padding:\s*0 18px/s,
+  "mobile topbar should keep the compact horizontal padding from the selected mock"
 );
 assert.match(
   mobileHeaderBlock,
-  /\.nav\s*\{[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)[^}]*width:\s*100%/s,
-  "mobile should keep five navigation links on one row"
+  /\.topbar\s*\{[^}]*backdrop-filter:\s*none[^}]*-webkit-backdrop-filter:\s*none/s,
+  "mobile topbar must not create a containing block that traps the fixed bottom navigation"
 );
 assert.match(
   mobileHeaderBlock,
-  /\.nav a\[aria-current="page"\]::after\s*\{[^}]*position:\s*absolute[^}]*right:\s*12px[^}]*bottom:\s*4px[^}]*left:\s*12px[^}]*width:\s*auto[^}]*margin-top:\s*0/s,
-  "mobile current-page underline should not change the navigation label height"
+  /\.nav\s*\{[^}]*position:\s*fixed[^}]*right:\s*0[^}]*bottom:\s*0[^}]*left:\s*0[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)[^}]*padding-bottom:\s*env\(safe-area-inset-bottom\)/s,
+  "mobile should keep all five navigation links in a safe-area-aware fixed bottom module"
+);
+assert.match(
+  mobileHeaderBlock,
+  /\.nav a\s*\{[^}]*min-height:\s*64px[^}]*font-size:\s*11px/s,
+  "mobile navigation links should keep readable labels and generous touch targets"
+);
+assert.match(
+  mobileHeaderBlock,
+  /\.nav a\[aria-current="page"\]::after\s*\{[^}]*position:\s*absolute[^}]*top:\s*0[^}]*right:\s*12px[^}]*bottom:\s*auto[^}]*left:\s*12px[^}]*width:\s*auto[^}]*margin-top:\s*0/s,
+  "mobile current-page line should sit on the top edge of the fixed module"
+);
+assert.match(
+  mobileHeaderBlock,
+  /\.site-shell\s*\{[^}]*padding-bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/s,
+  "mobile pages should reserve space for the fixed navigation"
 );
 const smallPhoneBlock = mediaBlock(
   sharedCss,
@@ -119,8 +134,8 @@ const canvasMobileBlock = mediaBlock(
 );
 assert.match(
   canvasMobileBlock,
-  /:root\s*\{[^}]*--site-header-height:\s*104px/s,
-  "mobile canvas should expose the approved 104px header height"
+  /:root\s*\{[^}]*--site-header-height:\s*56px/s,
+  "mobile canvas should expose the approved 56px header height"
 );
 const compactDesktopMarker = "@media (min-width: 900px) and (max-width: 1180px)";
 const compactDesktopStart = sharedCss.indexOf(compactDesktopMarker);

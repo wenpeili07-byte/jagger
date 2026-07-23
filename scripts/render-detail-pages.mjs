@@ -53,7 +53,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
     <title>Case ${record.id} | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../../styles.css?v=shop-case02-20260722-2" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
-    <link rel="stylesheet" href="../../case-detail.css?v=case-detail-link-closure-20260719" />
+    <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
   </head>
   <body data-section="cases">
     <main class="site-shell case-detail-page" data-detail-page>
@@ -112,7 +112,7 @@ export const renderCase02Page = (record) => `<!doctype html>
     <title>Case ${record.id} | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../../styles.css?v=shop-case02-20260722-2" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
-    <link rel="stylesheet" href="../../case-detail.css?v=case-detail-link-closure-20260719" />
+    <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
     <link rel="stylesheet" href="../../case-02.css?v=case02-final-review-20260722" />
   </head>
   <body data-section="cases">
@@ -165,7 +165,7 @@ export const renderServicePage = (record) => `<!doctype html>
     <title>${record.label} | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../../styles.css?v=shop-case02-20260722-2" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=canvas-20260721-2200" />
-    <link rel="stylesheet" href="../../service-detail.css?v=service-detail-20260719" />
+    <link rel="stylesheet" href="../../service-detail.css?v=mobile-spacing-20260722" />
   </head>
   <body data-section="services">
     <main class="site-shell service-detail-page" data-detail-page>
