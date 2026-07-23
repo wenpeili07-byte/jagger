@@ -6,6 +6,8 @@ import vm from "node:vm";
 const aboutHtml = readFileSync(new URL("./pages/about.html", import.meta.url), "utf8");
 const servicesHtml = readFileSync(new URL("./pages/services.html", import.meta.url), "utf8");
 const contactHtml = readFileSync(new URL("./pages/contact.html", import.meta.url), "utf8");
+const homepageHtml = readFileSync(new URL("./index.html", import.meta.url), "utf8");
+const casesHtml = readFileSync(new URL("./pages/cases.html", import.meta.url), "utf8");
 const cssUrl = new URL("./content-pages.css", import.meta.url);
 const jsUrl = new URL("./content-pages.js", import.meta.url);
 
@@ -120,6 +122,13 @@ assert.match(contactHtml, /name="name"[\s\S]*?minlength="2"[\s\S]*?maxlength="10
 assert.match(contactHtml, /name="email"[\s\S]*?minlength="3"[\s\S]*?maxlength="254"/, "contact email should match API validation limits");
 assert.match(contactHtml, /name="vehicle"[\s\S]*?minlength="2"[\s\S]*?maxlength="120"/, "contact vehicle should match API validation limits");
 assert.match(contactHtml, /name="message"[\s\S]*?minlength="10"[\s\S]*?maxlength="3000"/, "contact message should match API validation limits");
+
+test("public contact links use the active Gmail inbox", () => {
+  for (const html of [homepageHtml, casesHtml, contactHtml]) {
+    assert.match(html, /href="mailto:lonmadynamic@gmail\.com"/);
+    assert.doesNotMatch(html, /hello@lonmadynamic\.com/);
+  }
+});
 
 const contentPageShellBlock = css.match(/\.content-page\.site-shell\s*\{[^}]*\}/s)?.[0] || "";
 assert.match(contentPageShellBlock, /\.content-page\.site-shell\s*\{/, "content pages should keep a scoped visual block");

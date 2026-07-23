@@ -161,6 +161,21 @@ test("handler reads Content-Length from a Headers-like request object", async ()
   assert.equal(response.payload.code, "payload_too_large");
 });
 
+test("handler falls back to body size when Headers-like Content-Length is absent", async () => {
+  const response = createResponse();
+  await createContactHandler({ env: configuredEnv })(
+    {
+      method: "POST",
+      body: JSON.stringify({ ...validPayload, message: "x".repeat(17_000) }),
+      headers: { get: () => null },
+    },
+    response,
+  );
+
+  assert.equal(response.statusCode, 413);
+  assert.equal(response.payload.code, "payload_too_large");
+});
+
 test("handler returns invalid_submission for non-object JSON bodies", async () => {
   for (const body of ["null", "[]", '"plain value"']) {
     const response = createResponse();

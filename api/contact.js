@@ -33,6 +33,9 @@ function getContentLength(headers) {
   const value = typeof headers.get === "function"
     ? headers.get("content-length")
     : headers["content-length"] ?? headers["Content-Length"];
+  if (value == null || (typeof value === "string" && value.trim() === "")) {
+    return null;
+  }
   const contentLength = Number(value);
   return Number.isFinite(contentLength) && contentLength >= 0 ? contentLength : null;
 }
