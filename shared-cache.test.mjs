@@ -27,6 +27,7 @@ const publicPages = [
   "./pages/shop.html",
 ];
 const staleWarmCacheKeys = new Set([
+  "layout-canvas.css?v=canvas-20260721-2200",
   "content-pages.css?v=mobile-spacing-20260722",
   "styles.css?v=shop-case02-20260722-2",
   "content-pages.js?v=shop-case02-20260722-2",
@@ -50,6 +51,7 @@ test("all public and generated shared assets use one advanced cache version", ()
   for (const path of publicPages) {
     const html = read(path);
     references.push(assetReference(html, "styles.css", path));
+    references.push(assetReference(html, "layout-canvas.css", path));
     references.push(assetReference(html, path === "./index.html" ? "script.js" : "content-pages.js", path));
     if (html.includes("content-pages.css")) {
       references.push(assetReference(html, "content-pages.css", path));
@@ -65,6 +67,7 @@ test("all public and generated shared assets use one advanced cache version", ()
 
   for (const [label, html] of generatedOutputs) {
     references.push(assetReference(html, "styles.css", label));
+    references.push(assetReference(html, "layout-canvas.css", label));
     references.push(assetReference(html, "content-pages.js", label));
   }
 
@@ -78,7 +81,7 @@ test("all public and generated shared assets use one advanced cache version", ()
 test("new shared references cannot collide with known warm-cache entries", () => {
   for (const path of publicPages) {
     const html = read(path);
-    const assets = ["styles.css", path === "./index.html" ? "script.js" : "content-pages.js"];
+    const assets = ["styles.css", "layout-canvas.css", path === "./index.html" ? "script.js" : "content-pages.js"];
     if (html.includes("content-pages.css")) assets.push("content-pages.css");
 
     for (const asset of assets) {

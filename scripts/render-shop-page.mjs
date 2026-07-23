@@ -112,7 +112,7 @@ export const renderShopPage = (products = shopProducts) => {
     <meta name="description" content="Browse sample performance-part categories for a selected vehicle and contact LONMA DYNAMIC for fitment and installation details." />
     <title>Shop | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../styles.css?v=contact-form-20260723" />
-    <link rel="stylesheet" href="../layout-canvas.css?v=canvas-20260721-2200" />
+    <link rel="stylesheet" href="../layout-canvas.css?v=contact-form-20260723" />
     <link rel="stylesheet" href="../shop.css?v=shop-final-review-20260722" />
   </head>
   <body data-section="shop">

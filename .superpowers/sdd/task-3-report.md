@@ -134,3 +134,15 @@ Exact summary: `tests 106; pass 106; fail 0; cancelled 0; skipped 0; todo 0`.
 ### Commit
 
 - Implementation: `43ab8c0` (`Close content stylesheet cache closure`)
+
+### Integration Note
+
+The cache-fix commit is present in the controller checkout as `690ae27` (`Close content stylesheet cache closure`); the worker-local hash recorded above was rewritten during agent integration.
+
+## Layout Cache Fix Review
+
+- RED: after extending `shared-cache.test.mjs` to inspect `layout-canvas.css` on every public page and renderer, the focused run failed `2/2`; both failures reported `canvas-20260721-2200` instead of `contact-form-20260723`.
+- GREEN: after updating the 18 hand-authored pages, both renderers, and regenerating detail and Shop outputs, the focused cache/layout run passed `13/13`.
+- Full suite: `node --test *.test.mjs` passed `106/106` with `0` failures.
+- Static/stale scan: `18` public layout references and `2` renderer references use `contact-form-20260723`; no old layout key remains in public pages or renderers. The only remaining `canvas-20260721-2200` occurrence is the intentional denylist entry in `shared-cache.test.mjs`.
+- Scope review: feature-specific keys for `case-detail.css`, `service-detail.css`, `case-02.css/js`, `case-rail.css`, `shop.css/js`, and `cases.js` were retained.
