@@ -1,3 +1,5 @@
+const { createHash } = require("node:crypto");
+
 const ALLOWED_SERVICES = new Set([
   "Custom Vehicle Builds",
   "Performance Parts",
@@ -77,6 +79,19 @@ function buildContactEmail(payload) {
   return { subject, text, html, replyTo: payload.email };
 }
 
+function createIdempotencyKey(payload) {
+  const digest = createHash("sha256")
+    .update(JSON.stringify([
+      payload.name,
+      payload.email,
+      payload.vehicle,
+      payload.service,
+      payload.message,
+    ]))
+    .digest("hex");
+  return `contact/${digest}`;
+}
+
 function createContactHandler({
   fetchImpl = globalThis.fetch,
   env = process.env,
@@ -130,6 +145,7 @@ function createContactHandler({
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
+          "Idempotency-Key": createIdempotencyKey(payload),
         },
         body: JSON.stringify({
           from,

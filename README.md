@@ -26,6 +26,12 @@ use a verified domain sender owned by LONMA DYNAMIC. If the sender restriction i
 not satisfied, Resend can return `403`; the Contact API maps that provider refusal
 to `502` for the browser.
 
+Before activating the form in Production, configure a Vercel Firewall rate-limit
+rule for `POST /api/contact`: allow no more than 5 requests per minute per source,
+then rate-limit requests over that threshold. The API also sends a stable
+`Idempotency-Key` to Resend so a retry of the same inquiry does not create a
+duplicate email.
+
 After changing environment variables, redeploy Production. Submit one inquiry
 from `/pages/contact`, confirm the inline success message, verify receipt at
 `lonmadynamic@gmail.com`, and reply to confirm the customer's address is used.

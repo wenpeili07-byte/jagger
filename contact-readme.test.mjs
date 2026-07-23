@@ -10,3 +10,9 @@ test("contact setup documents the Resend onboarding sender restriction", () => {
   assert.match(readme, /verified domain sender/i);
   assert.match(readme, /403[\s\S]*502/);
 });
+
+test("contact setup requires a Vercel Firewall rate limit before activation", () => {
+  assert.match(readme, /Vercel Firewall/i);
+  assert.match(readme, /\/api\/contact/);
+  assert.match(readme, /5 requests per minute per source/i);
+});

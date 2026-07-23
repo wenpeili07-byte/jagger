@@ -77,6 +77,10 @@ test("handler sends valid inquiries to configured Resend recipient", async () =>
 
   assert.equal(response.statusCode, 200);
   assert.equal(requests[0].url, "https://api.resend.com/emails");
+  assert.match(
+    requests[0].options.headers["Idempotency-Key"],
+    /^contact\/[a-f0-9]{64}$/,
+  );
   const body = JSON.parse(requests[0].options.body);
   assert.deepEqual(body.to, ["lonmadynamic@gmail.com"]);
   assert.equal(body.reply_to, validPayload.email);
