@@ -605,6 +605,15 @@
   gap: 32px 28px;
 }
 
+.contact-honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .contact-field {
   display: grid;
   gap: 12px;
@@ -671,6 +680,20 @@
   margin: 0;
   color: var(--muted);
   font-size: 13px;
+}
+
+.contact-form[aria-busy="true"] .contact-submit-row button,
+.contact-submit-row button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+.contact-submit-row p[data-state="success"] {
+  color: var(--text);
+}
+
+.contact-submit-row p[data-state="error"] {
+  color: #d8a7a2;
 }
 
 .contact-submit-row button {

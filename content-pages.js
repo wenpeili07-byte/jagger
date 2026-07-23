@@ -7,8 +7,6 @@
   const ariaLabelNodes = [...document.querySelectorAll("[data-zh-aria-label][data-en-aria-label]")];
   const alternativeTextNodes = [...document.querySelectorAll("[data-zh-alt][data-en-alt]")];
   const navLinks = [...document.querySelectorAll(".nav a")];
-  const contactForm = document.querySelector("[data-contact-form]");
-  const contactStatus = document.querySelector("[data-contact-status]");
   const navLabels = {
     "about.html": { zh: "关于", en: "ABOUT" },
     "services.html": { zh: "业务", en: "SERVICES" },
@@ -98,29 +96,6 @@
   if (langToggle) {
     langToggle.addEventListener("click", () => {
       setLanguage(currentLanguage === "zh" ? "en" : "zh");
-    });
-  }
-
-  if (contactForm) {
-    contactForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-
-      const formData = new FormData(contactForm);
-      const subject = `[LONMA DYNAMIC] ${formData.get("service")} · ${formData.get("vehicle")}`;
-      const body = [
-        `Name: ${formData.get("name")}`,
-        `Email: ${formData.get("email")}`,
-        `Vehicle: ${formData.get("vehicle")}`,
-        `Service: ${formData.get("service")}`,
-        "",
-        `${formData.get("message")}`,
-      ].join("\n");
-
-      if (contactStatus) {
-        contactStatus.textContent = currentLanguage === "zh" ? "正在打开邮件应用…" : "Opening your email application…";
-      }
-
-      window.location.href = `mailto:hello@lonmadynamic.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     });
   }
 

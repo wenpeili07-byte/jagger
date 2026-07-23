@@ -110,7 +110,7 @@ for (const caseNumber of ["01", "02", "03", "04", "05", "06"]) {
   assert.equal((servicesHtml.match(new RegExp(`optimized/case-${caseNumber}\\.jpg`, "g")) || []).length, 2, `services should use case-${caseNumber}.jpg for both its sample and square preview`);
 }
 
-assert.match(contactHtml, /<form class="contact-form" data-contact-form>/, "contact should include a focused project inquiry form");
+assert.match(contactHtml, /<form class="contact-form" action="\/api\/contact" method="post" data-contact-form>/, "contact should include a focused project inquiry form");
 for (const name of ["name", "email", "vehicle", "service", "message"]) {
   assert.match(contactHtml, new RegExp(`name="${name}"`), `contact should collect ${name}`);
 }
@@ -260,8 +260,7 @@ test("services reduces the square preview to a simple fade", () => {
 
 assert.match(js, /sessionStorage\.setItem\("lonma-language", language\)/, "language choice should persist within one tab");
 assert.match(js, /querySelectorAll\("\[data-zh\]\[data-en\]"\)/, "content copy should switch between Chinese and English");
-assert.match(js, /new FormData\(contactForm\)/, "contact submit should use the visible form values");
-assert.match(js, /mailto:hello@lonmadynamic\.com/, "contact submit should open a prefilled email to LONMA");
+assert.doesNotMatch(js, /mailto:/, "shared interactions should not open a mail client");
 assert.match(js, /querySelectorAll\("\[data-service-row\]"\)/, "services should initialize the active process row");
 assert.match(js, /toggleAttribute\("data-active"/, "only one process row should remain active");
 assert.match(

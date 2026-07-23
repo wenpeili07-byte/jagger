@@ -57,7 +57,11 @@
           <a class="contact-email" href="mailto:hello@lonmadynamic.com">hello@lonmadynamic.com</a>
         </div>
 
-        <form class="contact-form" data-contact-form>
+        <form class="contact-form" action="/api/contact" method="post" data-contact-form>
+          <label class="contact-honeypot" aria-hidden="true">
+            <span>Company</span>
+            <input type="text" name="company" tabindex="-1" autocomplete="off" />
+          </label>
           <label class="contact-field">
             <span data-zh="你的称呼" data-en="YOUR NAME">YOUR NAME</span>
             <input
@@ -133,5 +137,6 @@
       </footer>
     </main>
     <script src="../content-pages.js?v=shop-case02-20260722-2"></script>
+    <script src="../contact-form.js?v=contact-form-20260723"></script>
   </body>
 </html>
