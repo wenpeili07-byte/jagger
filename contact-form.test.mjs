@@ -4,13 +4,14 @@ import { test } from "node:test";
 import vm from "node:vm";
 
 const html = readFileSync(new URL("./pages/contact.html", import.meta.url), "utf8");
+const css = readFileSync(new URL("./content-pages.css", import.meta.url), "utf8");
 const sharedJs = readFileSync(new URL("./content-pages.js", import.meta.url), "utf8");
 const formJsUrl = new URL("./contact-form.js", import.meta.url);
 
 test("contact form targets the same-site API and includes a honeypot", () => {
   assert.match(html, /action="\/api\/contact" method="post"/);
   assert.match(html, /name="company"[^>]*tabindex="-1"/);
-  assert.match(html, /src="\.\.\/contact-form\.js\?v=contact-form-final-review-20260723"/);
+  assert.match(html, /src="\.\.\/contact-form\.js\?v=three-page-expansion-20260726"/);
 });
 
 test("contact fields mirror the API validation limits", () => {
@@ -18,6 +19,17 @@ test("contact fields mirror the API validation limits", () => {
   assert.match(html, /name="email"[\s\S]*?minlength="3"[\s\S]*?maxlength="254"/);
   assert.match(html, /name="vehicle"[\s\S]*?minlength="2"[\s\S]*?maxlength="120"/);
   assert.match(html, /name="message"[\s\S]*?minlength="10"[\s\S]*?maxlength="3000"/);
+});
+
+test("contact prefill notice and form share one desktop column stack", () => {
+  assert.match(
+    html,
+    /class="contact-form-stack"[\s\S]*data-contact-prefill-status[\s\S]*<form class="contact-form"/,
+  );
+  assert.match(
+    css,
+    /\.contact-form-stack\s*\{[^}]*grid-column:\s*2[^}]*display:\s*grid[^}]*align-content:\s*start/s,
+  );
 });
 
 test("shared page controller no longer opens a mail client", () => {
@@ -35,6 +47,7 @@ class FakeNode {
     this.dataset = {};
     this.disabled = false;
     this.textContent = "";
+    this.value = "";
     this.listeners = new Map();
   }
 
@@ -55,19 +68,32 @@ class FakeNode {
   }
 }
 
-function runController({ language = "en", fetchImpl }) {
+function runController({ language = "en", fetchImpl, search = "", initialValues = {} }) {
   const source = readFileSync(formJsUrl, "utf8");
   const status = new FakeNode();
+  const prefillStatus = new FakeNode();
   const button = new FakeNode();
   const form = new FakeNode();
   form.action = "/api/contact";
-  form.values = {
-    name: "Jordan Lee",
-    email: "jordan@example.com",
-    vehicle: "2024 BMW G80 M3",
-    service: "Custom Vehicle Builds",
-    message: "Street setup with daily usability.",
+  const values = {
+    name: "",
+    email: "",
+    vehicle: "",
+    service: "",
+    message: "",
     company: "",
+    ...initialValues,
+  };
+  const fields = Object.fromEntries(
+    Object.entries(values).map(([name, value]) => {
+      const field = new FakeNode();
+      field.value = value;
+      return [name, field];
+    }),
+  );
+  form.values = values;
+  form.elements = {
+    namedItem: (name) => fields[name] ?? null,
   };
   form.querySelector = (selector) => selector === 'button[type="submit"]' ? button : null;
   form.reportValidity = () => true;
@@ -88,6 +114,7 @@ function runController({ language = "en", fetchImpl }) {
     querySelector(selector) {
       if (selector === "[data-contact-form]") return form;
       if (selector === "[data-contact-status]") return status;
+      if (selector === "[data-contact-prefill-status]") return prefillStatus;
       return null;
     },
   };
@@ -99,9 +126,11 @@ function runController({ language = "en", fetchImpl }) {
     JSON,
     Object,
     Promise,
+    URLSearchParams,
+    window: { location: { search } },
   });
 
-  return { button, form, status };
+  return { button, fields, form, prefillStatus, status };
 }
 
 test("contact controller posts JSON and resets after success", async () => {
@@ -110,6 +139,14 @@ test("contact controller posts JSON and resets after success", async () => {
     fetchImpl: async (url, options) => {
       requests.push({ url, options });
       return { ok: true };
+    },
+    initialValues: {
+      name: "Jordan Lee",
+      email: "jordan@example.com",
+      vehicle: "2024 BMW G80 M3",
+      service: "Custom Vehicle Builds",
+      message: "Street setup with daily usability.",
+      company: "",
     },
   });
   await harness.form.dispatch("submit", { preventDefault() {} });
@@ -120,6 +157,18 @@ test("contact controller posts JSON and resets after success", async () => {
   assert.equal(harness.form.resetCount, 1);
   assert.equal(harness.status.dataset.state, "success");
   assert.match(harness.status.textContent, /INQUIRY SENT/);
+});
+
+test("contact success hides a previously visible project prefill notice", async () => {
+  const harness = runController({
+    search:
+      "?vehicle=2024%20AUDI%20RS%205%20B9.5&service=Performance%20Parts&message=Wheel%20fitment%20request",
+    fetchImpl: async () => ({ ok: true }),
+  });
+
+  assert.equal(harness.prefillStatus.hidden, false);
+  await harness.form.dispatch("submit", { preventDefault() {} });
+  assert.equal(harness.prefillStatus.hidden, true);
 });
 
 test("contact controller blocks repeats while pending", async () => {
@@ -172,6 +221,43 @@ test("contact controller preserves values and localizes validation failures", as
   assert.match(harness.status.textContent, /请检查填写内容/);
 });
 
+test("contact prefill accepts known services and strips control characters", () => {
+  const harness = runController({
+    search: "?vehicle=2024%20BMW%20G80%20M3&service=Custom%20Vehicle%20Builds&message=Street%0Asetup",
+    fetchImpl: async () => ({ ok: true }),
+  });
+
+  assert.equal(harness.fields.vehicle.value, "2024 BMW G80 M3");
+  assert.equal(harness.fields.service.value, "Custom Vehicle Builds");
+  assert.equal(harness.fields.message.value, "Street setup");
+  assert.equal(harness.prefillStatus.hidden, false);
+});
+
+test("contact prefill appends product identity to a direct message", () => {
+  const harness = runController({
+    search:
+      "?vehicle=2024%20AUDI%20RS%205%20B9.5&service=Performance%20Parts&product=forged-wheel&message=Fitment%20check%3A%2019%20inch.",
+    fetchImpl: async () => ({ ok: true }),
+  });
+
+  assert.equal(harness.fields.vehicle.value, "2024 AUDI RS 5 B9.5");
+  assert.equal(
+    harness.fields.message.value,
+    "Fitment check: 19 inch. Product: forged-wheel.",
+  );
+});
+
+test("contact prefill rejects unknown services and caps field lengths", () => {
+  const harness = runController({
+    search: `?vehicle=${"M".repeat(150)}&service=Unknown&message=${"A".repeat(3100)}`,
+    fetchImpl: async () => ({ ok: true }),
+  });
+
+  assert.equal(harness.fields.vehicle.value.length, 120);
+  assert.equal(harness.fields.service.value, "");
+  assert.equal(harness.fields.message.value.length, 3000);
+});
+
 test("contact status follows the shared language toggle after a status is set", async () => {
   const sharedSource = readFileSync(new URL("./content-pages.js", import.meta.url), "utf8");
   const formSource = readFileSync(formJsUrl, "utf8");
@@ -189,6 +275,7 @@ test("contact status follows the shared language toggle after a status is set", 
     company: "",
   };
   form.querySelector = (selector) => selector === 'button[type="submit"]' ? button : null;
+  form.elements = { namedItem: () => null };
   form.reportValidity = () => true;
   form.reset = () => {};
 
@@ -231,6 +318,8 @@ test("contact status follows the shared language toggle after a status is set", 
     JSON,
     Object,
     Promise,
+    URLSearchParams,
+    window: { location: { search: "" } },
   });
 
   form.dispatch("submit", { preventDefault() {} });

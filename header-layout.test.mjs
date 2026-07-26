@@ -5,9 +5,9 @@ const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
 const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const js = readFileSync(new URL("./script.js", import.meta.url), "utf8");
 const renderer = readFileSync(new URL("./scripts/render-detail-pages.mjs", import.meta.url), "utf8");
-const sharedAssetVersion = "contact-form-20260723";
-const contentStylesVersion = "contact-form-20260723";
-const canvasVersion = "contact-form-20260723";
+const sharedAssetVersion = "three-page-expansion-20260726";
+const contentStylesVersion = "three-page-expansion-20260726";
+const canvasVersion = "three-page-expansion-20260726";
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
   assert.notEqual(start, -1, message);

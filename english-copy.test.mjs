@@ -3,6 +3,115 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
+const expansionRoutes = [
+  "./pages/project.html",
+  "./pages/shop/forged-wheel.html",
+  "./pages/cases/case-02.html",
+  "./pages/contact.html",
+];
+
+const neutralVisibleCopy = new Map([
+  [
+    "./pages/project.html",
+    new Map([
+      ["01", "step number"],
+      ["02", "step number"],
+      ["03", "step number"],
+      ["04", "step number"],
+      ["BMW", "vehicle make"],
+      ["AUDI", "vehicle make"],
+      ["MERCEDES-BENZ", "vehicle make"],
+    ]),
+  ],
+  [
+    "./pages/shop/forged-wheel.html",
+    new Map([
+      ["BMW", "vehicle make"],
+      ["AUDI", "vehicle make"],
+      ["MERCEDES-BENZ", "vehicle make"],
+      ["US$3,200", "reference price"],
+      ['19"', "wheel diameter"],
+      ['20"', "wheel diameter"],
+      ["9.5J / 10.5J", "wheel width code"],
+      ["10J / 11J", "wheel width code"],
+    ]),
+  ],
+  [
+    "./pages/cases/case-02.html",
+    new Map([
+      ["CASE 02", "case code"],
+      ["BMW G80 M3", "vehicle identifier"],
+      ["2024", "model year"],
+      ["01", "story sequence number"],
+      ["02", "story sequence number"],
+    ]),
+  ],
+  [
+    "./pages/contact.html",
+    new Map([
+      ["CONTACT", "editorial section token paired with its numeric index"],
+      ["01", "section number"],
+      ["lonmadynamic@gmail.com", "email address"],
+    ]),
+  ],
+]);
+
+const reviewerVisibleCopyExamples = [
+  {
+    path: "./pages/contact.html",
+    tag: "h2",
+    english: "START WITH THE GOAL, NOT A PARTS LIST.",
+    label: "Contact inquiry heading",
+  },
+  {
+    path: "./pages/project.html",
+    tag: "span",
+    english: "VEHICLE",
+    label: "Project step copy",
+  },
+  {
+    path: "./pages/project.html",
+    tag: "small",
+    english: "Balanced response and daily usability.",
+    label: "Project description copy",
+  },
+  {
+    path: "./pages/shop/forged-wheel.html",
+    tag: "a",
+    english: "ADD TO BUILD",
+    label: "Product action copy",
+  },
+  {
+    path: "./pages/shop/forged-wheel.html",
+    tag: "dd",
+    english: "MONOBLOCK FORGED",
+    label: "Product specification copy",
+  },
+  {
+    path: "./pages/cases/case-02.html",
+    tag: "p",
+    english: "Sharper response without turning the car into a single-purpose machine. Braking, chassis feedback, and wheel fitment are considered as one system.",
+    label: "Case 02 story copy",
+  },
+  {
+    path: "./pages/cases/case-02.html",
+    tag: "button",
+    english: "FINAL FILM COMING SOON",
+    label: "Case 02 state copy",
+  },
+  {
+    path: "./pages/contact.html",
+    tag: "span",
+    english: "WHAT DO YOU WANT TO CHANGE?",
+    label: "Contact form copy",
+  },
+];
+
+const case02PaginationCopy = [
+  { english: "← CASE 01", label: "previous case link" },
+  { english: "CASE 03 →", label: "next case link" },
+];
+
 const publicPages = [
   "./index.html",
   "./pages/about.html",
@@ -21,7 +130,9 @@ const publicPages = [
   "./pages/cases/case-05.html",
   "./pages/cases/case-06.html",
   "./pages/contact.html",
+  "./pages/project.html",
   "./pages/shop.html",
+  "./pages/shop/forged-wheel.html",
 ];
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
@@ -33,7 +144,7 @@ const decode = (value) =>
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">");
 
-const sharedAssetVersion = "contact-form-20260723";
+const sharedAssetVersion = "three-page-expansion-20260726";
 const casesControllerVersion = "english-copy-20260721";
 const chineseText = /[\p{Script=Han}]/u;
 
@@ -84,6 +195,164 @@ function attributeValue(attributes, name) {
   return attributes.match(new RegExp(`(?:^|\\s)${name}="([^"]*)"`))?.[1] ?? null;
 }
 
+function escapePattern(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+const voidElements = new Set([
+  "area",
+  "base",
+  "br",
+  "col",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
+]);
+
+function parseHtmlElements(html) {
+  const elements = [];
+  const stack = [];
+  const tokens = html.matchAll(/<!--[\s\S]*?-->|<![^>]*>|<\/?[a-z][^>]*>|[^<]+/gi);
+
+  for (const tokenMatch of tokens) {
+    const token = tokenMatch[0];
+    if (token.startsWith("<!--") || token.startsWith("<!")) {
+      continue;
+    }
+    if (token.startsWith("</")) {
+      const closingTag = token.match(/^<\/([a-z][\w-]*)/i)?.[1].toLowerCase();
+      while (stack.length > 0) {
+        if (stack.pop().tag === closingTag) {
+          break;
+        }
+      }
+      continue;
+    }
+    if (token.startsWith("<")) {
+      const opening = token.match(/^<([a-z][\w-]*)([\s\S]*?)(\/?)>$/i);
+      if (!opening) {
+        continue;
+      }
+
+      const element = {
+        tag: opening[1].toLowerCase(),
+        attributes: opening[2],
+        openingTag: token,
+        openingIndex: tokenMatch.index,
+        ownText: "",
+        parent: stack.at(-1) ?? null,
+      };
+      elements.push(element);
+      if (!opening[3] && !voidElements.has(element.tag)) {
+        stack.push(element);
+      }
+      continue;
+    }
+
+    if (stack.length > 0) {
+      stack.at(-1).ownText += token;
+    }
+  }
+
+  return elements;
+}
+
+function normalizedVisibleText(value) {
+  return decode(value).replace(/\s+/g, " ").trim();
+}
+
+function hasClass(element, name) {
+  return (attributeValue(element.attributes, "class") ?? "").split(/\s+/).includes(name);
+}
+
+function isExcludedVisibleTextContext(element) {
+  for (let current = element; current; current = current.parent) {
+    if (current.tag === "head" || ["script", "style", "template"].includes(current.tag)) {
+      return true;
+    }
+    if (hasClass(current, "topbar")) {
+      return true;
+    }
+    if (attributeValue(current.attributes, "aria-hidden") === "true") {
+      return true;
+    }
+  }
+  return false;
+}
+
+function visibleTextElements(html) {
+  return parseHtmlElements(html).filter(
+    (element) =>
+      normalizedVisibleText(element.ownText) !== "" && !isExcludedVisibleTextContext(element),
+  );
+}
+
+function neutralVisibleCopyReason(path, text) {
+  if (text === "LONMA DYNAMIC") {
+    return "brand";
+  }
+  return neutralVisibleCopy.get(path)?.get(text) ?? null;
+}
+
+function visibleElementLabel(element) {
+  const id = attributeValue(element.attributes, "id");
+  const classes = (attributeValue(element.attributes, "class") ?? "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((name) => `.${name}`)
+    .join("");
+  return `<${element.tag}${id ? `#${id}` : ""}${classes}> "${normalizedVisibleText(element.ownText)}"`;
+}
+
+function assertExpansionVisibleCopy(html, path) {
+  const bilingualElements = [];
+
+  for (const element of visibleTextElements(html)) {
+    const english = attributeValue(element.attributes, "data-en");
+    const chinese = attributeValue(element.attributes, "data-zh");
+    const label = visibleElementLabel(element);
+
+    if (english !== null || chinese !== null) {
+      assert.ok(english, `${path} ${label} should define data-en`);
+      assert.ok(chinese, `${path} ${label} should define data-zh`);
+      assert.equal(
+        normalizedVisibleText(element.ownText),
+        normalizedVisibleText(english),
+        `${path} ${label} should render English first`,
+      );
+      bilingualElements.push(element);
+      continue;
+    }
+
+    assert.ok(
+      neutralVisibleCopyReason(path, normalizedVisibleText(element.ownText)),
+      `${path} ${label} should define data-en and data-zh or be documented as language-neutral`,
+    );
+  }
+
+  return bilingualElements;
+}
+
+function withoutRequiredLanguageAttribute(html, element, attribute) {
+  const mutatedTag = element.openingTag.replace(
+    new RegExp(`\\s+${escapePattern(attribute)}="[^"]*"`),
+    "",
+  );
+  assert.notEqual(
+    mutatedTag,
+    element.openingTag,
+    `${visibleElementLabel(element)} fixture should contain ${attribute}`,
+  );
+  return `${html.slice(0, element.openingIndex)}${mutatedTag}${html.slice(element.openingIndex + element.openingTag.length)}`;
+}
+
 test("content controller cache references use the current shared asset version", async () => {
   for (const path of publicPages.filter((path) => path !== "./index.html")) {
     const html = read(path);
@@ -92,7 +361,7 @@ test("content controller cache references use the current shared asset version",
       new RegExp(`content-pages\\.js\\?v=${sharedAssetVersion}`),
       `${path} should load the current shared content controller version`,
     );
-    assert.doesNotMatch(html, /content-pages\.js\?v=(?!contact-form-20260723)/, `${path} should not retain a stale content controller version`);
+    assert.doesNotMatch(html, new RegExp(`content-pages\\.js\\?v=(?!${sharedAssetVersion})`), `${path} should not retain a stale content controller version`);
   }
 
   const cases = read("./pages/cases.html");
@@ -263,6 +532,64 @@ test("all public pages ship English-first markup", () => {
       }
     }
     assert.ok(translatableAttributeCount > 0, `${path} should expose translatable live attributes`);
+  }
+});
+
+test("expansion routes exhaustively classify every meaningful visible text element", () => {
+  for (const path of expansionRoutes) {
+    assertExpansionVisibleCopy(read(path), path);
+  }
+});
+
+test("expansion visible-copy coverage includes every reviewer example", () => {
+  for (const example of reviewerVisibleCopyExamples) {
+    const coveredElements = assertExpansionVisibleCopy(read(example.path), example.path);
+    assert.equal(
+      coveredElements.filter(
+        (element) =>
+          element.tag === example.tag &&
+          normalizedVisibleText(attributeValue(element.attributes, "data-en") ?? "") === example.english,
+      ).length,
+      1,
+      `${example.path} should cover ${example.label}`,
+    );
+  }
+});
+
+test("Case 02 pagination links are exhaustive bilingual nodes", () => {
+  const path = "./pages/cases/case-02.html";
+  const coveredElements = assertExpansionVisibleCopy(read(path), path);
+
+  for (const { english, label } of case02PaginationCopy) {
+    assert.equal(
+      coveredElements.filter(
+        (element) =>
+          element.tag === "a" &&
+          normalizedVisibleText(attributeValue(element.attributes, "data-en") ?? "") === english,
+      ).length,
+      1,
+      `${path} should cover the ${label}`,
+    );
+  }
+});
+
+test("exhaustive expansion visible-copy gate rejects either missing language attribute", () => {
+  for (const path of expansionRoutes) {
+    const html = read(path);
+    const bilingualElements = assertExpansionVisibleCopy(html, path);
+    for (const element of bilingualElements) {
+      for (const attribute of ["data-en", "data-zh"]) {
+        const mutated = withoutRequiredLanguageAttribute(html, element, attribute);
+        assert.throws(
+          () => assertExpansionVisibleCopy(mutated, path),
+          {
+            name: "AssertionError",
+            message: `${path} ${visibleElementLabel(element)} should define ${attribute}`,
+          },
+          `${path} ${visibleElementLabel(element)} should reject missing ${attribute}`,
+        );
+      }
+    }
   }
 });
 

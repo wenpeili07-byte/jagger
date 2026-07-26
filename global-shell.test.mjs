@@ -2,6 +2,12 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
+const expansionPages = [
+  "./pages/project.html",
+  "./pages/shop/forged-wheel.html",
+  "./pages/cases/case-02.html",
+];
+
 const pageGroups = [
   {
     section: "home",
@@ -45,9 +51,14 @@ const pageGroups = [
     currentHref: "./contact.html",
   },
   {
+    section: "project",
+    pages: ["./pages/project.html"],
+    currentHref: null,
+  },
+  {
     section: "shop",
-    pages: ["./pages/shop.html"],
-    currentHref: "./shop.html",
+    pages: ["./pages/shop.html", "./pages/shop/forged-wheel.html"],
+    currentHref: (path) => path.includes("/shop/") ? "../shop.html" : "./shop.html",
   },
 ];
 
@@ -82,13 +93,26 @@ for (const group of pageGroups) {
   }
 }
 
+test("three-page expansion routes expose one complete shared shell", () => {
+  for (const path of expansionPages) {
+    const html = read(path);
+    const header = html.match(/<header class="topbar">([\s\S]*?)<\/header>/)?.[1] ?? "";
+
+    assert.equal((header.match(/<a href=/g) || []).length, 5, `${path} should expose five navigation links`);
+    assert.equal((header.match(/<button class="lang-toggle"/g) || []).length, 1, `${path} should expose one language toggle`);
+    assert.equal((html.match(/<footer class="content-footer">/g) || []).length, 1, `${path} should expose one shared footer`);
+  }
+});
+
 const footerLinks = new Map([
-  ["./index.html", "./pages/contact.html"],
+  ["./index.html", "./pages/project.html"],
   ["./pages/about.html", "./contact.html"],
   ["./pages/services.html", "./contact.html"],
   ["./pages/cases.html", "./contact.html"],
   ["./pages/contact.html", "./cases.html"],
+  ["./pages/project.html", "./contact.html"],
   ["./pages/shop.html", "./contact.html"],
+  ["./pages/shop/forged-wheel.html", "../contact.html"],
 ]);
 
 for (const number of ["01", "02", "03", "04", "05", "06"]) {
@@ -96,7 +120,7 @@ for (const number of ["01", "02", "03", "04", "05", "06"]) {
 }
 
 for (const slug of ["build", "parts", "photo", "ecu", "chassis", "exhaust"]) {
-  footerLinks.set(`./pages/services/${slug}.html`, "../contact.html");
+  footerLinks.set(`./pages/services/${slug}.html`, slug === "build" ? "../project.html" : "../contact.html");
 }
 
 for (const [path, href] of footerLinks) {
@@ -126,10 +150,11 @@ test("footer styling is global and not duplicated by content pages", () => {
   assert.doesNotMatch(contentCss, /\.content-footer/);
 });
 
-test("Shop and Case 02 expose their live and synchronized initial states", () => {
+test("Shop and Case 02 expose their stable initial states", () => {
   const shopHtml = read("./pages/shop.html");
   const case02Html = read("./pages/cases/case-02.html");
 
   assert.match(shopHtml, /data-results-status aria-live="polite"/);
-  assert.match(case02Html, /data-case-marker="01" aria-pressed="true" data-active/);
+  assert.match(case02Html, /class="case02-video-stage" data-video-state="poster-only"/);
+  assert.match(case02Html, /class="case02-video-status" disabled/);
 });

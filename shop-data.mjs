@@ -1,8 +1,27 @@
+const shopVehicleTuples = [
+  { make: "BMW", model: "G80 M3", year: "2024", chassis: "G8X" },
+  { make: "AUDI", model: "RS 5", year: "2024", chassis: "B9.5" },
+  { make: "MERCEDES-BENZ", model: "C 63 S", year: "2024", chassis: "W206" },
+];
+
 export const shopVehicles = {
   makes: ["BMW", "AUDI", "MERCEDES-BENZ"],
-  models: { BMW: ["G80 M3"], AUDI: [], "MERCEDES-BENZ": [] },
-  years: { "G80 M3": ["2024"] },
-  chassis: { "G80 M3": ["G8X"] },
+  models: {
+    BMW: ["G80 M3"],
+    AUDI: ["RS 5"],
+    "MERCEDES-BENZ": ["C 63 S"],
+  },
+  years: {
+    "G80 M3": ["2024"],
+    "RS 5": ["2024"],
+    "C 63 S": ["2024"],
+  },
+  chassis: {
+    "G80 M3": ["G8X"],
+    "RS 5": ["B9.5"],
+    "C 63 S": ["W206"],
+  },
+  tuples: shopVehicleTuples,
 };
 
 export const shopProducts = [
@@ -19,6 +38,93 @@ export const shopProducts = [
     compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
     inquirySubject: { en: "FORGED WHEEL INQUIRY", zh: "锻造轮毂咨询" },
     shopifyProductId: null,
+    detail: {
+      kicker: { en: "WHEELS / FORGED", zh: "轮毂 / 锻造" },
+      title: { en: "MONOBLOCK FORGED WHEEL", zh: "单片式锻造轮毂" },
+      displayName: { en: "Forged Wheel", zh: "锻造轮毂" },
+      summary: {
+        en: "A lightweight wheel direction configured around vehicle fitment, brake clearance, and complete-car proportion.",
+        zh: "围绕车型适配、刹车空间与整车比例配置的轻量化轮毂方向。",
+      },
+      specifications: {
+        construction: { en: "MONOBLOCK FORGED", zh: "单片式锻造" },
+        application: {
+          en: "STREET & ROAD PERFORMANCE",
+          zh: "街道与道路性能",
+        },
+        fitment: {
+          en: "REFERENCE SET · CONFIRM BEFORE ORDER",
+          zh: "参考适配 · 下单前确认",
+        },
+      },
+      referencePrice: {
+        display: "US$3,200",
+        note: {
+          en: "Final quote follows fitment verification.",
+          zh: "最终报价以适配确认后为准。",
+        },
+      },
+      options: {
+        diameter: [
+          { id: "19 inch", label: { en: '19"', zh: '19"' } },
+          { id: "20 inch", label: { en: '20"', zh: '20"' } },
+        ],
+        width: [
+          { id: "9.5J / 10.5J", label: { en: "9.5J / 10.5J", zh: "9.5J / 10.5J" } },
+          { id: "10J / 11J", label: { en: "10J / 11J", zh: "10J / 11J" } },
+        ],
+        finish: [
+          {
+            id: "Satin Black",
+            label: { en: "SATIN BLACK", zh: "缎面黑" },
+            swatch: "black",
+          },
+          {
+            id: "Brushed Silver",
+            label: { en: "BRUSHED SILVER", zh: "拉丝银" },
+            swatch: "silver",
+          },
+        ],
+      },
+      defaults: {
+        vehicle: shopVehicleTuples[0],
+        diameter: "19 inch",
+        width: "9.5J / 10.5J",
+        finish: "Satin Black",
+        quantity: 4,
+      },
+      fitments: [
+        {
+          make: "BMW",
+          model: "G80 M3",
+          year: "2024",
+          chassis: "G8X",
+          combinations: [
+            { diameter: "19 inch", width: "9.5J / 10.5J" },
+            { diameter: "20 inch", width: "10J / 11J" },
+          ],
+        },
+        {
+          make: "AUDI",
+          model: "RS 5",
+          year: "2024",
+          chassis: "B9.5",
+          combinations: [
+            { diameter: "19 inch", width: "9.5J / 10.5J" },
+          ],
+        },
+      ],
+      fitmentCopy: {
+        supported: {
+          en: "REFERENCE FITMENT · FINAL CLEARANCE CHECK REQUIRED",
+          zh: "参考适配 · 仍需最终空间确认",
+        },
+        unsupported: {
+          en: "FITMENT CONSULTATION REQUIRED",
+          zh: "需要确认车型适配",
+        },
+      },
+    },
   },
   {
     id: "carbon-intake",

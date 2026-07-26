@@ -55,3 +55,19 @@ final result: passed
 All observed images loaded, visible Shop text fit its containers, the Case display title rendered without visible clipping or overlap, and the browser console had no warnings or errors.
 
 final result: passed
+
+## Three-Page Expansion — 2026-07-26
+
+| Page | 1900×1050 | 1440×900 | 1100×900 | 390×844 | 430×932 |
+| --- | --- | --- | --- | --- | --- |
+| Project Planner | PASS | PASS | PASS | PASS | PASS |
+| Forged Wheel | PASS | PASS | PASS | PASS | PASS |
+| Case 02 Story | PASS | PASS | PASS | PASS | PASS |
+| Contact Prefill | PASS | PASS | PASS | PASS | PASS |
+
+- English-first fresh load: PASS
+- Chinese/English toggle: PASS
+- Keyboard focus: PASS
+- Reduced motion: PASS
+- Entry and back links: PASS
+- Horizontal overflow: PASS

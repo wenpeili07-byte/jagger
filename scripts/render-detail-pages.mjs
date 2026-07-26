@@ -38,10 +38,10 @@ const header = (section) => `<header class="topbar">
     </div>
   </header>`;
 
-const globalFooter = `<footer class="content-footer">
+const globalFooter = (projectHref = "../contact.html") => `<footer class="content-footer">
         <span>LONMA DYNAMIC</span>
         <span data-zh="龙马态度 · 2026" data-en="AUTOMOTIVE ATTITUDE · 2026">AUTOMOTIVE ATTITUDE · 2026</span>
-        <a href="../contact.html" data-zh="开始你的项目 →" data-en="START YOUR PROJECT →">START YOUR PROJECT →</a>
+        <a href="${projectHref}" data-zh="开始你的项目 →" data-en="START YOUR PROJECT →">START YOUR PROJECT →</a>
       </footer>`;
 
 const renderGenericCasePage = (record) => `<!doctype html>
@@ -51,8 +51,8 @@ const renderGenericCasePage = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=contact-form-20260723" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=contact-form-20260723" />
+    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
   </head>
   <body data-section="cases">
@@ -81,27 +81,12 @@ const renderGenericCasePage = (record) => `<!doctype html>
         ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html"`)}
         ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html"`)}
       </nav>
-      ${globalFooter}
+      ${globalFooter()}
     </main>
-    <script src="../../content-pages.js?v=contact-form-20260723"></script>
+    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
   </body>
 </html>
 `;
-
-const renderCase02Marker = (part) => `<button class="case02-marker" type="button" data-case-marker="${escapeAttribute(part.number)}" aria-pressed="${part.number === "01"}" ${part.number === "01" ? "data-active " : ""}${i18nAttribute("aria-label", { zh: `突出显示${part.label.zh}`, en: `Highlight ${part.label.en}` })}>
-            <span aria-hidden="true">${Number(part.number)}</span>
-          </button>`;
-
-const renderCase02Part = (part) => `<a class="case02-part" data-case-part="${escapeAttribute(part.number)}" ${part.number === "01" ? "data-active " : ""}href="../shop.html?category=${escapeAttribute(part.category)}" ${i18nAttribute("aria-label", { zh: `查看${part.title.zh}分类`, en: `View ${part.title.en} category` })}>
-          <span class="case02-part-number" aria-hidden="true">${Number(part.number)}</span>
-          <img src="../../${escapeAttribute(part.image)}" ${i18nAttribute("alt", { zh: `${part.title.zh}分类参考`, en: `${part.title.en} category reference` })} />
-          <span class="case02-part-copy">
-            ${i18n("span", part.label, ' class="case02-part-label"')}
-            ${i18n("strong", part.title)}
-            ${i18n("span", part.note, ' class="case02-part-note"')}
-          </span>
-          <span class="case02-part-arrow" aria-hidden="true">→</span>
-        </a>`;
 
 export const renderCase02Page = (record) => `<!doctype html>
 <html lang="en">
@@ -110,45 +95,72 @@ export const renderCase02Page = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=contact-form-20260723" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=contact-form-20260723" />
+    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
-    <link rel="stylesheet" href="../../case-02.css?v=case02-final-review-20260722" />
+    <link rel="stylesheet" href="../../case-02.css?v=three-page-expansion-20260726" />
   </head>
   <body data-section="cases">
     <main class="site-shell case-detail-page case02-page" data-detail-page>
       ${header("cases")}
-      <section class="case02-showcase">
-        <div class="case02-media">
-          <img src="../../${record.image}" ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
-          <div class="case02-heading">
-            ${i18n("a", { zh: "← 返回案例", en: "← BACK TO CASES" }, ' class="detail-back" href="../cases.html"')}
-            <p>CASE ${record.id} /</p>
-            ${i18n("h1", record.title)}
-          </div>
-          ${record.partsUsed.map(renderCase02Marker).join("\n          ")}
+      <section class="case02-video-stage" data-video-state="poster-only" aria-labelledby="case02-title">
+        <video
+          data-case-video
+          poster="../../assets/images/网页/optimized/case-02.jpg"
+          controls
+          preload="metadata"
+          aria-label="Case 02 project film"
+          data-en-aria-label="Case 02 project film"
+          data-zh-aria-label="案例 02 项目影片"
+        ></video>
+        <div class="case02-video-copy">
+          ${i18n("a", { zh: "← 返回案例", en: "← BACK TO CASES" }, ' href="../cases.html"')}
+          <p>CASE ${record.id}</p>
+          ${i18n("h1", record.title, ' id="case02-title"')}
+          <dl>
+            <div>${i18n("dt", { zh: "车辆", en: "VEHICLE" })}<dd>BMW G80 M3</dd></div>
+            <div>${i18n("dt", { zh: "年份", en: "YEAR" })}<dd>2024</dd></div>
+          </dl>
         </div>
-        <aside class="case02-parts" aria-labelledby="case02-parts-title">
-          ${i18n("h2", { zh: "使用部件", en: "PARTS USED" }, ' id="case02-parts-title"')}
-          ${record.partsUsed.map(renderCase02Part).join("\n          ")}
-          ${i18n("a", { zh: "查看完整改装目录 →", en: "VIEW COMPLETE BUILD LIST →" }, ' class="case02-shop-all" href="#case-02-editorial"')}
-        </aside>
+        ${i18n("button", { zh: "完整影片即将上线", en: "FINAL FILM COMING SOON" }, ' type="button" class="case02-video-status" disabled')}
       </section>
-      <section class="detail-story" id="case-02-editorial">
-        ${i18n("p", record.story)}
-      </section>
+      <div class="case02-story">
+        <section class="case02-story-beat case02-story-beat-direction">
+          <div class="case02-story-copy">
+            <p>01</p>
+            ${i18n("h2", { zh: "改装方向", en: "THE DIRECTION" })}
+            ${i18n("p", {
+              zh: "提升响应，同时保留车辆在真实道路中的完整性。刹车、底盘反馈与轮毂数据作为一个系统共同调整。",
+              en: "Sharper response without turning the car into a single-purpose machine. Braking, chassis feedback, and wheel fitment are considered as one system.",
+            })}
+          </div>
+          <figure class="case02-story-media"><img src="../../assets/images/shop/brake-kit.webp" loading="lazy" ${i18nAttribute("alt", { zh: "分类参考图片：刹车系统", en: "Category reference image: brake system" })} /></figure>
+        </section>
+        <section class="case02-story-beat case02-story-beat-test">
+          <figure class="case02-story-media"><img src="../../assets/images/shop/coilover-kit.webp" loading="lazy" ${i18nAttribute("alt", { zh: "分类参考图片：底盘设定", en: "Category reference image: chassis setup" })} /></figure>
+          <div class="case02-story-copy">
+            <p>02</p>
+            ${i18n("h2", { zh: "测试、调整、再测试", en: "TEST, ADJUST, REPEAT" })}
+            ${i18n("p", {
+              zh: "每一次变化都通过真实驾驶、轮胎状态与驾驶反馈判断。持续调整，直到整车形成统一响应。",
+              en: "Each change is judged through real driving, tire condition, and driver feedback. The setup evolves until the car responds as one complete package.",
+            })}
+          </div>
+        </section>
+        <figure class="case02-story-media case02-story-wide"><img src="../../assets/images/shop/forged-wheel.webp" loading="lazy" ${i18nAttribute("alt", { zh: "分类参考图片：锻造轮毂", en: "Category reference image: forged wheel" })} /></figure>
+      </div>
       <section class="detail-contact">
         ${i18n("h2", { zh: "讨论你的下一台车", en: "DISCUSS YOUR NEXT BUILD" })}
-        ${i18n("a", { zh: "开始咨询 →", en: "START AN INQUIRY →" }, ' href="../contact.html"')}
+        ${i18n("a", { zh: "开始咨询 →", en: "START AN INQUIRY →" }, ' href="../contact.html?service=Custom%20Vehicle%20Builds&amp;vehicle=2024%20BMW%20G80%20M3&amp;message=Case%2002%20road%20and%20track%20direction."')}
       </section>
       <nav class="detail-pagination" ${i18nAttribute("aria-label", { zh: "案例分页", en: "Case pagination" })}>
         ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html"`)}
         ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html"`)}
       </nav>
-      ${globalFooter}
+      ${globalFooter()}
     </main>
-    <script src="../../content-pages.js?v=contact-form-20260723"></script>
-    <script src="../../case-02.js?v=case02-final-review-20260722"></script>
+    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
+    <script src="../../case-02.js?v=three-page-expansion-20260726"></script>
   </body>
 </html>
 `;
@@ -156,15 +168,20 @@ export const renderCase02Page = (record) => `<!doctype html>
 export const renderCasePage = (record) =>
   record.id === "02" ? renderCase02Page(record) : renderGenericCasePage(record);
 
-export const renderServicePage = (record) => `<!doctype html>
+export const renderServicePage = (record) => {
+  const projectHref = record.id === "build"
+    ? "../project.html"
+    : "../contact.html";
+
+  return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>${record.label} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=contact-form-20260723" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=contact-form-20260723" />
+    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
     <link rel="stylesheet" href="../../service-detail.css?v=mobile-spacing-20260722" />
   </head>
   <body data-section="services">
@@ -187,14 +204,15 @@ export const renderServicePage = (record) => `<!doctype html>
       </section>
       <section class="detail-contact">
         ${i18n("h2", { zh: "开始你的项目", en: "START YOUR PROJECT" })}
-        ${i18n("a", { zh: "提交车辆信息 →", en: "SEND VEHICLE DETAILS →" }, ' href="../contact.html"')}
+        ${i18n("a", { zh: "提交车辆信息 →", en: "SEND VEHICLE DETAILS →" }, ` href="${projectHref}"`)}
       </section>
-      ${globalFooter}
+      ${globalFooter(projectHref)}
     </main>
-    <script src="../../content-pages.js?v=contact-form-20260723"></script>
+    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
   </body>
 </html>
 `;
+};
 
 export async function writeDetailPages() {
   await mkdir(resolve(root, "pages/cases"), { recursive: true });

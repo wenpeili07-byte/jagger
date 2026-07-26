@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
@@ -8,6 +8,12 @@ const sharedCss = read("./styles.css");
 const contentCss = read("./content-pages.css");
 const shopCss = read("./shop.css");
 const case02Css = read("./case-02.css");
+const projectCss = existsSync(new URL("./project.css", import.meta.url))
+  ? read("./project.css")
+  : "";
+const shopProductCss = existsSync(new URL("./shop-product.css", import.meta.url))
+  ? read("./shop-product.css")
+  : "";
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
   assert.notEqual(start, -1, message);
@@ -26,7 +32,9 @@ const publicPages = [
   "./pages/services.html",
   "./pages/cases.html",
   "./pages/contact.html",
+  "./pages/project.html",
   "./pages/shop.html",
+  "./pages/shop/forged-wheel.html",
   "./pages/cases/case-01.html",
   "./pages/services/build.html",
   "./pages/services/parts.html",
@@ -61,7 +69,7 @@ assert.doesNotMatch(contentCss, /\.content-page\.site-shell\s*\{[^}]*max-width:/
 
 for (const path of publicPages) {
   const html = read(path);
-  assert.match(html, /layout-canvas\.css\?v=contact-form-20260723/, `${path} should load the current shared canvas cache key`);
+  assert.match(html, /layout-canvas\.css\?v=three-page-expansion-20260726/, `${path} should load the current shared canvas cache key`);
 }
 
 // Task 3: compact header and services rules.
@@ -169,34 +177,79 @@ assert.match(
   /@media \(max-width:\s*767px\)[\s\S]*\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*1fr/s,
   "Shop should use a single product column on mobile"
 );
-assert.match(
-  case02Css,
-  /@media \(max-width:\s*767px\)[\s\S]*\[data-case-marker\]\s*\{[^}]*display:\s*none/s,
-  "Case 02 should hide image markers on mobile"
-);
-test("Case 02 desktop showcase expands with intrinsic rail content", () => {
-  const case02ShowcaseRule = ruleBlock(
+test("Case 02 stays full-width and 16:9 on 1900px and 2200px canvases", () => {
+  const videoStageRule = ruleBlock(
     case02Css,
-    ".case02-showcase",
-    "Case 02 should define its desktop showcase"
+    ".case02-video-stage",
+    "Case 02 should define its poster stage"
   );
+  assert.match(videoStageRule, /width:\s*100%/);
+  assert.match(videoStageRule, /aspect-ratio:\s*16\s*\/\s*9/);
   assert.doesNotMatch(
-    case02ShowcaseRule,
-    /(?:^|\n)\s*height\s*:/,
-    "Case 02 desktop showcase should expand with intrinsic rail content on short viewports"
+    videoStageRule,
+    /max-height:|width:\s*min\(/,
+    "wide canvases should keep scrolling instead of shrinking or distorting the poster stage"
+  );
+  assert.match(videoStageRule, /overflow:\s*hidden/);
+
+  for (const canvasWidth of [1900, 2200]) {
+    const stageHeight = canvasWidth * 9 / 16;
+    assert.equal(
+      Number((canvasWidth / stageHeight).toFixed(3)),
+      1.778,
+      `${canvasWidth}px canvas should retain a 16:9 stage`
+    );
+  }
+
+  assert.match(
+    case02Css,
+    /\.case02-video-stage\s*>\s*video\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*object-fit:\s*cover/s
   );
 });
 
-test("Case 02 tablet image preserves the approved 4:3 geometry", () => {
-  const case02TabletBlock = mediaBlock(
+test("Case 02 story stacks in reading order below 1000px", () => {
+  const case02StackBlock = mediaBlock(
     case02Css,
-    "@media (min-width: 768px) and (max-width: 1279px)",
-    "Case 02 should define the approved tablet range"
+    "@media (max-width: 1000px)",
+    "Case 02 should define its stacked story range"
   );
   assert.match(
-    case02TabletBlock,
-    /\.case02-media\s*\{[^}]*aspect-ratio:\s*4\s*\/\s*3/s,
-    "Case 02 should preserve a 4:3 tablet image"
+    case02StackBlock,
+    /\.case02-story-beat\s*\{[^}]*grid-template-columns:\s*1fr/s,
+    "Case 02 story beats should use one column"
+  );
+  assert.doesNotMatch(
+    case02StackBlock,
+    /\border\s*:/,
+    "stacked story beats should preserve their document reading order"
+  );
+});
+
+test("Case 02 mobile moves copy below the poster and keeps useful case links", () => {
+  const case02MobileBlock = mediaBlock(
+    case02Css,
+    "@media (max-width: 767px)",
+    "Case 02 should define its mobile range"
+  );
+  assert.match(
+    case02MobileBlock,
+    /\.case02-video-stage\s*\{[^}]*aspect-ratio:\s*auto/s,
+    "the mobile stage should grow to include copy beneath the poster"
+  );
+  assert.match(
+    case02MobileBlock,
+    /\.case02-video-stage\s*>\s*video\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/s,
+    "the mobile poster should retain its 16:9 frame"
+  );
+  assert.match(
+    case02MobileBlock,
+    /\.case02-video-copy\s*\{[^}]*position:\s*static/s,
+    "mobile copy should leave the poster overlay"
+  );
+  assert.match(
+    case02MobileBlock,
+    /\.case02-page\s+\.detail-pagination a\s*\{[^}]*min-height:\s*48px/s,
+    "adjacent case links should retain useful mobile touch targets"
   );
 });
 const lateCompactCasesBlock = mediaBlock(
@@ -209,6 +262,107 @@ assert.match(
   /\.cases-hero\s*\{[^}]*grid-template-columns:\s*minmax\(240px,\s*0\.76fr\)\s+minmax\(0,\s*1\.24fr\)[^}]*gap:\s*clamp\(16px,\s*2\.2vw,\s*28px\)/s,
   "late cases styles should preserve shrinkable columns through the final cascade"
 );
+
+test("contact inquiry keeps prefill and form in its single tablet column", () => {
+  const contactTabletBlock = mediaBlock(
+    contentCss,
+    "@media (max-width: 1180px)",
+    "content styles should define the contact tablet range"
+  );
+
+  assert.match(
+    contactTabletBlock,
+    /\.contact-form-stack\s*\{[^}]*grid-column:\s*1/s,
+    "contact prefill and form should remain in the sole contact inquiry column at tablet widths"
+  );
+});
+
+test("project planner preserves its desktop split and mobile action clearance", () => {
+  assert.match(
+    projectCss,
+    /\.project-planner\s*\{[^}]*min-height:\s*min\(calc\(100vh - var\(--site-header-height\)\),\s*var\(--site-first-screen-max\)\)/s,
+    "project planner should use the shared first-screen canvas tokens"
+  );
+  assert.match(
+    projectCss,
+    /\.project-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(420px,\s*0\.86fr\)\s+minmax\(0,\s*1\.14fr\)/s,
+    "project planner should use the approved desktop split"
+  );
+  assert.match(
+    projectCss,
+    /@media \(max-width:\s*1100px\)[\s\S]*?\.project-workspace\s*\{[^}]*grid-template-columns:\s*1fr/s,
+    "project planner should stack below 1100px"
+  );
+  const projectMobileBlock = mediaBlock(
+    projectCss,
+    "@media (max-width: 767px)",
+    "project planner should define its mobile range"
+  );
+  assert.match(
+    projectMobileBlock,
+    /\.project-progress\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s,
+    "project planner should retain all four compact progress steps on mobile"
+  );
+  assert.match(
+    projectMobileBlock,
+    /\.project-controls\s*\{[^}]*padding-bottom:\s*calc\(92px \+ env\(safe-area-inset-bottom\)\)/s,
+    "project controls should reserve mobile action space"
+  );
+  assert.match(
+    projectMobileBlock,
+    /\.project-actions\s*\{[^}]*position:\s*sticky[^}]*bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/s,
+    "project actions should remain above the fixed mobile navigation"
+  );
+});
+
+test("forged wheel detail stacks cleanly and clears the mobile navigation", () => {
+  assert.match(
+    shopProductCss,
+    /\.product-detail\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1\.08fr\)\s+minmax\(420px,\s*0\.92fr\)/s,
+    "product detail should use the approved desktop split"
+  );
+  assert.match(
+    shopProductCss,
+    /\.product-stage-main\s*\{[^}]*aspect-ratio:\s*1[^}]*background:\s*#0d0f11/s,
+    "product media should retain square neutral staging"
+  );
+  assert.match(
+    shopProductCss,
+    /\.product-stage-main\s*>\s*img\s*\{[^}]*object-fit:\s*contain/s,
+    "the wheel must remain fully visible"
+  );
+  assert.match(
+    shopProductCss,
+    /@media \(max-width:\s*1100px\)[\s\S]*?\.product-detail\s*\{[^}]*grid-template-columns:\s*1fr/s,
+    "product detail should stack below 1100px"
+  );
+  const productMobileBlock = mediaBlock(
+    shopProductCss,
+    "@media (max-width: 767px)",
+    "product detail should define its mobile range"
+  );
+  assert.match(
+    productMobileBlock,
+    /\.forged-wheel-page\s*\{[^}]*padding-bottom:\s*calc\(148px \+ env\(safe-area-inset-bottom\)\)/s,
+    "mobile product content should reserve action-bar space"
+  );
+  assert.match(
+    productMobileBlock,
+    /\.product-actions\s*\{[^}]*position:\s*fixed[^}]*bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/s,
+    "mobile product actions should sit above the shared bottom navigation"
+  );
+});
+
+test("new pages preserve the shared canvas and mobile stacking", () => {
+  const productCss = read("./shop-product.css");
+
+  assert.doesNotMatch(`${projectCss}${productCss}${case02Css}`, /width:\s*100vw|transform:\s*scale\(/);
+  assert.match(projectCss, /@media \(max-width:\s*1100px\)[\s\S]*\.project-workspace\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(productCss, /@media \(max-width:\s*1100px\)[\s\S]*\.product-detail\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(case02Css, /@media \(max-width:\s*1000px\)[\s\S]*\.case02-story-beat\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(productCss, /padding-bottom:\s*calc\(148px \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(projectCss, /bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/);
+});
 
 // Task 4: every large desktop should fit the complete homepage inside the shared 973px first screen.
 const largeDesktopMarker = "@media (min-width: 1700px)";
