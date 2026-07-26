@@ -212,6 +212,31 @@ test("incoming supported Audi tuple stays atomic and preserves the back-to-shop 
   });
 });
 
+test("supported fitment matching is case-insensitive and returns canonical vehicle values", () => {
+  const harness = createProductHarness();
+
+  harness.exported.setVehicle("audi", "rs 5", "2024", "b9.5");
+
+  assert.equal(harness.exported.getState().supported, true);
+  const plannerRoute = new URL(
+    harness.addToBuild.href,
+    "https://example.test/pages/shop/forged-wheel.html",
+  );
+  assert.equal(plannerRoute.searchParams.get("vehicle"), "2024 AUDI RS 5 B9.5");
+});
+
+test("back-to-shop preserves every managed category", () => {
+  const harness = createProductHarness(
+    "?category=ecu,wheels&make=AUDI&model=RS%205&year=2024&chassis=B9.5",
+  );
+  const backRoute = new URL(
+    harness.backToShop.href,
+    "https://example.test/pages/shop/forged-wheel.html",
+  );
+
+  assert.equal(backRoute.searchParams.get("category"), "ecu,wheels");
+});
+
 test("incomplete vehicle query falls back to one coherent supported tuple", () => {
   const harness = createProductHarness("?make=AUDI");
 

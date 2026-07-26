@@ -386,6 +386,31 @@ test("forged wheel checked-in page is generated from the shared product record",
   assert.match(productHtml, /data-product-config/);
 });
 
+test("forged wheel specifications render finish and fitment copy from shared facts", () => {
+  const forgedWheel = structuredClone(
+    shopProducts.find((product) => product.id === "forged-wheel"),
+  );
+  forgedWheel.detail.options.finish = [
+    {
+      id: "Frozen Bronze",
+      label: { en: "FROZEN BRONZE", zh: "磨砂古铜" },
+      swatch: "bronze",
+    },
+  ];
+  forgedWheel.detail.specifications.fitment = {
+    en: "CONSULTATION MATRIX · VERIFY BEFORE ORDER",
+    zh: "咨询矩阵 · 下单前确认",
+  };
+
+  const mutatedHtml = shopRenderer.renderForgedWheelPage(forgedWheel);
+
+  assert.match(mutatedHtml, /FROZEN BRONZE/);
+  assert.match(mutatedHtml, /磨砂古铜/);
+  assert.match(mutatedHtml, /CONSULTATION MATRIX · VERIFY BEFORE ORDER/);
+  assert.match(mutatedHtml, /咨询矩阵 · 下单前确认/);
+  assert.doesNotMatch(mutatedHtml, /SATIN BLACK OR BRUSHED SILVER/);
+});
+
 test("shop renderer carries complete dialog data and a visible action footer", () => {
   assert.equal((html.match(/data-compatibility-en=/g) || []).length, 6);
   assert.equal((html.match(/data-inquiry-subject-en=/g) || []).length, 6);

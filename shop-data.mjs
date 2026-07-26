@@ -46,6 +46,17 @@ export const shopProducts = [
         en: "A lightweight wheel direction configured around vehicle fitment, brake clearance, and complete-car proportion.",
         zh: "围绕车型适配、刹车空间与整车比例配置的轻量化轮毂方向。",
       },
+      specifications: {
+        construction: { en: "MONOBLOCK FORGED", zh: "单片式锻造" },
+        application: {
+          en: "STREET & ROAD PERFORMANCE",
+          zh: "街道与道路性能",
+        },
+        fitment: {
+          en: "REFERENCE SET · CONFIRM BEFORE ORDER",
+          zh: "参考适配 · 下单前确认",
+        },
+      },
       referencePrice: {
         display: "US$3,200",
         note: {

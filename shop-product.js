@@ -63,13 +63,17 @@
     };
   }
 
+  function normalizedVehicleValue(value) {
+    return cleanQueryValue(value, 40).toUpperCase();
+  }
+
   function findVehicleTuple(values) {
     const vehicle = cleanVehicle(values);
     return productConfig.vehicles.find((candidate) =>
-      candidate.make === vehicle.make
-      && candidate.model === vehicle.model
-      && candidate.year === vehicle.year
-      && candidate.chassis === vehicle.chassis
+      normalizedVehicleValue(candidate.make) === normalizedVehicleValue(vehicle.make)
+      && normalizedVehicleValue(candidate.model) === normalizedVehicleValue(vehicle.model)
+      && normalizedVehicleValue(candidate.year) === normalizedVehicleValue(vehicle.year)
+      && normalizedVehicleValue(candidate.chassis) === normalizedVehicleValue(vehicle.chassis)
     ) || null;
   }
 
@@ -80,11 +84,13 @@
   }
 
   function validateFitment(state) {
+    const canonicalVehicle = findVehicleTuple(state.vehicle);
+    if (!canonicalVehicle) return false;
     const fitment = productConfig.fitments.find((candidate) =>
-      candidate.make === state.vehicle.make
-      && candidate.model === state.vehicle.model
-      && candidate.year === state.vehicle.year
-      && candidate.chassis === state.vehicle.chassis
+      normalizedVehicleValue(candidate.make) === normalizedVehicleValue(canonicalVehicle.make)
+      && normalizedVehicleValue(candidate.model) === normalizedVehicleValue(canonicalVehicle.model)
+      && normalizedVehicleValue(candidate.year) === normalizedVehicleValue(canonicalVehicle.year)
+      && normalizedVehicleValue(candidate.chassis) === normalizedVehicleValue(canonicalVehicle.chassis)
     );
     return Boolean(
       fitment?.combinations?.some((combination) =>
@@ -156,11 +162,12 @@
   }
 
   function syncStateFromControls() {
-    productState.vehicle = cleanVehicle(
+    const enteredVehicle = cleanVehicle(
       Object.fromEntries(
         Object.entries(vehicleControls).map(([key, control]) => [key, control.value]),
       ),
     );
+    productState.vehicle = { ...(findVehicleTuple(enteredVehicle) || enteredVehicle) };
     productState.diameter = selectedOption("diameter");
     productState.width = selectedOption("width");
     productState.finish = selectedOption("finish");
@@ -217,7 +224,8 @@
     Object.assign(window.LonmaProductTest, {
       getState: () => productState,
       setVehicle(make, model, year, chassis) {
-        productState.vehicle = cleanVehicle({ make, model, year, chassis });
+        const enteredVehicle = cleanVehicle({ make, model, year, chassis });
+        productState.vehicle = { ...(findVehicleTuple(enteredVehicle) || enteredVehicle) };
         syncProductActions(productState);
       },
       syncProductActions,

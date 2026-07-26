@@ -32,6 +32,7 @@ const categoryLabels = {
   aero: { en: "AERO", zh: "空气动力" },
   exhaust: { en: "EXHAUST", zh: "排气" },
 };
+const managedProductCategories = [...Object.keys(categoryLabels), "ecu"];
 
 const renderOptions = (values) =>
   values.map((value) => `<option value="${escapeAttribute(value)}">${escapeText(value)}</option>`).join("\n              ");
@@ -130,10 +131,14 @@ export const renderForgedWheelPage = (
 
   const { detail } = product;
   const defaultVehicle = detail.defaults.vehicle;
+  const finishSpecification = {
+    en: detail.options.finish.map(({ label }) => label.en).join(" OR "),
+    zh: detail.options.finish.map(({ label }) => label.zh).join("或"),
+  };
   const productConfig = {
     id: product.id,
     category: product.category,
-    categories: Object.keys(categoryLabels),
+    categories: managedProductCategories,
     vehicles: shopVehicles.tuples,
     ...detail,
   };
@@ -239,10 +244,10 @@ export const renderForgedWheelPage = (
         ${i18n("p", { en: "PRODUCT DIRECTION", zh: "产品方向" }, ' class="product-kicker"')}
         ${i18n("h2", { en: "SPECIFICATIONS", zh: "规格" }, ' id="product-specifications-title"')}
         <dl>
-          <div>${i18n("dt", { en: "CONSTRUCTION", zh: "结构" })}${i18n("dd", { en: "MONOBLOCK FORGED", zh: "单片式锻造" })}</div>
-          <div>${i18n("dt", { en: "APPLICATION", zh: "用途" })}${i18n("dd", { en: "STREET & ROAD PERFORMANCE", zh: "街道与道路性能" })}</div>
-          <div>${i18n("dt", { en: "FINISH", zh: "颜色" })}${i18n("dd", { en: "SATIN BLACK OR BRUSHED SILVER", zh: "缎面黑或拉丝银" })}</div>
-          <div>${i18n("dt", { en: "FITMENT", zh: "适配" })}${i18n("dd", { en: "REFERENCE SET · CONFIRM BEFORE ORDER", zh: "参考适配 · 下单前确认" })}</div>
+          <div>${i18n("dt", { en: "CONSTRUCTION", zh: "结构" })}${i18n("dd", detail.specifications.construction)}</div>
+          <div>${i18n("dt", { en: "APPLICATION", zh: "用途" })}${i18n("dd", detail.specifications.application)}</div>
+          <div>${i18n("dt", { en: "FINISH", zh: "颜色" })}${i18n("dd", finishSpecification)}</div>
+          <div>${i18n("dt", { en: "FITMENT", zh: "适配" })}${i18n("dd", detail.specifications.fitment)}</div>
         </dl>
       </section>
 
