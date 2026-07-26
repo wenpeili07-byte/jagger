@@ -7,6 +7,7 @@
     <title>Project Planner | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../styles.css?v=three-page-expansion-20260726" />
     <link rel="stylesheet" href="../layout-canvas.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../project.css?v=project-planner-20260726" />
   </head>
   <body data-section="project">
     <main class="site-shell project-page">
@@ -27,8 +28,72 @@
           </button>
         </div>
       </header>
-      <section aria-labelledby="project-title">
-        <h1 id="project-title" data-en="BUILD YOUR DIRECTION." data-zh="确定你的改装方向。">BUILD YOUR DIRECTION.</h1>
+      <section class="project-planner" aria-labelledby="project-title" data-project-planner>
+        <header class="project-heading">
+          <p data-en="PROJECT PLANNER · 01–04" data-zh="项目规划 · 01–04">PROJECT PLANNER · 01–04</p>
+          <h1 id="project-title" data-en="BUILD YOUR DIRECTION." data-zh="确定你的改装方向。">BUILD YOUR DIRECTION.</h1>
+        </header>
+        <ol class="project-progress" aria-label="Project steps" data-en-aria-label="Project steps" data-zh-aria-label="项目步骤">
+          <li><button type="button" data-progress-step="0" aria-current="step"><span>01</span><span data-en="VEHICLE" data-zh="车辆">VEHICLE</span></button></li>
+          <li><button type="button" data-progress-step="1"><span>02</span><span data-en="GOAL" data-zh="目标">GOAL</span></button></li>
+          <li><button type="button" data-progress-step="2"><span>03</span><span data-en="DIRECTION" data-zh="方向">DIRECTION</span></button></li>
+          <li><button type="button" data-progress-step="3"><span>04</span><span data-en="REVIEW" data-zh="确认">REVIEW</span></button></li>
+        </ol>
+        <div class="project-workspace">
+          <div class="project-controls">
+            <section data-planner-step="0">
+              <p class="project-kicker" data-en="01 / VEHICLE" data-zh="01 / 车辆">01 / VEHICLE</p>
+              <h2 data-en="START WITH THE CAR." data-zh="先从车辆开始。">START WITH THE CAR.</h2>
+              <div class="project-fields">
+                <label><span data-en="MAKE" data-zh="品牌">MAKE</span><select data-vehicle-make><option>BMW</option><option>AUDI</option><option>MERCEDES-BENZ</option></select></label>
+                <label><span data-en="MODEL" data-zh="车型">MODEL</span><input data-vehicle-model value="G80 M3" maxlength="40" /></label>
+                <label><span data-en="CHASSIS" data-zh="底盘">CHASSIS</span><input data-vehicle-chassis value="G8X" maxlength="20" /></label>
+                <label><span data-en="YEAR" data-zh="年份">YEAR</span><input data-vehicle-year inputmode="numeric" value="2024" maxlength="4" /></label>
+              </div>
+            </section>
+            <section data-planner-step="1" hidden>
+              <p class="project-kicker" data-en="02 / GOAL" data-zh="02 / 目标">02 / GOAL</p>
+              <h2 data-en="HOW SHOULD IT FEEL?" data-zh="你希望它呈现什么状态？">HOW SHOULD IT FEEL?</h2>
+              <div class="project-choice-list">
+                <label><input type="radio" name="goal" value="street" checked /><span><strong data-en="STREET" data-zh="街道">STREET</strong><small data-en="Balanced response and daily usability." data-zh="兼顾响应与日常使用。">Balanced response and daily usability.</small></span></label>
+                <label><input type="radio" name="goal" value="road-track" /><span><strong data-en="ROAD & TRACK" data-zh="道路与赛道">ROAD & TRACK</strong><small data-en="Repeatable performance with sharper feedback." data-zh="更直接的反馈与稳定表现。">Repeatable performance with sharper feedback.</small></span></label>
+                <label><input type="radio" name="goal" value="show" /><span><strong data-en="SHOW" data-zh="展示">SHOW</strong><small data-en="A coherent visual direction for the complete car." data-zh="建立完整统一的整车视觉方向。">A coherent visual direction for the complete car.</small></span></label>
+              </div>
+            </section>
+            <section data-planner-step="2" hidden>
+              <p class="project-kicker" data-en="03 / DIRECTION" data-zh="03 / 方向">03 / DIRECTION</p>
+              <h2 data-en="CHOOSE THE WORKSTREAMS." data-zh="选择需要推进的方向。">CHOOSE THE WORKSTREAMS.</h2>
+              <div class="project-direction-grid">
+                <label><input type="checkbox" value="build" /><span data-en="VEHICLE BUILD" data-zh="汽车改装">VEHICLE BUILD</span></label>
+                <label><input type="checkbox" value="parts" /><span data-en="PERFORMANCE PARTS" data-zh="汽车配件">PERFORMANCE PARTS</span></label>
+                <label><input type="checkbox" value="photo" /><span data-en="AUTOMOTIVE MEDIA" data-zh="汽车摄影">AUTOMOTIVE MEDIA</span></label>
+                <label><input type="checkbox" value="ecu" /><span data-en="ECU CALIBRATION" data-zh="ECU 特调">ECU CALIBRATION</span></label>
+                <label><input type="checkbox" value="chassis" /><span data-en="CHASSIS SETUP" data-zh="底盘设定">CHASSIS SETUP</span></label>
+                <label><input type="checkbox" value="exhaust" /><span data-en="INTAKE / EXHAUST" data-zh="进排气">INTAKE / EXHAUST</span></label>
+              </div>
+            </section>
+            <section data-planner-step="3" hidden>
+              <p class="project-kicker" data-en="04 / REVIEW" data-zh="04 / 确认">04 / REVIEW</p>
+              <h2 data-en="REVIEW THE DIRECTION." data-zh="确认项目方向。">REVIEW THE DIRECTION.</h2>
+              <dl class="project-review">
+                <div><dt data-en="VEHICLE" data-zh="车辆">VEHICLE</dt><dd data-review-vehicle></dd></div>
+                <div><dt data-en="GOAL" data-zh="目标">GOAL</dt><dd data-review-goal></dd></div>
+                <div><dt data-en="DIRECTION" data-zh="方向">DIRECTION</dt><dd data-review-directions></dd></div>
+                <div data-review-product-row hidden><dt data-en="PRODUCT" data-zh="产品">PRODUCT</dt><dd data-review-product></dd></div>
+              </dl>
+            </section>
+            <p class="project-error" data-project-error aria-live="polite"></p>
+            <div class="project-actions">
+              <button type="button" data-planner-back disabled><span aria-hidden="true">←</span><span data-en="BACK" data-zh="返回">BACK</span></button>
+              <button type="button" data-planner-next><span data-en="CONTINUE" data-zh="继续">CONTINUE</span><span aria-hidden="true">→</span></button>
+              <a data-planner-submit hidden data-en="SEND TO LONMA →" data-zh="发送给龙马 →">SEND TO LONMA →</a>
+            </div>
+          </div>
+          <figure class="project-visual">
+            <img src="../assets/images/网页/optimized/case-01.jpg" alt="LONMA DYNAMIC BMW project vehicle" data-en-alt="LONMA DYNAMIC BMW project vehicle" data-zh-alt="LONMA DYNAMIC BMW 项目车辆" />
+            <figcaption data-en="DIRECTION BEFORE PARTS." data-zh="先确定方向，再选择部件。">DIRECTION BEFORE PARTS.</figcaption>
+          </figure>
+        </div>
       </section>
       <footer class="content-footer">
         <span>LONMA DYNAMIC</span>
@@ -37,5 +102,6 @@
       </footer>
     </main>
     <script src="../content-pages.js?v=three-page-expansion-20260726"></script>
+    <script src="../project.js?v=project-planner-20260726"></script>
   </body>
 </html>

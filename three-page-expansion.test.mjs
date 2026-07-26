@@ -25,3 +25,11 @@ test("the contact page exposes a bilingual prefill notice", () => {
   assert.match(html, /data-en="PROJECT DETAILS ADDED FROM YOUR SELECTIONS\."/);
   assert.match(html, /data-zh="已载入你选择的项目资料。"/);
 });
+
+test("the project route loads its planner assets and authentic local image", () => {
+  const html = read("./pages/project.html");
+
+  assert.match(html, /href="\.\.\/project\.css\?v=project-planner-20260726"/);
+  assert.match(html, /src="\.\.\/project\.js\?v=project-planner-20260726"/);
+  assert.match(html, /src="\.\.\/assets\/images\/网页\/optimized\/case-01\.jpg"/);
+});

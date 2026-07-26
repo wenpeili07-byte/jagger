@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
@@ -8,6 +8,9 @@ const sharedCss = read("./styles.css");
 const contentCss = read("./content-pages.css");
 const shopCss = read("./shop.css");
 const case02Css = read("./case-02.css");
+const projectCss = existsSync(new URL("./project.css", import.meta.url))
+  ? read("./project.css")
+  : "";
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
   assert.notEqual(start, -1, message);
@@ -221,6 +224,44 @@ test("contact inquiry keeps prefill and form in its single tablet column", () =>
     contactTabletBlock,
     /\.contact-prefill-status,\s*\.contact-form\s*\{[^}]*grid-column:\s*1/s,
     "contact prefill and form should remain in the sole contact inquiry column at tablet widths"
+  );
+});
+
+test("project planner preserves its desktop split and mobile action clearance", () => {
+  assert.match(
+    projectCss,
+    /\.project-planner\s*\{[^}]*min-height:\s*min\(calc\(100vh - var\(--site-header-height\)\),\s*var\(--site-first-screen-max\)\)/s,
+    "project planner should use the shared first-screen canvas tokens"
+  );
+  assert.match(
+    projectCss,
+    /\.project-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(420px,\s*0\.86fr\)\s+minmax\(0,\s*1\.14fr\)/s,
+    "project planner should use the approved desktop split"
+  );
+  assert.match(
+    projectCss,
+    /@media \(max-width:\s*1100px\)[\s\S]*?\.project-workspace\s*\{[^}]*grid-template-columns:\s*1fr/s,
+    "project planner should stack below 1100px"
+  );
+  const projectMobileBlock = mediaBlock(
+    projectCss,
+    "@media (max-width: 767px)",
+    "project planner should define its mobile range"
+  );
+  assert.match(
+    projectMobileBlock,
+    /\.project-progress\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s,
+    "project planner should retain all four compact progress steps on mobile"
+  );
+  assert.match(
+    projectMobileBlock,
+    /\.project-controls\s*\{[^}]*padding-bottom:\s*calc\(92px \+ env\(safe-area-inset-bottom\)\)/s,
+    "project controls should reserve mobile action space"
+  );
+  assert.match(
+    projectMobileBlock,
+    /\.project-actions\s*\{[^}]*position:\s*sticky[^}]*bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/s,
+    "project actions should remain above the fixed mobile navigation"
   );
 });
 
