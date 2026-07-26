@@ -175,15 +175,30 @@ assert.match(
   /@media \(max-width:\s*767px\)[\s\S]*\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*1fr/s,
   "Shop should use a single product column on mobile"
 );
-test("Case 02 uses a capped 16:9 poster stage without scaling", () => {
+test("Case 02 stays full-width and 16:9 on 1900px and 2200px canvases", () => {
   const videoStageRule = ruleBlock(
     case02Css,
     ".case02-video-stage",
     "Case 02 should define its poster stage"
   );
+  assert.match(videoStageRule, /width:\s*100%/);
   assert.match(videoStageRule, /aspect-ratio:\s*16\s*\/\s*9/);
-  assert.match(videoStageRule, /max-height:\s*var\(--site-first-screen-max\)/);
+  assert.doesNotMatch(
+    videoStageRule,
+    /max-height:|width:\s*min\(/,
+    "wide canvases should keep scrolling instead of shrinking or distorting the poster stage"
+  );
   assert.match(videoStageRule, /overflow:\s*hidden/);
+
+  for (const canvasWidth of [1900, 2200]) {
+    const stageHeight = canvasWidth * 9 / 16;
+    assert.equal(
+      Number((canvasWidth / stageHeight).toFixed(3)),
+      1.778,
+      `${canvasWidth}px canvas should retain a 16:9 stage`
+    );
+  }
+
   assert.match(
     case02Css,
     /\.case02-video-stage\s*>\s*video\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*object-fit:\s*cover/s

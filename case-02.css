@@ -1,7 +1,6 @@
 .case02-video-stage {
   position: relative;
-  width: min(100%, calc(var(--site-first-screen-max) * 16 / 9));
-  max-height: var(--site-first-screen-max);
+  width: 100%;
   margin: 0 auto;
   overflow: hidden;
   aspect-ratio: 16 / 9;
