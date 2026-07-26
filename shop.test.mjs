@@ -12,13 +12,13 @@ const css = readFileSync(new URL("./shop.css", import.meta.url), "utf8");
 class RuntimeNode {
   constructor({ dataset = {}, value = "" } = {}) {
     this.attributes = new Map();
+    this._href = "";
     this.alt = "";
     this.checked = false;
     this.dataset = { ...dataset };
     this.disabled = false;
     this.focusCount = 0;
     this.hidden = false;
-    this.href = "";
     this.isConnected = true;
     this.listeners = new Map();
     this.open = false;
@@ -57,8 +57,18 @@ class RuntimeNode {
     return this.attributes.get(name) ?? null;
   }
 
+  get href() {
+    return this._href;
+  }
+
+  set href(value) {
+    this._href = String(value);
+    this.attributes.set("href", this._href);
+  }
+
   setAttribute(name, value) {
     this.attributes.set(name, String(value));
+    if (name === "href") this._href = String(value);
   }
 
   showModal() {
@@ -67,6 +77,7 @@ class RuntimeNode {
 }
 
 function createDialogHarness({
+  categoryValues = [],
   locationHref = "https://example.test/pages/shop.html",
   productHref = "./shop/forged-wheel.html",
 } = {}) {
@@ -107,6 +118,11 @@ function createDialogHarness({
   const mobileYear = new RuntimeNode();
   const mobileChassis = new RuntimeNode();
   const findButton = new RuntimeNode();
+  const filters = categoryValues.map((value) => new RuntimeNode({ value }));
+  const makeControl = new RuntimeNode({ value: "BMW" });
+  const modelControl = new RuntimeNode({ value: "G80 M3" });
+  const yearControl = new RuntimeNode({ value: "2024" });
+  const chassisControl = new RuntimeNode({ value: "G8X" });
   const singleNodes = new Map([
     ["[data-results-status]", new RuntimeNode()],
     ["[data-results-empty]", new RuntimeNode()],
@@ -120,10 +136,10 @@ function createDialogHarness({
     ["[data-dialog-description]", new RuntimeNode()],
     ["[data-dialog-inquiry]", dialogInquiry],
     ["[data-dialog-close]", dialogClose],
-    ["[data-shop-make]", new RuntimeNode({ value: "BMW" })],
-    ["[data-shop-model]", new RuntimeNode({ value: "G80 M3" })],
-    ["[data-shop-year]", new RuntimeNode({ value: "2024" })],
-    ["[data-shop-chassis]", new RuntimeNode({ value: "G8X" })],
+    ["[data-shop-make]", makeControl],
+    ["[data-shop-model]", modelControl],
+    ["[data-shop-year]", yearControl],
+    ["[data-shop-chassis]", chassisControl],
     [".shop-selector", shopSelector],
     ["[data-mobile-vehicle-edit]", mobileVehicleEdit],
     ["[data-mobile-vehicle-make]", mobileMake],
@@ -147,7 +163,7 @@ function createDialogHarness({
     querySelector: (selector) => singleNodes.get(selector),
     querySelectorAll(selector) {
       if (selector === "[data-product-card]") return [card];
-      if (selector === "[data-category-filter]") return [];
+      if (selector === "[data-category-filter]") return filters;
       if (selector === "[data-product-link]") return [productLink];
       return [];
     },
@@ -177,7 +193,10 @@ function createDialogHarness({
     dialogCompatibility,
     dialogInquiry,
     documentListeners,
+    filters,
     findButton,
+    makeControl,
+    modelControl,
     mobileChassis,
     mobileMake,
     mobileModel,
@@ -187,6 +206,8 @@ function createDialogHarness({
     productDialog,
     productLink,
     shopSelector,
+    yearControl,
+    chassisControl,
     trigger,
   };
 }
@@ -224,6 +245,25 @@ test("forged wheel link preserves category, vehicle, and its own query values", 
     model: "G80 M3",
     year: "2024",
     chassis: "G8X",
+  });
+});
+
+test("forged wheel link removes cleared managed query values", () => {
+  const harness = createDialogHarness({
+    categoryValues: ["wheels"],
+    locationHref: "https://example.test/pages/shop.html?category=wheels",
+    productHref: "./shop/forged-wheel.html?source=shop-card",
+  });
+
+  harness.filters[0].checked = false;
+  harness.filters[0].listeners.get("change")();
+  harness.makeControl.value = "AUDI";
+  harness.makeControl.listeners.get("change")();
+
+  const target = new URL(harness.productLink.href, "https://example.test/pages/shop.html");
+  assert.deepEqual(Object.fromEntries(target.searchParams), {
+    source: "shop-card",
+    make: "AUDI",
   });
 });
 

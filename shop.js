@@ -1,6 +1,10 @@
 (() => {
   const cards = [...document.querySelectorAll("[data-product-card]")];
   const productLinks = [...document.querySelectorAll("[data-product-link]")];
+  const productLinkBases = new Map(
+    productLinks.map((link) => [link, link.getAttribute("href")])
+  );
+  const managedProductQueryKeys = ["category", "make", "model", "year", "chassis"];
   const filters = [...document.querySelectorAll("[data-category-filter]")];
   const resultsStatus = document.querySelector("[data-results-status]");
   const emptyState = document.querySelector("[data-results-empty]");
@@ -70,10 +74,11 @@
     source.set("chassis", chassisControl.value);
 
     productLinks.forEach((link) => {
-      const target = new URL(link.getAttribute("href"), window.location.href);
-      ["category", "make", "model", "year", "chassis"].forEach((key) => {
+      const target = new URL(productLinkBases.get(link), window.location.href);
+      managedProductQueryKeys.forEach((key) => {
         const value = source.get(key);
         if (value) target.searchParams.set(key, value);
+        else target.searchParams.delete(key);
       });
       link.href = `${target.pathname}${target.search}`;
     });

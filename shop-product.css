@@ -220,6 +220,11 @@
   background: rgba(28, 93, 153, 0.12);
 }
 
+.product-option-row label:has(input:focus-visible) {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 3px;
+}
+
 .finish-swatch {
   width: 20px;
   height: 20px;

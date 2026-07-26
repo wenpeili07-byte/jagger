@@ -5,6 +5,7 @@ import vm from "node:vm";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const html = read("./pages/shop/forged-wheel.html");
+const css = read("./shop-product.css");
 const source = existsSync(new URL("./shop-product.js", import.meta.url))
   ? read("./shop-product.js")
   : "";
@@ -184,3 +185,9 @@ test("incoming vehicle query is cleaned, bounded, and validated", () => {
   );
 });
 
+test("hidden product option inputs expose a visible label focus state", () => {
+  assert.match(
+    css,
+    /\.product-option-row label:has\(input:focus-visible\)\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)[^}]*outline-offset:\s*3px/s
+  );
+});
