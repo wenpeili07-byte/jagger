@@ -210,6 +210,20 @@ assert.match(
   "late cases styles should preserve shrinkable columns through the final cascade"
 );
 
+test("contact inquiry keeps prefill and form in its single tablet column", () => {
+  const contactTabletBlock = mediaBlock(
+    contentCss,
+    "@media (max-width: 1180px)",
+    "content styles should define the contact tablet range"
+  );
+
+  assert.match(
+    contactTabletBlock,
+    /\.contact-prefill-status,\s*\.contact-form\s*\{[^}]*grid-column:\s*1/s,
+    "contact prefill and form should remain in the sole contact inquiry column at tablet widths"
+  );
+});
+
 // Task 4: every large desktop should fit the complete homepage inside the shared 973px first screen.
 const largeDesktopMarker = "@media (min-width: 1700px)";
 const largeDesktopStart = canvasCss.indexOf(largeDesktopMarker);
