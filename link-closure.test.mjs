@@ -110,7 +110,11 @@ for (const id of serviceIds) {
   assert.equal(attributeValue(backLink, "href"), "../services.html", `${route} should return to the services index`);
   const contactSection = html.match(/<section class="detail-contact">([\s\S]*?)<\/section>/)?.[1];
   assert.ok(contactSection, `${route} should contain a complete contact section`);
-  assert.equal(attributeValue([...contactSection.matchAll(/<a\b[^>]*>/g)][0][0], "href"), "../contact.html", `${route} should send inquiries to contact`);
+  assert.equal(
+    attributeValue([...contactSection.matchAll(/<a\b[^>]*>/g)][0][0], "href"),
+    id === "build" ? "../project.html" : "../contact.html",
+    `${route} should route inquiries to the appropriate next step`,
+  );
 }
 
 const archiveRoutes = anchorsWithClass(casesHtml, "archive-card").map((anchor) => attributeValue(anchor, "href"));

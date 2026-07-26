@@ -45,9 +45,14 @@ const pageGroups = [
     currentHref: "./contact.html",
   },
   {
+    section: "project",
+    pages: ["./pages/project.html"],
+    currentHref: null,
+  },
+  {
     section: "shop",
-    pages: ["./pages/shop.html"],
-    currentHref: "./shop.html",
+    pages: ["./pages/shop.html", "./pages/shop/forged-wheel.html"],
+    currentHref: (path) => path.includes("/shop/") ? "../shop.html" : "./shop.html",
   },
 ];
 
@@ -83,12 +88,14 @@ for (const group of pageGroups) {
 }
 
 const footerLinks = new Map([
-  ["./index.html", "./pages/contact.html"],
+  ["./index.html", "./pages/project.html"],
   ["./pages/about.html", "./contact.html"],
   ["./pages/services.html", "./contact.html"],
   ["./pages/cases.html", "./contact.html"],
   ["./pages/contact.html", "./cases.html"],
+  ["./pages/project.html", "./contact.html"],
   ["./pages/shop.html", "./contact.html"],
+  ["./pages/shop/forged-wheel.html", "../contact.html"],
 ]);
 
 for (const number of ["01", "02", "03", "04", "05", "06"]) {
@@ -96,7 +103,7 @@ for (const number of ["01", "02", "03", "04", "05", "06"]) {
 }
 
 for (const slug of ["build", "parts", "photo", "ecu", "chassis", "exhaust"]) {
-  footerLinks.set(`./pages/services/${slug}.html`, "../contact.html");
+  footerLinks.set(`./pages/services/${slug}.html`, slug === "build" ? "../project.html" : "../contact.html");
 }
 
 for (const [path, href] of footerLinks) {

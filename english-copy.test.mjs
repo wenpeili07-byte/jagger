@@ -21,7 +21,9 @@ const publicPages = [
   "./pages/cases/case-05.html",
   "./pages/cases/case-06.html",
   "./pages/contact.html",
+  "./pages/project.html",
   "./pages/shop.html",
+  "./pages/shop/forged-wheel.html",
 ];
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
@@ -34,6 +36,7 @@ const decode = (value) =>
     .replaceAll("&gt;", ">");
 
 const sharedAssetVersion = "contact-form-20260723";
+const threePageExpansionAssetVersion = "three-page-expansion-20260726";
 const casesControllerVersion = "english-copy-20260721";
 const chineseText = /[\p{Script=Han}]/u;
 
@@ -87,12 +90,15 @@ function attributeValue(attributes, name) {
 test("content controller cache references use the current shared asset version", async () => {
   for (const path of publicPages.filter((path) => path !== "./index.html")) {
     const html = read(path);
+    const version = path === "./pages/project.html" || path === "./pages/shop/forged-wheel.html"
+      ? threePageExpansionAssetVersion
+      : sharedAssetVersion;
     assert.match(
       html,
-      new RegExp(`content-pages\\.js\\?v=${sharedAssetVersion}`),
+      new RegExp(`content-pages\\.js\\?v=${version}`),
       `${path} should load the current shared content controller version`,
     );
-    assert.doesNotMatch(html, /content-pages\.js\?v=(?!contact-form-20260723)/, `${path} should not retain a stale content controller version`);
+    assert.doesNotMatch(html, new RegExp(`content-pages\\.js\\?v=(?!${version})`), `${path} should not retain a stale content controller version`);
   }
 
   const cases = read("./pages/cases.html");

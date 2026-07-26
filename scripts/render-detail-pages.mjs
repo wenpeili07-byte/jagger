@@ -38,10 +38,10 @@ const header = (section) => `<header class="topbar">
     </div>
   </header>`;
 
-const globalFooter = `<footer class="content-footer">
+const globalFooter = (projectHref = "../contact.html") => `<footer class="content-footer">
         <span>LONMA DYNAMIC</span>
         <span data-zh="龙马态度 · 2026" data-en="AUTOMOTIVE ATTITUDE · 2026">AUTOMOTIVE ATTITUDE · 2026</span>
-        <a href="../contact.html" data-zh="开始你的项目 →" data-en="START YOUR PROJECT →">START YOUR PROJECT →</a>
+        <a href="${projectHref}" data-zh="开始你的项目 →" data-en="START YOUR PROJECT →">START YOUR PROJECT →</a>
       </footer>`;
 
 const renderGenericCasePage = (record) => `<!doctype html>
@@ -81,7 +81,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
         ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html"`)}
         ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html"`)}
       </nav>
-      ${globalFooter}
+      ${globalFooter()}
     </main>
     <script src="../../content-pages.js?v=contact-form-20260723"></script>
   </body>
@@ -145,7 +145,7 @@ export const renderCase02Page = (record) => `<!doctype html>
         ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html"`)}
         ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html"`)}
       </nav>
-      ${globalFooter}
+      ${globalFooter()}
     </main>
     <script src="../../content-pages.js?v=contact-form-20260723"></script>
     <script src="../../case-02.js?v=case02-final-review-20260722"></script>
@@ -156,7 +156,12 @@ export const renderCase02Page = (record) => `<!doctype html>
 export const renderCasePage = (record) =>
   record.id === "02" ? renderCase02Page(record) : renderGenericCasePage(record);
 
-export const renderServicePage = (record) => `<!doctype html>
+export const renderServicePage = (record) => {
+  const projectHref = record.id === "build"
+    ? "../project.html"
+    : "../contact.html";
+
+  return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -187,14 +192,15 @@ export const renderServicePage = (record) => `<!doctype html>
       </section>
       <section class="detail-contact">
         ${i18n("h2", { zh: "开始你的项目", en: "START YOUR PROJECT" })}
-        ${i18n("a", { zh: "提交车辆信息 →", en: "SEND VEHICLE DETAILS →" }, ' href="../contact.html"')}
+        ${i18n("a", { zh: "提交车辆信息 →", en: "SEND VEHICLE DETAILS →" }, ` href="${projectHref}"`)}
       </section>
-      ${globalFooter}
+      ${globalFooter(projectHref)}
     </main>
     <script src="../../content-pages.js?v=contact-form-20260723"></script>
   </body>
 </html>
 `;
+};
 
 export async function writeDetailPages() {
   await mkdir(resolve(root, "pages/cases"), { recursive: true });
