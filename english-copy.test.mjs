@@ -3,10 +3,36 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-const expansionPages = [
-  "./pages/project.html",
-  "./pages/shop/forged-wheel.html",
-  "./pages/cases/case-02.html",
+const expansionVisibleCopy = [
+  {
+    path: "./pages/project.html",
+    nodes: [
+      { selector: "#project-title", label: "planner title" },
+      { selector: "[data-planner-submit]", label: "planner submit action" },
+    ],
+  },
+  {
+    path: "./pages/shop/forged-wheel.html",
+    nodes: [
+      { selector: "#product-title", label: "product title" },
+      { selector: "[data-add-to-build]", label: "add-to-build action" },
+      { selector: "[data-fitment-inquiry]", label: "fitment inquiry action" },
+    ],
+  },
+  {
+    path: "./pages/cases/case-02.html",
+    nodes: [
+      { selector: "#case02-title", label: "case title" },
+      { selector: ".case02-video-status", label: "poster-only video status" },
+    ],
+  },
+  {
+    path: "./pages/contact.html",
+    nodes: [
+      { selector: ".content-local-title", label: "contact introduction" },
+      { selector: "[data-contact-prefill-status]", label: "contact prefill status" },
+    ],
+  },
 ];
 
 const publicPages = [
@@ -90,6 +116,62 @@ function createSessionStorage(language = "en") {
 
 function attributeValue(attributes, name) {
   return attributes.match(new RegExp(`(?:^|\\s)${name}="([^"]*)"`))?.[1] ?? null;
+}
+
+function escapePattern(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function matchesSimpleSelector(attributes, selector) {
+  if (selector.startsWith("#")) {
+    return attributeValue(attributes, "id") === selector.slice(1);
+  }
+  if (selector.startsWith(".")) {
+    return (attributeValue(attributes, "class") ?? "").split(/\s+/).includes(selector.slice(1));
+  }
+
+  const attribute = selector.match(/^\[([\w-]+)\]$/)?.[1];
+  assert.ok(attribute, `unsupported visible-copy selector ${selector}`);
+  return new RegExp(`(?:^|\\s)${escapePattern(attribute)}(?:\\s|=|$)`).test(attributes);
+}
+
+function directTextNodes(html) {
+  return [...html.matchAll(/<([a-z][\w-]*)\b([^>]*)>([^<]*)<\/\1>/gi)];
+}
+
+function assertExpansionVisibleCopy(html, path, requiredNodes) {
+  const visibleNodes = directTextNodes(html);
+
+  for (const { selector, label } of requiredNodes) {
+    const matches = visibleNodes.filter(([, , attributes]) => matchesSimpleSelector(attributes, selector));
+    assert.equal(matches.length, 1, `${path} ${selector} should identify one visible ${label}`);
+
+    const [, tag, attributes, live] = matches[0];
+    const english = attributeValue(attributes, "data-en");
+    const chinese = attributeValue(attributes, "data-zh");
+    assert.ok(english, `${path} ${selector} should define data-en for ${label}`);
+    assert.ok(chinese, `${path} ${selector} should define data-zh for ${label}`);
+    assert.equal(
+      decode(live).trim(),
+      decode(english).trim(),
+      `${path} ${selector} <${tag}> should render English first`,
+    );
+  }
+}
+
+function withoutRequiredLanguageAttribute(html, { selector, label }, attribute) {
+  const openingTags = [...html.matchAll(/<([a-z][\w-]*)\b([^>]*)>/gi)].filter(
+    ([, , attributes]) => matchesSimpleSelector(attributes, selector),
+  );
+  assert.equal(openingTags.length, 1, `${selector} should identify one ${label} fixture`);
+
+  const match = openingTags[0];
+  const mutatedTag = match[0].replace(
+    new RegExp(`\\s+${escapePattern(attribute)}="[^"]*"`),
+    "",
+  );
+  assert.notEqual(mutatedTag, match[0], `${selector} fixture should contain ${attribute}`);
+  return `${html.slice(0, match.index)}${mutatedTag}${html.slice(match.index + match[0].length)}`;
 }
 
 test("content controller cache references use the current shared asset version", async () => {
@@ -274,17 +356,27 @@ test("all public pages ship English-first markup", () => {
   }
 });
 
-test("three-page expansion routes pair visible English text with Chinese copy", () => {
-  for (const path of expansionPages) {
-    const html = read(path);
-    const visibleBilingualNodes = [
-      ...html.matchAll(/<([a-z][\w-]*)\b([^>]*\bdata-en="([^"]*)"[^>]*)>([^<]*)<\/\1>/gi),
-    ];
+test("expansion routes require bilingual attributes on meaningful visible copy", () => {
+  for (const { path, nodes } of expansionVisibleCopy) {
+    assertExpansionVisibleCopy(read(path), path, nodes);
+  }
+});
 
-    assert.ok(visibleBilingualNodes.length > 0, `${path} should expose visible bilingual text`);
-    for (const [, tag, attributes, english, live] of visibleBilingualNodes) {
-      assert.match(attributes, /\bdata-zh="[^"]*"/, `${path} <${tag}> should pair data-en with data-zh`);
-      assert.equal(decode(live).trim(), decode(english).trim(), `${path} <${tag}> should render English first`);
+test("expansion visible-copy gate rejects either missing language attribute", () => {
+  for (const { path, nodes } of expansionVisibleCopy) {
+    const html = read(path);
+    for (const node of nodes) {
+      for (const attribute of ["data-en", "data-zh"]) {
+        const mutated = withoutRequiredLanguageAttribute(html, node, attribute);
+        assert.throws(
+          () => assertExpansionVisibleCopy(mutated, path, [node]),
+          {
+            name: "AssertionError",
+            message: `${path} ${node.selector} should define ${attribute} for ${node.label}`,
+          },
+          `${path} ${node.selector} should reject missing ${attribute}`,
+        );
+      }
     }
   }
 });
