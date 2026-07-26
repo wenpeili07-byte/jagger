@@ -9,6 +9,7 @@ const readOptional = (path) => {
 };
 const html = readOptional("./pages/project.html");
 const source = readOptional("./project.js");
+const css = readOptional("./project.css");
 
 class PlannerNode {
   constructor({ checked = false, dataset = {}, value = "" } = {}) {
@@ -83,6 +84,7 @@ function createPlannerHarness(search = "") {
   const reviewDirections = new PlannerNode();
   const reviewProduct = new PlannerNode();
   const reviewProductRow = new PlannerNode();
+  const langToggle = new PlannerNode();
   const singleNodes = new Map([
     ["[data-project-planner]", new PlannerNode()],
     ["[data-vehicle-make]", vehicle.make],
@@ -98,6 +100,7 @@ function createPlannerHarness(search = "") {
     ["[data-review-directions]", reviewDirections],
     ["[data-review-product]", reviewProduct],
     ["[data-review-product-row]", reviewProductRow],
+    [".lang-toggle", langToggle],
   ]);
   const document = {
     documentElement: { lang: "en" },
@@ -110,6 +113,9 @@ function createPlannerHarness(search = "") {
       return [];
     },
   };
+  langToggle.addEventListener("click", () => {
+    document.documentElement.lang = document.documentElement.lang === "en" ? "zh-CN" : "en";
+  });
   const testBridge = {};
   const window = {
     location: { href: "", search },
@@ -121,8 +127,10 @@ function createPlannerHarness(search = "") {
   return {
     back,
     directions,
+    document,
     error,
     goals,
+    langToggle,
     next,
     progress,
     reviewDirections,
@@ -159,6 +167,78 @@ test("planner query selections are bounded, cleaned, and preselect parts", () =>
   assert.equal(harness.directions.find((node) => node.value === "parts").checked, true);
   assert.equal(state.product.includes("\n"), false);
   assert.match(state.product, /^x{120}, Finish: Satin Black, Quantity: 12345678$/);
+});
+
+test("planner hydrates a bounded vehicle from the Add to Build query", () => {
+  const configured = createPlannerHarness(
+    "?vehicle=2025%00BMW%09G82%20M4%0AG8X&direction=parts"
+  );
+
+  assert.deepEqual(
+    { ...configured.testBridge.getState().vehicle },
+    { make: "BMW", model: "G82 M4", chassis: "G8X", year: "2025" }
+  );
+  assert.deepEqual(
+    Object.fromEntries(Object.entries(configured.vehicle).map(([key, node]) => [key, node.value])),
+    { make: "BMW", model: "G82 M4", chassis: "G8X", year: "2025" }
+  );
+
+  const bounded = createPlannerHarness(
+    `?vehicle=2026%20BMW%20${"M".repeat(70)}%20G8X`
+  );
+  assert.equal(bounded.testBridge.getState().vehicle.model.length, 40);
+  assert.equal(bounded.vehicle.model.value.length, 40);
+});
+
+test("planner review switches selected services and product labels to Chinese", () => {
+  const query = new URLSearchParams({
+    direction: "parts",
+    product: "forged-wheel",
+    diameter: "19 inch",
+    width: "9.5J / 10.5J",
+    finish: "Satin Black",
+    quantity: "4",
+  });
+  const harness = createPlannerHarness(`?${query}`);
+
+  harness.progress[3].dispatch("click");
+  assert.equal(harness.reviewDirections.textContent, "Performance Parts");
+  assert.equal(
+    harness.reviewProduct.textContent,
+    "forged-wheel, Diameter: 19 inch, Width: 9.5J / 10.5J, Finish: Satin Black, Quantity: 4"
+  );
+
+  harness.langToggle.dispatch("click");
+  assert.equal(harness.document.documentElement.lang, "zh-CN");
+  assert.equal(harness.reviewGoal.textContent, "街道");
+  assert.equal(harness.reviewDirections.textContent, "汽车配件");
+  assert.equal(
+    harness.reviewProduct.textContent,
+    "forged-wheel, 直径: 19 inch, 宽度: 9.5J / 10.5J, 颜色: Satin Black, 数量: 4"
+  );
+});
+
+test("planner translates a visible validation error on language change", () => {
+  const harness = createPlannerHarness();
+
+  harness.vehicle.model.value = " ";
+  harness.vehicle.model.dispatch("input");
+  harness.next.dispatch("click");
+  assert.equal(harness.error.textContent, "COMPLETE ALL VEHICLE FIELDS TO CONTINUE.");
+
+  harness.langToggle.dispatch("click");
+  assert.equal(harness.error.textContent, "请完整填写车辆资料后继续。");
+});
+
+test("inactive progress numbers stay neutral until current or complete", () => {
+  assert.match(
+    css,
+    /\.project-progress button span:first-child\s*\{[^}]*color:\s*var\(--muted\)/s
+  );
+  assert.match(
+    css,
+    /\.project-progress button\[aria-current="step"\] span:first-child,\s*\.project-progress button\[data-complete\] span:first-child\s*\{[^}]*color:\s*var\(--accent-bright\)/s
+  );
 });
 
 test("planner validates transitions and preserves browser-driven selections", () => {

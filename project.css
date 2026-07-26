@@ -87,6 +87,11 @@
 }
 
 .project-progress button span:first-child {
+  color: var(--muted);
+}
+
+.project-progress button[aria-current="step"] span:first-child,
+.project-progress button[data-complete] span:first-child {
   color: var(--accent-bright);
 }
 

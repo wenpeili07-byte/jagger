@@ -7,6 +7,20 @@
     chassis: "Chassis Setup",
     exhaust: "Intake & Exhaust",
   };
+  const serviceLabels = {
+    build: { en: serviceMap.build, zh: "汽车改装" },
+    parts: { en: serviceMap.parts, zh: "汽车配件" },
+    photo: { en: serviceMap.photo, zh: "汽车摄影" },
+    ecu: { en: serviceMap.ecu, zh: "ECU 特调" },
+    chassis: { en: serviceMap.chassis, zh: "底盘设定" },
+    exhaust: { en: serviceMap.exhaust, zh: "进排气" },
+  };
+  const productOptionLabels = {
+    diameter: { en: "Diameter", zh: "直径" },
+    width: { en: "Width", zh: "宽度" },
+    finish: { en: "Finish", zh: "颜色" },
+    quantity: { en: "Quantity", zh: "数量" },
+  };
   const goalLabels = {
     street: { en: "STREET", zh: "街道" },
     "road-track": { en: "ROAD & TRACK", zh: "道路与赛道" },
@@ -19,6 +33,8 @@
     directions: new Set(),
     product: null,
   };
+  let productSelection = null;
+  let activeErrorKey = "";
 
   function cleanSelection(value, maxLength) {
     return String(value || "")
@@ -32,18 +48,40 @@
     const query = new URLSearchParams(search);
     const product = cleanSelection(query.get("product"), 120);
     const options = [
-      ["Diameter", cleanSelection(query.get("diameter"), 80)],
-      ["Width", cleanSelection(query.get("width"), 80)],
-      ["Finish", cleanSelection(query.get("finish"), 80)],
-      ["Quantity", cleanSelection(query.get("quantity"), 8)],
+      ["diameter", cleanSelection(query.get("diameter"), 80)],
+      ["width", cleanSelection(query.get("width"), 80)],
+      ["finish", cleanSelection(query.get("finish"), 80)],
+      ["quantity", cleanSelection(query.get("quantity"), 8)],
     ].filter(([, value]) => value);
 
     return {
       direction: query.get("direction") === "parts" ? "parts" : "",
+      productSelection: product ? { name: product, options } : null,
       product: product
-        ? [product, ...options.map(([label, value]) => `${label}: ${value}`)].join(", ")
+        ? [
+            product,
+            ...options.map(([key, value]) => `${productOptionLabels[key].en}: ${value}`),
+          ].join(", ")
         : null,
+      vehicle: readVehicleSelection(query.get("vehicle")),
     };
+  }
+
+  function readVehicleSelection(value) {
+    const parts = cleanSelection(value, 120).split(" ").filter(Boolean);
+    if (parts.length < 4) return null;
+
+    const year = cleanSelection(parts.shift(), 4);
+    const make = cleanSelection(parts.shift(), 20).toUpperCase();
+    const chassis = cleanSelection(parts.pop(), 20);
+    const model = cleanSelection(parts.join(" "), 40);
+    const supportedMakes = new Set(["BMW", "AUDI", "MERCEDES-BENZ"]);
+
+    if (!/^\d{4}$/.test(year) || !supportedMakes.has(make) || !model || !chassis) {
+      return null;
+    }
+
+    return { make, model, chassis, year };
   }
 
   function buildContactUrl(state) {
@@ -99,6 +137,7 @@
         zh: "请至少选择一个项目方向。",
       },
     };
+    activeErrorKey = key;
     errorNode.textContent = key ? messages[key][getLanguage()] : "";
   }
 
@@ -115,7 +154,7 @@
   function updateReview() {
     const language = getLanguage();
     const selectedServices = [...plannerState.directions]
-      .map((key) => serviceMap[key])
+      .map((key) => serviceLabels[key]?.[language])
       .filter(Boolean);
 
     reviewNodes.vehicle.textContent = [
@@ -126,7 +165,14 @@
     ].filter(Boolean).join(" ");
     reviewNodes.goal.textContent = goalLabels[plannerState.goal][language];
     reviewNodes.directions.textContent = selectedServices.join(", ");
-    reviewNodes.product.textContent = plannerState.product || "";
+    reviewNodes.product.textContent = productSelection
+      ? [
+          productSelection.name,
+          ...productSelection.options.map(
+            ([key, value]) => `${productOptionLabels[key][language]}: ${value}`
+          ),
+        ].join(", ")
+      : plannerState.product || "";
     reviewNodes.productRow.hidden = !plannerState.product;
     submitLink.href = buildContactUrl(plannerState);
   }
@@ -165,6 +211,13 @@
   if (root) {
     const initialQuery = readPlannerQuery(window.location.search);
     plannerState.product = initialQuery.product;
+    productSelection = initialQuery.productSelection;
+    if (initialQuery.vehicle) {
+      Object.assign(plannerState.vehicle, initialQuery.vehicle);
+      Object.entries(vehicleControls).forEach(([key, control]) => {
+        control.value = plannerState.vehicle[key];
+      });
+    }
     if (initialQuery.direction) plannerState.directions.add(initialQuery.direction);
 
     Object.entries(vehicleControls).forEach(([key, control]) => {
@@ -207,7 +260,10 @@
       submitLink.href = target;
       window.location.href = target;
     });
-    langToggle?.addEventListener("click", updateReview);
+    langToggle?.addEventListener("click", () => {
+      updateReview();
+      setError(activeErrorKey);
+    });
 
     setStep(0);
   }
