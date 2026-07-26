@@ -51,8 +51,8 @@ const renderGenericCasePage = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=contact-form-20260723" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=contact-form-20260723" />
+    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
   </head>
   <body data-section="cases">
@@ -83,7 +83,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
       </nav>
       ${globalFooter()}
     </main>
-    <script src="../../content-pages.js?v=contact-form-20260723"></script>
+    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
   </body>
 </html>
 `;
@@ -95,10 +95,10 @@ export const renderCase02Page = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=contact-form-20260723" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=contact-form-20260723" />
+    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
-    <link rel="stylesheet" href="../../case-02.css?v=case02-video-story-20260726" />
+    <link rel="stylesheet" href="../../case-02.css?v=three-page-expansion-20260726" />
   </head>
   <body data-section="cases">
     <main class="site-shell case-detail-page case02-page" data-detail-page>
@@ -159,8 +159,8 @@ export const renderCase02Page = (record) => `<!doctype html>
       </nav>
       ${globalFooter()}
     </main>
-    <script src="../../content-pages.js?v=contact-form-20260723"></script>
-    <script src="../../case-02.js?v=case02-video-story-20260726"></script>
+    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
+    <script src="../../case-02.js?v=three-page-expansion-20260726"></script>
   </body>
 </html>
 `;
@@ -180,8 +180,8 @@ export const renderServicePage = (record) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>${record.label} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=contact-form-20260723" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=contact-form-20260723" />
+    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
     <link rel="stylesheet" href="../../service-detail.css?v=mobile-spacing-20260722" />
   </head>
   <body data-section="services">
@@ -208,7 +208,7 @@ export const renderServicePage = (record) => {
       </section>
       ${globalFooter(projectHref)}
     </main>
-    <script src="../../content-pages.js?v=contact-form-20260723"></script>
+    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
   </body>
 </html>
 `;

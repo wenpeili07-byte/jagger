@@ -119,8 +119,8 @@ export const renderShopPage = (products = shopProducts) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Browse sample performance-part categories for a selected vehicle and contact LONMA DYNAMIC for fitment and installation details." />
     <title>Shop | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../styles.css?v=contact-form-20260723" />
-    <link rel="stylesheet" href="../layout-canvas.css?v=contact-form-20260723" />
+    <link rel="stylesheet" href="../styles.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../layout-canvas.css?v=three-page-expansion-20260726" />
     <link rel="stylesheet" href="../shop.css?v=shop-final-review-20260722" />
   </head>
   <body data-section="shop">
@@ -233,7 +233,7 @@ export const renderShopPage = (products = shopProducts) => {
       </dialog>
       ${footer}
     </main>
-    <script src="../content-pages.js?v=contact-form-20260723"></script>
+    <script src="../content-pages.js?v=three-page-expansion-20260726"></script>
     <script src="../shop.js?v=shop-final-review-20260722"></script>
   </body>
 </html>

@@ -2,6 +2,12 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
+const expansionPages = [
+  "./pages/project.html",
+  "./pages/shop/forged-wheel.html",
+  "./pages/cases/case-02.html",
+];
+
 const pageGroups = [
   {
     section: "home",
@@ -86,6 +92,17 @@ for (const group of pageGroups) {
     });
   }
 }
+
+test("three-page expansion routes expose one complete shared shell", () => {
+  for (const path of expansionPages) {
+    const html = read(path);
+    const header = html.match(/<header class="topbar">([\s\S]*?)<\/header>/)?.[1] ?? "";
+
+    assert.equal((header.match(/<a href=/g) || []).length, 5, `${path} should expose five navigation links`);
+    assert.equal((header.match(/<button class="lang-toggle"/g) || []).length, 1, `${path} should expose one language toggle`);
+    assert.equal((html.match(/<footer class="content-footer">/g) || []).length, 1, `${path} should expose one shared footer`);
+  }
+});
 
 const footerLinks = new Map([
   ["./index.html", "./pages/project.html"],

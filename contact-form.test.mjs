@@ -10,7 +10,7 @@ const formJsUrl = new URL("./contact-form.js", import.meta.url);
 test("contact form targets the same-site API and includes a honeypot", () => {
   assert.match(html, /action="\/api\/contact" method="post"/);
   assert.match(html, /name="company"[^>]*tabindex="-1"/);
-  assert.match(html, /src="\.\.\/contact-form\.js\?v=contact-form-final-review-20260723"/);
+  assert.match(html, /src="\.\.\/contact-form\.js\?v=three-page-expansion-20260726"/);
 });
 
 test("contact fields mirror the API validation limits", () => {

@@ -3,6 +3,12 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
+const expansionPages = [
+  "./pages/project.html",
+  "./pages/shop/forged-wheel.html",
+  "./pages/cases/case-02.html",
+];
+
 const publicPages = [
   "./index.html",
   "./pages/about.html",
@@ -35,8 +41,7 @@ const decode = (value) =>
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">");
 
-const sharedAssetVersion = "contact-form-20260723";
-const threePageExpansionAssetVersion = "three-page-expansion-20260726";
+const sharedAssetVersion = "three-page-expansion-20260726";
 const casesControllerVersion = "english-copy-20260721";
 const chineseText = /[\p{Script=Han}]/u;
 
@@ -90,15 +95,12 @@ function attributeValue(attributes, name) {
 test("content controller cache references use the current shared asset version", async () => {
   for (const path of publicPages.filter((path) => path !== "./index.html")) {
     const html = read(path);
-    const version = path === "./pages/project.html" || path === "./pages/shop/forged-wheel.html"
-      ? threePageExpansionAssetVersion
-      : sharedAssetVersion;
     assert.match(
       html,
-      new RegExp(`content-pages\\.js\\?v=${version}`),
+      new RegExp(`content-pages\\.js\\?v=${sharedAssetVersion}`),
       `${path} should load the current shared content controller version`,
     );
-    assert.doesNotMatch(html, new RegExp(`content-pages\\.js\\?v=(?!${version})`), `${path} should not retain a stale content controller version`);
+    assert.doesNotMatch(html, new RegExp(`content-pages\\.js\\?v=(?!${sharedAssetVersion})`), `${path} should not retain a stale content controller version`);
   }
 
   const cases = read("./pages/cases.html");
@@ -269,6 +271,21 @@ test("all public pages ship English-first markup", () => {
       }
     }
     assert.ok(translatableAttributeCount > 0, `${path} should expose translatable live attributes`);
+  }
+});
+
+test("three-page expansion routes pair visible English text with Chinese copy", () => {
+  for (const path of expansionPages) {
+    const html = read(path);
+    const visibleBilingualNodes = [
+      ...html.matchAll(/<([a-z][\w-]*)\b([^>]*\bdata-en="([^"]*)"[^>]*)>([^<]*)<\/\1>/gi),
+    ];
+
+    assert.ok(visibleBilingualNodes.length > 0, `${path} should expose visible bilingual text`);
+    for (const [, tag, attributes, english, live] of visibleBilingualNodes) {
+      assert.match(attributes, /\bdata-zh="[^"]*"/, `${path} <${tag}> should pair data-en with data-zh`);
+      assert.equal(decode(live).trim(), decode(english).trim(), `${path} <${tag}> should render English first`);
+    }
   }
 });
 

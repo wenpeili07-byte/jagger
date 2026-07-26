@@ -32,7 +32,9 @@ const publicPages = [
   "./pages/services.html",
   "./pages/cases.html",
   "./pages/contact.html",
+  "./pages/project.html",
   "./pages/shop.html",
+  "./pages/shop/forged-wheel.html",
   "./pages/cases/case-01.html",
   "./pages/services/build.html",
   "./pages/services/parts.html",
@@ -67,7 +69,7 @@ assert.doesNotMatch(contentCss, /\.content-page\.site-shell\s*\{[^}]*max-width:/
 
 for (const path of publicPages) {
   const html = read(path);
-  assert.match(html, /layout-canvas\.css\?v=contact-form-20260723/, `${path} should load the current shared canvas cache key`);
+  assert.match(html, /layout-canvas\.css\?v=three-page-expansion-20260726/, `${path} should load the current shared canvas cache key`);
 }
 
 // Task 3: compact header and services rules.
@@ -349,6 +351,17 @@ test("forged wheel detail stacks cleanly and clears the mobile navigation", () =
     /\.product-actions\s*\{[^}]*position:\s*fixed[^}]*bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/s,
     "mobile product actions should sit above the shared bottom navigation"
   );
+});
+
+test("new pages preserve the shared canvas and mobile stacking", () => {
+  const productCss = read("./shop-product.css");
+
+  assert.doesNotMatch(`${projectCss}${productCss}${case02Css}`, /width:\s*100vw|transform:\s*scale\(/);
+  assert.match(projectCss, /@media \(max-width:\s*1100px\)[\s\S]*\.project-workspace\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(productCss, /@media \(max-width:\s*1100px\)[\s\S]*\.product-detail\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(case02Css, /@media \(max-width:\s*1000px\)[\s\S]*\.case02-story-beat\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(productCss, /padding-bottom:\s*calc\(148px \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(projectCss, /bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/);
 });
 
 // Task 4: every large desktop should fit the complete homepage inside the shared 973px first screen.

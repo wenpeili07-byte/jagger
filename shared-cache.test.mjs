@@ -5,7 +5,7 @@ import { caseDetails, serviceDetails } from "./detail-pages-data.mjs";
 import { renderCasePage, renderServicePage } from "./scripts/render-detail-pages.mjs";
 import { renderShopPage } from "./scripts/render-shop-page.mjs";
 
-const sharedAssetVersion = "contact-form-20260723";
+const sharedAssetVersion = "three-page-expansion-20260726";
 const publicPages = [
   "./index.html",
   "./pages/about.html",
@@ -24,7 +24,9 @@ const publicPages = [
   "./pages/cases/case-05.html",
   "./pages/cases/case-06.html",
   "./pages/contact.html",
+  "./pages/project.html",
   "./pages/shop.html",
+  "./pages/shop/forged-wheel.html",
 ];
 const staleWarmCacheKeys = new Set([
   "layout-canvas.css?v=canvas-20260721-2200",
@@ -88,6 +90,22 @@ test("new shared references cannot collide with known warm-cache entries", () =>
       const reference = assetReference(html, asset, path);
       assert.equal(reference.version, sharedAssetVersion);
       assert.equal(staleWarmCacheKeys.has(reference.key), false, `${path} should not reuse ${reference.key}`);
+    }
+  }
+});
+
+test("three-page expansion assets use the integration cache version", () => {
+  const assetPages = new Map([
+    ["./pages/project.html", ["project.css", "project.js"]],
+    ["./pages/shop/forged-wheel.html", ["shop-product.css", "shop-product.js"]],
+    ["./pages/cases/case-02.html", ["case-02.css", "case-02.js"]],
+    ["./pages/contact.html", ["contact-form.js"]],
+  ]);
+
+  for (const [path, assets] of assetPages) {
+    const html = read(path);
+    for (const asset of assets) {
+      assert.equal(assetReference(html, asset, path).version, sharedAssetVersion);
     }
   }
 });
