@@ -4,6 +4,7 @@ import { test } from "node:test";
 import vm from "node:vm";
 
 const html = readFileSync(new URL("./pages/contact.html", import.meta.url), "utf8");
+const css = readFileSync(new URL("./content-pages.css", import.meta.url), "utf8");
 const sharedJs = readFileSync(new URL("./content-pages.js", import.meta.url), "utf8");
 const formJsUrl = new URL("./contact-form.js", import.meta.url);
 
@@ -18,6 +19,17 @@ test("contact fields mirror the API validation limits", () => {
   assert.match(html, /name="email"[\s\S]*?minlength="3"[\s\S]*?maxlength="254"/);
   assert.match(html, /name="vehicle"[\s\S]*?minlength="2"[\s\S]*?maxlength="120"/);
   assert.match(html, /name="message"[\s\S]*?minlength="10"[\s\S]*?maxlength="3000"/);
+});
+
+test("contact prefill notice and form share one desktop column stack", () => {
+  assert.match(
+    html,
+    /class="contact-form-stack"[\s\S]*data-contact-prefill-status[\s\S]*<form class="contact-form"/,
+  );
+  assert.match(
+    css,
+    /\.contact-form-stack\s*\{[^}]*grid-column:\s*2[^}]*display:\s*grid[^}]*align-content:\s*start/s,
+  );
 });
 
 test("shared page controller no longer opens a mail client", () => {
@@ -147,6 +159,18 @@ test("contact controller posts JSON and resets after success", async () => {
   assert.match(harness.status.textContent, /INQUIRY SENT/);
 });
 
+test("contact success hides a previously visible project prefill notice", async () => {
+  const harness = runController({
+    search:
+      "?vehicle=2024%20AUDI%20RS%205%20B9.5&service=Performance%20Parts&message=Wheel%20fitment%20request",
+    fetchImpl: async () => ({ ok: true }),
+  });
+
+  assert.equal(harness.prefillStatus.hidden, false);
+  await harness.form.dispatch("submit", { preventDefault() {} });
+  assert.equal(harness.prefillStatus.hidden, true);
+});
+
 test("contact controller blocks repeats while pending", async () => {
   let resolveRequest;
   let requestCount = 0;
@@ -207,6 +231,20 @@ test("contact prefill accepts known services and strips control characters", () 
   assert.equal(harness.fields.service.value, "Custom Vehicle Builds");
   assert.equal(harness.fields.message.value, "Street setup");
   assert.equal(harness.prefillStatus.hidden, false);
+});
+
+test("contact prefill appends product identity to a direct message", () => {
+  const harness = runController({
+    search:
+      "?vehicle=2024%20AUDI%20RS%205%20B9.5&service=Performance%20Parts&product=forged-wheel&message=Fitment%20check%3A%2019%20inch.",
+    fetchImpl: async () => ({ ok: true }),
+  });
+
+  assert.equal(harness.fields.vehicle.value, "2024 AUDI RS 5 B9.5");
+  assert.equal(
+    harness.fields.message.value,
+    "Fitment check: 19 inch. Product: forged-wheel.",
+  );
 });
 
 test("contact prefill rejects unknown services and caps field lengths", () => {

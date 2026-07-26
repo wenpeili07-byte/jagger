@@ -3,11 +3,13 @@ import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 import { shopProducts, shopVehicles } from "./shop-data.mjs";
-import { renderShopPage } from "./scripts/render-shop-page.mjs";
+import * as shopRenderer from "./scripts/render-shop-page.mjs";
 
 const html = readFileSync(new URL("./pages/shop.html", import.meta.url), "utf8");
+const productHtml = readFileSync(new URL("./pages/shop/forged-wheel.html", import.meta.url), "utf8");
 const js = readFileSync(new URL("./shop.js", import.meta.url), "utf8");
 const css = readFileSync(new URL("./shop.css", import.meta.url), "utf8");
+const { renderShopPage } = shopRenderer;
 
 class RuntimeNode {
   constructor({ dataset = {}, value = "" } = {}) {
@@ -112,6 +114,8 @@ function createDialogHarness({
   productLink.setAttribute("href", productHref);
   const documentListeners = new Map();
   const shopSelector = new RuntimeNode();
+  const vehicleData = new RuntimeNode();
+  vehicleData.textContent = JSON.stringify(shopVehicles.tuples ?? []);
   const mobileVehicleEdit = new RuntimeNode();
   const mobileMake = new RuntimeNode();
   const mobileModel = new RuntimeNode();
@@ -147,6 +151,7 @@ function createDialogHarness({
     ["[data-mobile-vehicle-year]", mobileYear],
     ["[data-mobile-vehicle-chassis]", mobileChassis],
     ["[data-find-parts]", findButton],
+    ["[data-shop-vehicle-data]", vehicleData],
   ]);
   const locationUrl = new URL(locationHref);
   const location = {
@@ -248,6 +253,31 @@ test("forged wheel link preserves category, vehicle, and its own query values", 
   });
 });
 
+test("shop hydrates an allowlisted Audi tuple without mixing BMW defaults", () => {
+  const harness = createDialogHarness({
+    locationHref:
+      "https://example.test/pages/shop.html?category=wheels&make=AUDI&model=RS%205&year=2024&chassis=B9.5",
+  });
+  const target = new URL(harness.productLink.href, "https://example.test/pages/shop.html");
+
+  assert.deepEqual(
+    [
+      harness.makeControl.value,
+      harness.modelControl.value,
+      harness.yearControl.value,
+      harness.chassisControl.value,
+    ],
+    ["AUDI", "RS 5", "2024", "B9.5"],
+  );
+  assert.deepEqual(Object.fromEntries(target.searchParams), {
+    category: "wheels",
+    make: "AUDI",
+    model: "RS 5",
+    year: "2024",
+    chassis: "B9.5",
+  });
+});
+
 test("forged wheel link removes cleared managed query values", () => {
   const harness = createDialogHarness({
     categoryValues: ["wheels"],
@@ -264,6 +294,9 @@ test("forged wheel link removes cleared managed query values", () => {
   assert.deepEqual(Object.fromEntries(target.searchParams), {
     source: "shop-card",
     make: "AUDI",
+    model: "RS 5",
+    year: "2024",
+    chassis: "B9.5",
   });
 });
 
@@ -316,6 +349,41 @@ test("shop records define truthful future-ready dialog fields", () => {
     assert.ok(product.inquirySubject.en && product.inquirySubject.zh);
     assert.equal(product.shopifyProductId, null);
   }
+});
+
+test("shared shop data owns coherent vehicles and forged-wheel commercial facts", () => {
+  assert.deepEqual(shopVehicles.tuples, [
+    { make: "BMW", model: "G80 M3", year: "2024", chassis: "G8X" },
+    { make: "AUDI", model: "RS 5", year: "2024", chassis: "B9.5" },
+    { make: "MERCEDES-BENZ", model: "C 63 S", year: "2024", chassis: "W206" },
+  ]);
+
+  const forgedWheel = shopProducts.find((product) => product.id === "forged-wheel");
+  assert.ok(forgedWheel?.detail, "forged-wheel should own its detail facts");
+  if (!forgedWheel?.detail) return;
+  assert.deepEqual(forgedWheel.detail.referencePrice, {
+    display: "US$3,200",
+    note: {
+      en: "Final quote follows fitment verification.",
+      zh: "最终报价以适配确认后为准。",
+    },
+  });
+  assert.equal(forgedWheel.detail.options.finish[0].id, "Satin Black");
+  assert.ok(
+    forgedWheel.detail.fitments.some(
+      (fitment) =>
+        fitment.make === "AUDI"
+        && fitment.model === "RS 5"
+        && fitment.year === "2024"
+        && fitment.chassis === "B9.5",
+    ),
+  );
+});
+
+test("forged wheel checked-in page is generated from the shared product record", () => {
+  assert.equal(typeof shopRenderer.renderForgedWheelPage, "function");
+  assert.equal(productHtml, shopRenderer.renderForgedWheelPage());
+  assert.match(productHtml, /data-product-config/);
 });
 
 test("shop renderer carries complete dialog data and a visible action footer", () => {
@@ -389,8 +457,8 @@ test("checked-in Shop page matches its renderer byte for byte", () => {
 });
 
 test("shop controller supports filters, query links, and dialog focus", () => {
-  assert.match(html, /shop\.css\?v=shop-final-review-20260722/);
-  assert.match(html, /shop\.js\?v=shop-final-review-20260722/);
+  assert.match(html, /shop\.css\?v=three-page-expansion-20260726/);
+  assert.match(html, /shop\.js\?v=three-page-expansion-20260726/);
   assert.match(js, /new URLSearchParams\(window\.location\.search\)/);
   assert.match(js, /querySelectorAll\("\[data-product-card\]"\)/);
   assert.match(js, /querySelectorAll\("\[data-category-filter\]"\)/);
@@ -400,7 +468,7 @@ test("shop controller supports filters, query links, and dialog focus", () => {
   assert.match(js, /lastDialogTrigger\.focus\(\)/);
 });
 
-test("shop controller resets unsupported vehicle fields and reports no samples", () => {
+test("shop controller keeps supported vehicle tuples coherent", () => {
   class FakeNode {
     constructor({ dataset = {}, value = "" } = {}) {
       this.checked = false;
@@ -441,6 +509,8 @@ test("shop controller resets unsupported vehicle fields and reports no samples",
   const yearControl = new FakeNode({ value: "2024" });
   const chassisControl = new FakeNode({ value: "G8X" });
   const findButton = new FakeNode();
+  const vehicleData = new FakeNode();
+  vehicleData.textContent = JSON.stringify(shopVehicles.tuples ?? []);
   const resultsStatus = new FakeNode();
   const emptyState = new FakeNode();
   const locationUrl = new URL("https://example.test/pages/shop.html");
@@ -467,6 +537,7 @@ test("shop controller resets unsupported vehicle fields and reports no samples",
     ["[data-shop-year]", yearControl],
     ["[data-shop-chassis]", chassisControl],
     ["[data-find-parts]", findButton],
+    ["[data-shop-vehicle-data]", vehicleData],
   ]);
   const document = {
     documentElement: { lang: "en" },
@@ -505,11 +576,11 @@ test("shop controller resets unsupported vehicle fields and reports no samples",
   makeControl.listeners.get("change")();
   assert.deepEqual(
     [modelControl, yearControl, chassisControl].map((control) => [control.value, control.disabled]),
-    [["", true], ["", true], ["", true]]
+    [["RS 5", false], ["2024", false], ["B9.5", false]]
   );
   findButton.listeners.get("click")();
-  assert.equal(resultsStatus.textContent, "00 SAMPLE RESULTS");
-  assert.equal(emptyState.hidden, false);
+  assert.equal(resultsStatus.textContent, "06 SAMPLE RESULTS");
+  assert.equal(emptyState.hidden, true);
 
   makeControl.value = "BMW";
   makeControl.listeners.get("change")();

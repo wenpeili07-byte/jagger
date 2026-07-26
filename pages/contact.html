@@ -57,14 +57,15 @@
           <a class="contact-email" href="mailto:lonmadynamic@gmail.com">lonmadynamic@gmail.com</a>
         </div>
 
-        <p
-          class="contact-prefill-status"
-          data-contact-prefill-status
-          data-en="PROJECT DETAILS ADDED FROM YOUR SELECTIONS."
-          data-zh="已载入你选择的项目资料。"
-          hidden
-        >PROJECT DETAILS ADDED FROM YOUR SELECTIONS.</p>
-        <form class="contact-form" action="/api/contact" method="post" data-contact-form>
+        <div class="contact-form-stack">
+          <p
+            class="contact-prefill-status"
+            data-contact-prefill-status
+            data-en="PROJECT DETAILS ADDED FROM YOUR SELECTIONS."
+            data-zh="已载入你选择的项目资料。"
+            hidden
+          >PROJECT DETAILS ADDED FROM YOUR SELECTIONS.</p>
+          <form class="contact-form" action="/api/contact" method="post" data-contact-form>
           <label class="contact-honeypot" aria-hidden="true">
             <span>Company</span>
             <input type="text" name="company" tabindex="-1" autocomplete="off" />
@@ -147,7 +148,8 @@
               <span aria-hidden="true">→</span>
             </button>
           </div>
-        </form>
+          </form>
+        </div>
       </section>
 
       <footer class="content-footer">

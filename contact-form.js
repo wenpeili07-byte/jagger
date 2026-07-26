@@ -41,9 +41,14 @@
     const requestedService = cleanQueryValue(query.get("service"), 80);
     const product = cleanQueryValue(query.get("product"), 120);
     const subject = cleanQueryValue(query.get("subject"), 180);
-    const directMessage = cleanQueryValue(query.get("message"), 3000);
-    const message = directMessage || cleanQueryValue(
-      [subject, product && `Product: ${product}`].filter(Boolean).join(". "),
+    const directMessage = cleanQueryValue(query.get("message"), product ? 2850 : 3000);
+    const baseMessage = directMessage || subject;
+    const productMessage =
+      product && !baseMessage.toLowerCase().includes(product.toLowerCase())
+        ? `Product: ${product}.`
+        : "";
+    const message = cleanQueryValue(
+      [baseMessage, productMessage].filter(Boolean).join(" "),
       3000,
     );
 
@@ -107,6 +112,7 @@
       }
 
       form.reset();
+      if (prefillStatus) prefillStatus.hidden = true;
       setStatus("success");
     } catch (error) {
       setStatus(error?.message === "invalid_submission" ? "validation" : "error");

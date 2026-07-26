@@ -134,10 +134,10 @@ export const renderCase02Page = (record) => `<!doctype html>
               en: "Sharper response without turning the car into a single-purpose machine. Braking, chassis feedback, and wheel fitment are considered as one system.",
             })}
           </div>
-          <figure class="case02-story-media"><img src="../../assets/images/shop/brake-kit.webp" loading="lazy" ${i18nAttribute("alt", { zh: "案例 02 刹车系统细节", en: "Case 02 brake system detail" })} /></figure>
+          <figure class="case02-story-media"><img src="../../assets/images/shop/brake-kit.webp" loading="lazy" ${i18nAttribute("alt", { zh: "分类参考图片：刹车系统", en: "Category reference image: brake system" })} /></figure>
         </section>
         <section class="case02-story-beat case02-story-beat-test">
-          <figure class="case02-story-media"><img src="../../assets/images/shop/coilover-kit.webp" loading="lazy" ${i18nAttribute("alt", { zh: "案例 02 底盘设定细节", en: "Case 02 chassis setup detail" })} /></figure>
+          <figure class="case02-story-media"><img src="../../assets/images/shop/coilover-kit.webp" loading="lazy" ${i18nAttribute("alt", { zh: "分类参考图片：底盘设定", en: "Category reference image: chassis setup" })} /></figure>
           <div class="case02-story-copy">
             <p>02</p>
             ${i18n("h2", { zh: "测试、调整、再测试", en: "TEST, ADJUST, REPEAT" })}
@@ -147,7 +147,7 @@ export const renderCase02Page = (record) => `<!doctype html>
             })}
           </div>
         </section>
-        <figure class="case02-story-media case02-story-wide"><img src="../../assets/images/shop/forged-wheel.webp" loading="lazy" ${i18nAttribute("alt", { zh: "案例 02 锻造轮毂方向", en: "Case 02 forged wheel direction" })} /></figure>
+        <figure class="case02-story-media case02-story-wide"><img src="../../assets/images/shop/forged-wheel.webp" loading="lazy" ${i18nAttribute("alt", { zh: "分类参考图片：锻造轮毂", en: "Category reference image: forged wheel" })} /></figure>
       </div>
       <section class="detail-contact">
         ${i18n("h2", { zh: "讨论你的下一台车", en: "DISCUSS YOUR NEXT BUILD" })}

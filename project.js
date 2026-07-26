@@ -21,6 +21,15 @@
     finish: { en: "Finish", zh: "颜色" },
     quantity: { en: "Quantity", zh: "数量" },
   };
+  const productLabels = {
+    "forged-wheel": { en: "Forged Wheel", zh: "锻造轮毂" },
+  };
+  const productOptionValueLabels = {
+    finish: {
+      "Satin Black": { en: "Satin Black", zh: "缎面黑" },
+      "Brushed Silver": { en: "Brushed Silver", zh: "拉丝银" },
+    },
+  };
   const goalLabels = {
     street: { en: "STREET", zh: "街道" },
     "road-track": { en: "ROAD & TRACK", zh: "道路与赛道" },
@@ -31,6 +40,7 @@
     vehicle: { make: "BMW", model: "G80 M3", chassis: "G8X", year: "2024" },
     goal: "street",
     directions: new Set(),
+    productId: "",
     product: null,
   };
   let productSelection = null;
@@ -56,6 +66,7 @@
 
     return {
       direction: query.get("direction") === "parts" ? "parts" : "",
+      productId: product,
       productSelection: product ? { name: product, options } : null,
       product: product
         ? [
@@ -95,6 +106,7 @@
         state.product ? `Product selection: ${state.product}.` : "",
       ].filter(Boolean).join(" "),
     });
+    if (state.productId) query.set("product", state.productId);
     return `./contact.html?${query.toString()}`;
   }
 
@@ -167,9 +179,12 @@
     reviewNodes.directions.textContent = selectedServices.join(", ");
     reviewNodes.product.textContent = productSelection
       ? [
-          productSelection.name,
+          productLabels[productSelection.name]?.[language] || productSelection.name,
           ...productSelection.options.map(
-            ([key, value]) => `${productOptionLabels[key][language]}: ${value}`
+            ([key, value]) =>
+              `${productOptionLabels[key][language]}: ${
+                productOptionValueLabels[key]?.[value]?.[language] || value
+              }`
           ),
         ].join(", ")
       : plannerState.product || "";
@@ -210,6 +225,7 @@
 
   if (root) {
     const initialQuery = readPlannerQuery(window.location.search);
+    plannerState.productId = initialQuery.productId;
     plannerState.product = initialQuery.product;
     productSelection = initialQuery.productSelection;
     if (initialQuery.vehicle) {

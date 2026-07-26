@@ -28,6 +28,15 @@ test("Case 02 is an image-led bilingual story", () => {
   assert.doesNotMatch(html, /PARTS USED|data-case-marker|data-case-part/);
 });
 
+test("Case 02 supporting catalog images are labeled as references, not project details", () => {
+  assert.equal((html.match(/data-en-alt="Category reference image:/g) || []).length, 3);
+  assert.equal((html.match(/data-zh-alt="分类参考图片：/g) || []).length, 3);
+  assert.doesNotMatch(
+    html,
+    /data-en-alt="Case 02 (?:brake system detail|chassis setup detail|forged wheel direction)"/,
+  );
+});
+
 test("Case 02 preserves archive, adjacent case, and inquiry links", () => {
   assert.match(html, /href="\.\.\/cases\.html"/);
   assert.match(html, /href="\.\/case-01\.html"/);

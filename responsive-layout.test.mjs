@@ -272,7 +272,7 @@ test("contact inquiry keeps prefill and form in its single tablet column", () =>
 
   assert.match(
     contactTabletBlock,
-    /\.contact-prefill-status,\s*\.contact-form\s*\{[^}]*grid-column:\s*1/s,
+    /\.contact-form-stack\s*\{[^}]*grid-column:\s*1/s,
     "contact prefill and form should remain in the sole contact inquiry column at tablet widths"
   );
 });

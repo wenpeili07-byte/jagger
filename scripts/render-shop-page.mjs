@@ -36,6 +36,9 @@ const categoryLabels = {
 const renderOptions = (values) =>
   values.map((value) => `<option value="${escapeAttribute(value)}">${escapeText(value)}</option>`).join("\n              ");
 
+const serializeJson = (value) =>
+  JSON.stringify(value).replaceAll("<", "\\u003c");
+
 const renderFilter = ([category, label]) => `<label class="shop-filter-option">
               <input type="checkbox" value="${escapeAttribute(category)}" data-category-filter />
               <span data-zh="${escapeAttribute(label.zh)}" data-en="${escapeAttribute(label.en)}">${escapeText(label.en)}</span>
@@ -109,6 +112,154 @@ const footer = `<footer class="content-footer">
         <a href="./contact.html" data-zh="开始你的项目 →" data-en="START YOUR PROJECT →">START YOUR PROJECT →</a>
       </footer>`;
 
+const renderProductOptions = (name, options, selected, { finish = false } = {}) =>
+  options.map((option) => {
+    const checked = option.id === selected ? " checked" : "";
+    const swatch = finish
+      ? `<span class="finish-swatch finish-swatch-${escapeAttribute(option.swatch)}" aria-hidden="true"></span>`
+      : "";
+    return `<label><input type="radio" name="${escapeAttribute(name)}" value="${escapeAttribute(option.id)}"${checked} />${swatch}${i18n("span", option.label)}</label>`;
+  }).join("\n              ");
+
+export const renderForgedWheelPage = (
+  product = shopProducts.find(({ id }) => id === "forged-wheel"),
+) => {
+  if (!product?.detail) {
+    throw new Error("forged-wheel detail data is required");
+  }
+
+  const { detail } = product;
+  const defaultVehicle = detail.defaults.vehicle;
+  const productConfig = {
+    id: product.id,
+    category: product.category,
+    categories: Object.keys(categoryLabels),
+    vehicles: shopVehicles.tuples,
+    ...detail,
+  };
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Configure a forged wheel direction and request final fitment verification from LONMA DYNAMIC." />
+    <title>Monoblock Forged Wheel | LONMA DYNAMIC</title>
+    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../shop-product.css?v=three-page-expansion-20260726" />
+  </head>
+  <body data-section="shop">
+    <main class="site-shell forged-wheel-page" data-product-id="${escapeAttribute(product.id)}">
+      <header class="topbar">
+        <a class="brand" href="../../index.html" ${i18nAttribute("aria-label", { zh: "回到首页", en: "Back to home" })}>LONMA DYNAMIC</a>
+        <nav class="nav" ${i18nAttribute("aria-label", { zh: "主导航", en: "Main navigation" })}>
+          <a href="../about.html">ABOUT</a>
+          <a href="../services.html">SERVICES</a>
+          <a href="../cases.html">CASES</a>
+          <a href="../contact.html">CONTACT</a>
+          <a href="../shop.html" aria-current="page">SHOP</a>
+        </nav>
+        <div class="top-actions">
+          <button class="lang-toggle" type="button" aria-label="切换到中文">
+            <span class="lang-option" data-lang-option="zh">中</span>
+            <span class="lang-separator" aria-hidden="true">/</span>
+            <span class="lang-option is-current" data-lang-option="en">EN</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="product-detail" aria-labelledby="product-title">
+        <div class="product-stage">
+          ${i18n("a", { en: "← BACK TO SHOP", zh: "← 返回商店" }, ' class="product-back" href="../shop.html" data-product-back')}
+          <div class="product-stage-main">
+            <img src="../../${escapeAttribute(product.image)}" ${i18nAttribute("alt", {
+              en: "Forged performance wheel in satin black",
+              zh: "缎面黑锻造性能轮毂",
+            })} />
+          </div>
+          <div class="product-thumbnails" ${i18nAttribute("aria-label", { en: "Product views", zh: "产品视图" })}>
+            <button type="button" aria-current="true" ${i18nAttribute("aria-label", { en: "Front wheel view", zh: "轮毂正面视图" })}><img src="../../${escapeAttribute(product.image)}" alt="" /></button>
+          </div>
+        </div>
+
+        <div class="product-config">
+          ${i18n("p", detail.kicker, ' class="product-kicker"')}
+          ${i18n("h1", detail.title, ' id="product-title"')}
+          ${i18n("p", detail.summary, ' class="product-summary"')}
+          <p class="product-reference-price">
+            ${i18n("span", { en: "REFERENCE PACKAGE", zh: "参考套装" })}
+            <strong>${escapeText(detail.referencePrice.display)}</strong>
+            ${i18n("small", detail.referencePrice.note)}
+          </p>
+
+          <fieldset data-product-fitment>
+            ${i18n("legend", { en: "VEHICLE FITMENT", zh: "车型适配" })}
+            <div class="product-fitment-grid">
+              <label>${i18n("span", { en: "MAKE", zh: "品牌" })}<select data-fitment-make maxlength="20">${renderOptions(shopVehicles.makes)}</select></label>
+              <label>${i18n("span", { en: "MODEL", zh: "车型" })}<input data-fitment-model value="${escapeAttribute(defaultVehicle.model)}" maxlength="40" /></label>
+              <label>${i18n("span", { en: "YEAR", zh: "年份" })}<input data-fitment-year value="${escapeAttribute(defaultVehicle.year)}" maxlength="4" inputmode="numeric" /></label>
+              <label>${i18n("span", { en: "CHASSIS", zh: "底盘" })}<input data-fitment-chassis value="${escapeAttribute(defaultVehicle.chassis)}" maxlength="20" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset data-option-group="diameter">
+            ${i18n("legend", { en: "DIAMETER", zh: "直径" })}
+            <div class="product-option-row">
+              ${renderProductOptions("diameter", detail.options.diameter, detail.defaults.diameter)}
+            </div>
+          </fieldset>
+
+          <fieldset data-option-group="width">
+            ${i18n("legend", { en: "WIDTH", zh: "宽度" })}
+            <div class="product-option-row">
+              ${renderProductOptions("width", detail.options.width, detail.defaults.width)}
+            </div>
+          </fieldset>
+
+          <fieldset data-option-group="finish">
+            ${i18n("legend", { en: "FINISH", zh: "颜色" })}
+            <div class="product-option-row product-finish-row">
+              ${renderProductOptions("finish", detail.options.finish, detail.defaults.finish, { finish: true })}
+            </div>
+          </fieldset>
+
+          <label class="product-quantity">${i18n("span", { en: "QUANTITY", zh: "数量" })}<input data-product-quantity type="number" min="1" max="4" value="${escapeAttribute(detail.defaults.quantity)}" /></label>
+          <p class="product-fitment-message" data-fitment-message aria-live="polite"></p>
+
+          <div class="product-actions">
+            <span class="product-action-price">${i18n("small", { en: "REFERENCE PACKAGE", zh: "参考套装" })}<strong>${escapeText(detail.referencePrice.display)}</strong></span>
+            ${i18n("a", { en: "ADD TO BUILD", zh: "加入项目" }, " data-add-to-build")}
+            ${i18n("a", { en: "REQUEST FITMENT CHECK", zh: "申请适配确认" }, " data-fitment-inquiry")}
+          </div>
+        </div>
+      </section>
+
+      <section class="product-specifications" aria-labelledby="product-specifications-title">
+        ${i18n("p", { en: "PRODUCT DIRECTION", zh: "产品方向" }, ' class="product-kicker"')}
+        ${i18n("h2", { en: "SPECIFICATIONS", zh: "规格" }, ' id="product-specifications-title"')}
+        <dl>
+          <div>${i18n("dt", { en: "CONSTRUCTION", zh: "结构" })}${i18n("dd", { en: "MONOBLOCK FORGED", zh: "单片式锻造" })}</div>
+          <div>${i18n("dt", { en: "APPLICATION", zh: "用途" })}${i18n("dd", { en: "STREET & ROAD PERFORMANCE", zh: "街道与道路性能" })}</div>
+          <div>${i18n("dt", { en: "FINISH", zh: "颜色" })}${i18n("dd", { en: "SATIN BLACK OR BRUSHED SILVER", zh: "缎面黑或拉丝银" })}</div>
+          <div>${i18n("dt", { en: "FITMENT", zh: "适配" })}${i18n("dd", { en: "REFERENCE SET · CONFIRM BEFORE ORDER", zh: "参考适配 · 下单前确认" })}</div>
+        </dl>
+      </section>
+
+      <footer class="content-footer">
+        <span>LONMA DYNAMIC</span>
+        <span data-zh="龙马态度 · 2026" data-en="AUTOMOTIVE ATTITUDE · 2026">AUTOMOTIVE ATTITUDE · 2026</span>
+        <a href="../contact.html" data-zh="直接联系 →" data-en="CONTACT DIRECTLY →">CONTACT DIRECTLY →</a>
+      </footer>
+    </main>
+    <script type="application/json" data-product-config>${serializeJson(productConfig)}</script>
+    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
+    <script src="../../shop-product.js?v=three-page-expansion-20260726"></script>
+  </body>
+</html>
+`;
+};
+
 export const renderShopPage = (products = shopProducts) => {
   const firstProduct = products[0] || shopProducts[0];
 
@@ -121,7 +272,7 @@ export const renderShopPage = (products = shopProducts) => {
     <title>Shop | LONMA DYNAMIC</title>
     <link rel="stylesheet" href="../styles.css?v=three-page-expansion-20260726" />
     <link rel="stylesheet" href="../layout-canvas.css?v=three-page-expansion-20260726" />
-    <link rel="stylesheet" href="../shop.css?v=shop-final-review-20260722" />
+    <link rel="stylesheet" href="../shop.css?v=three-page-expansion-20260726" />
   </head>
   <body data-section="shop">
     <main class="site-shell shop-page" ${i18nAttribute("aria-label", { zh: "LONMA DYNAMIC 商店", en: "LONMA DYNAMIC shop" })}>
@@ -149,19 +300,19 @@ export const renderShopPage = (products = shopProducts) => {
           <label class="shop-field" for="shop-model">
             ${i18n("span", { zh: "车型", en: "MODEL" })}
             <select id="shop-model" data-shop-model>
-                ${renderOptions(shopVehicles.models.BMW)}
+                ${renderOptions([...new Set(shopVehicles.tuples.map(({ model }) => model))])}
             </select>
           </label>
           <label class="shop-field" for="shop-year">
             ${i18n("span", { zh: "年份", en: "YEAR" })}
             <select id="shop-year" data-shop-year>
-                ${renderOptions(shopVehicles.years["G80 M3"])}
+                ${renderOptions([...new Set(shopVehicles.tuples.map(({ year }) => year))])}
             </select>
           </label>
           <label class="shop-field" for="shop-chassis">
             ${i18n("span", { zh: "底盘", en: "CHASSIS" })}
             <select id="shop-chassis" data-shop-chassis>
-                ${renderOptions(shopVehicles.chassis["G80 M3"])}
+                ${renderOptions([...new Set(shopVehicles.tuples.map(({ chassis }) => chassis))])}
             </select>
           </label>
           ${i18n("button", { zh: "查找部件", en: "FIND PARTS" }, ' class="shop-find-button" type="button" data-find-parts')}
@@ -233,8 +384,9 @@ export const renderShopPage = (products = shopProducts) => {
       </dialog>
       ${footer}
     </main>
+    <script type="application/json" data-shop-vehicle-data>${serializeJson(shopVehicles.tuples)}</script>
     <script src="../content-pages.js?v=three-page-expansion-20260726"></script>
-    <script src="../shop.js?v=shop-final-review-20260722"></script>
+    <script src="../shop.js?v=three-page-expansion-20260726"></script>
   </body>
 </html>
 `;
@@ -242,7 +394,9 @@ export const renderShopPage = (products = shopProducts) => {
 
 export async function writeShopPage() {
   await mkdir(resolve(root, "pages"), { recursive: true });
+  await mkdir(resolve(root, "pages/shop"), { recursive: true });
   await writeFile(resolve(root, "pages/shop.html"), renderShopPage());
+  await writeFile(resolve(root, "pages/shop/forged-wheel.html"), renderForgedWheelPage());
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -205,7 +205,7 @@ test("planner review switches selected services and product labels to Chinese", 
   assert.equal(harness.reviewDirections.textContent, "Performance Parts");
   assert.equal(
     harness.reviewProduct.textContent,
-    "forged-wheel, Diameter: 19 inch, Width: 9.5J / 10.5J, Finish: Satin Black, Quantity: 4"
+    "Forged Wheel, Diameter: 19 inch, Width: 9.5J / 10.5J, Finish: Satin Black, Quantity: 4"
   );
 
   harness.langToggle.dispatch("click");
@@ -214,8 +214,10 @@ test("planner review switches selected services and product labels to Chinese", 
   assert.equal(harness.reviewDirections.textContent, "汽车配件");
   assert.equal(
     harness.reviewProduct.textContent,
-    "forged-wheel, 直径: 19 inch, 宽度: 9.5J / 10.5J, 颜色: Satin Black, 数量: 4"
+    "锻造轮毂, 直径: 19 inch, 宽度: 9.5J / 10.5J, 颜色: 缎面黑, 数量: 4"
   );
+  assert.match(harness.testBridge.getState().product, /forged-wheel/);
+  assert.match(harness.testBridge.getState().product, /Satin Black/);
 });
 
 test("planner translates a visible validation error on language change", () => {
@@ -274,7 +276,7 @@ test("planner validates transitions and preserves browser-driven selections", ()
   assert.equal(harness.reviewVehicle.textContent, "2024 BMW G82 M4 G8X");
   assert.equal(harness.reviewGoal.textContent, "ROAD & TRACK");
   assert.equal(harness.reviewDirections.textContent, "Chassis Setup");
-  assert.equal(harness.reviewProduct.textContent, "forged-wheel, Finish: Satin Black");
+  assert.equal(harness.reviewProduct.textContent, "Forged Wheel, Finish: Satin Black");
   assert.equal(harness.reviewProductRow.hidden, false);
   assert.equal(harness.steps[3].hidden, false);
   assert.equal(harness.steps[2].hidden, true);
@@ -284,6 +286,7 @@ test("planner validates transitions and preserves browser-driven selections", ()
   assert.equal(target.pathname, "/pages/contact.html");
   assert.equal(target.searchParams.get("vehicle"), "2024 BMW G82 M4 G8X");
   assert.equal(target.searchParams.get("service"), "Chassis Setup");
+  assert.equal(target.searchParams.get("product"), "forged-wheel");
   assert.match(target.searchParams.get("message"), /Goal: ROAD & TRACK\./);
   assert.match(target.searchParams.get("message"), /forged-wheel/i);
   assert.match(target.searchParams.get("message"), /Satin Black/);
@@ -292,6 +295,27 @@ test("planner validates transitions and preserves browser-driven selections", ()
   harness.progress[3].dispatch("click");
   assert.equal(harness.testBridge.getState().goal, "road-track");
   assert.deepEqual([...harness.testBridge.getState().directions], ["chassis"]);
+});
+
+test("Audi product selection stays intact from planner review to contact", () => {
+  const query = new URLSearchParams({
+    vehicle: "2024 AUDI RS 5 B9.5",
+    direction: "parts",
+    product: "forged-wheel",
+    diameter: "19 inch",
+    width: "9.5J / 10.5J",
+    finish: "Satin Black",
+    quantity: "4",
+  });
+  const harness = createPlannerHarness(`?${query}`);
+
+  harness.progress[3].dispatch("click");
+  const target = new URL(harness.submit.href, "https://example.test/pages/project.html");
+
+  assert.equal(harness.reviewVehicle.textContent, "2024 AUDI RS 5 B9.5");
+  assert.equal(target.searchParams.get("vehicle"), "2024 AUDI RS 5 B9.5");
+  assert.equal(target.searchParams.get("product"), "forged-wheel");
+  assert.match(target.searchParams.get("message"), /Product selection: forged-wheel/);
 });
 
 test("planner submit click uses the allowlisted contact URL", () => {

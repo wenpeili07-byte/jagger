@@ -97,6 +97,7 @@ test("new shared references cannot collide with known warm-cache entries", () =>
 test("three-page expansion assets use the integration cache version", () => {
   const assetPages = new Map([
     ["./pages/project.html", ["project.css", "project.js"]],
+    ["./pages/shop.html", ["shop.css", "shop.js"]],
     ["./pages/shop/forged-wheel.html", ["shop-product.css", "shop-product.js"]],
     ["./pages/cases/case-02.html", ["case-02.css", "case-02.js"]],
     ["./pages/contact.html", ["contact-form.js"]],

@@ -1,12 +1,7 @@
 (() => {
-  const productState = {
-    vehicle: { make: "BMW", model: "G80 M3", year: "2024", chassis: "G8X" },
-    diameter: "19 inch",
-    width: "9.5J / 10.5J",
-    finish: "Satin Black",
-    quantity: 4,
-    supported: true,
-  };
+  const configNode = document.querySelector("[data-product-config]");
+  const productConfig = readProductConfig(configNode);
+  if (!productConfig) return;
 
   const vehicleControls = {
     make: document.querySelector("[data-fitment-make]"),
@@ -23,7 +18,33 @@
   const fitmentMessage = document.querySelector("[data-fitment-message]");
   const addToBuild = document.querySelector("[data-add-to-build]");
   const fitmentInquiry = document.querySelector("[data-fitment-inquiry]");
+  const backToShop = document.querySelector("[data-product-back]");
   const langToggle = document.querySelector(".lang-toggle");
+  const defaultVehicle = { ...productConfig.defaults.vehicle };
+  const productState = {
+    vehicle: { ...defaultVehicle },
+    diameter: productConfig.defaults.diameter,
+    width: productConfig.defaults.width,
+    finish: productConfig.defaults.finish,
+    quantity: productConfig.defaults.quantity,
+    supported: false,
+  };
+
+  function readProductConfig(node) {
+    try {
+      const parsed = JSON.parse(node?.textContent || "null");
+      return parsed
+        && typeof parsed.id === "string"
+        && Array.isArray(parsed.vehicles)
+        && Array.isArray(parsed.fitments)
+        && parsed.defaults
+        && parsed.options
+        ? parsed
+        : null;
+    } catch {
+      return null;
+    }
+  }
 
   function cleanQueryValue(value, maxLength) {
     return String(value || "")
@@ -33,25 +54,67 @@
       .slice(0, maxLength);
   }
 
+  function cleanVehicle(values) {
+    return {
+      make: cleanQueryValue(values.make, 20).toUpperCase(),
+      model: cleanQueryValue(values.model, 40),
+      year: cleanQueryValue(values.year, 4),
+      chassis: cleanQueryValue(values.chassis, 20),
+    };
+  }
+
+  function findVehicleTuple(values) {
+    const vehicle = cleanVehicle(values);
+    return productConfig.vehicles.find((candidate) =>
+      candidate.make === vehicle.make
+      && candidate.model === vehicle.model
+      && candidate.year === vehicle.year
+      && candidate.chassis === vehicle.chassis
+    ) || null;
+  }
+
+  function applyVehicleToControls(vehicle) {
+    for (const [key, control] of Object.entries(vehicleControls)) {
+      control.value = vehicle[key];
+    }
+  }
+
   function validateFitment(state) {
-    const supportedModel = /^(G80 M3|G82 M4|G83 M4)$/i.test(state.vehicle.model.trim());
-    const supportedYear = Number(state.vehicle.year) >= 2021 && Number(state.vehicle.year) <= 2026;
-    const supportedSize =
-      (state.diameter === "19 inch" && state.width === "9.5J / 10.5J") ||
-      (state.diameter === "20 inch" && state.width === "10J / 11J");
-    return state.vehicle.make === "BMW"
-      && state.vehicle.chassis.toUpperCase() === "G8X"
-      && supportedModel
-      && supportedYear
-      && supportedSize;
+    const fitment = productConfig.fitments.find((candidate) =>
+      candidate.make === state.vehicle.make
+      && candidate.model === state.vehicle.model
+      && candidate.year === state.vehicle.year
+      && candidate.chassis === state.vehicle.chassis
+    );
+    return Boolean(
+      fitment?.combinations?.some((combination) =>
+        combination.diameter === state.diameter
+        && combination.width === state.width
+      ),
+    );
+  }
+
+  function syncBackToShop(state) {
+    if (!backToShop) return;
+    const source = new URLSearchParams(window.location.search);
+    const categories = source
+      .getAll("category")
+      .flatMap((value) => value.split(","))
+      .filter((value) => productConfig.categories.includes(value));
+    const target = new URLSearchParams();
+    if (categories.length > 0) target.set("category", [...new Set(categories)].join(","));
+    for (const key of ["make", "model", "year", "chassis"]) {
+      target.set(key, state.vehicle[key]);
+    }
+    backToShop.setAttribute("href", `../shop.html?${target.toString()}`);
   }
 
   function syncProductActions(state) {
     state.supported = validateFitment(state);
     const language = document.documentElement.lang.startsWith("zh") ? "zh" : "en";
     const fitmentCopy = state.supported
-      ? { en: "FITMENT MATCH · FINAL CLEARANCE CHECK REQUIRED", zh: "适配匹配 · 仍需最终空间确认" }
-      : { en: "FITMENT CHECK REQUIRED", zh: "需要确认车型适配" };
+      ? productConfig.fitmentCopy.supported
+      : productConfig.fitmentCopy.unsupported;
 
     fitmentMessage.dataset.en = fitmentCopy.en;
     fitmentMessage.dataset.zh = fitmentCopy.zh;
@@ -59,7 +122,7 @@
     addToBuild.setAttribute("aria-disabled", String(!state.supported));
 
     const plannerQuery = new URLSearchParams({
-      product: "forged-wheel",
+      product: productConfig.id,
       vehicle: [state.vehicle.year, state.vehicle.make, state.vehicle.model, state.vehicle.chassis].join(" "),
       direction: "parts",
       diameter: state.diameter,
@@ -79,23 +142,28 @@
     const contactQuery = new URLSearchParams({
       vehicle: [state.vehicle.year, state.vehicle.make, state.vehicle.model, state.vehicle.chassis].join(" "),
       service: "Performance Parts",
-      product: "forged-wheel",
-      message: `Fitment check: ${state.diameter}, ${state.width}, ${state.finish}, quantity ${state.quantity}.`,
+      product: productConfig.id,
+      message: `Product: ${productConfig.id}. Fitment check: ${state.diameter}, ${state.width}, ${state.finish}, quantity ${state.quantity}.`,
     });
     fitmentInquiry.setAttribute("href", `../contact.html?${contactQuery.toString()}`);
+    syncBackToShop(state);
+  }
+
+  function selectedOption(key) {
+    const selected = optionControls[key].find((control) => control.checked)?.value;
+    const allowed = new Set(productConfig.options[key].map(({ id }) => id));
+    return allowed.has(selected) ? selected : productConfig.defaults[key];
   }
 
   function syncStateFromControls() {
-    productState.vehicle = {
-      make: cleanQueryValue(vehicleControls.make.value, 20),
-      model: cleanQueryValue(vehicleControls.model.value, 40),
-      year: cleanQueryValue(vehicleControls.year.value, 4),
-      chassis: cleanQueryValue(vehicleControls.chassis.value, 20),
-    };
-
-    for (const [key, controls] of Object.entries(optionControls)) {
-      productState[key] = controls.find((control) => control.checked)?.value || productState[key];
-    }
+    productState.vehicle = cleanVehicle(
+      Object.fromEntries(
+        Object.entries(vehicleControls).map(([key, control]) => [key, control.value]),
+      ),
+    );
+    productState.diameter = selectedOption("diameter");
+    productState.width = selectedOption("width");
+    productState.finish = selectedOption("finish");
 
     const quantity = Number.parseInt(quantityControl.value, 10);
     productState.quantity = Math.min(4, Math.max(1, Number.isNaN(quantity) ? 1 : quantity));
@@ -105,17 +173,31 @@
 
   function applyInitialVehicle() {
     const query = new URLSearchParams(window.location.search);
-    const limits = { make: 20, model: 40, year: 4, chassis: 20 };
-
-    for (const [key, control] of Object.entries(vehicleControls)) {
-      const value = cleanQueryValue(query.get(key), limits[key]);
-      if (value) control.value = value;
-    }
+    const queryVehicle = cleanVehicle({
+      make: query.get("make"),
+      model: query.get("model"),
+      year: query.get("year"),
+      chassis: query.get("chassis"),
+    });
+    const complete = Object.values(queryVehicle).every(Boolean);
+    const selectedVehicle = complete ? findVehicleTuple(queryVehicle) : null;
+    productState.vehicle = { ...(selectedVehicle || defaultVehicle) };
+    applyVehicleToControls(productState.vehicle);
   }
 
   applyInitialVehicle();
 
-  Object.values(vehicleControls).forEach((control) => {
+  vehicleControls.make.addEventListener("change", () => {
+    const selectedVehicle =
+      productConfig.vehicles.find(
+        ({ make }) => make === cleanQueryValue(vehicleControls.make.value, 20).toUpperCase(),
+      )
+      || defaultVehicle;
+    productState.vehicle = { ...selectedVehicle };
+    applyVehicleToControls(productState.vehicle);
+    syncStateFromControls();
+  });
+  [vehicleControls.model, vehicleControls.year, vehicleControls.chassis].forEach((control) => {
     control.addEventListener("input", syncStateFromControls);
     control.addEventListener("change", syncStateFromControls);
   });
@@ -135,7 +217,7 @@
     Object.assign(window.LonmaProductTest, {
       getState: () => productState,
       setVehicle(make, model, year, chassis) {
-        productState.vehicle = { make, model, year, chassis };
+        productState.vehicle = cleanVehicle({ make, model, year, chassis });
         syncProductActions(productState);
       },
       syncProductActions,
