@@ -11,6 +11,9 @@ const case02Css = read("./case-02.css");
 const projectCss = existsSync(new URL("./project.css", import.meta.url))
   ? read("./project.css")
   : "";
+const shopProductCss = existsSync(new URL("./shop-product.css", import.meta.url))
+  ? read("./shop-product.css")
+  : "";
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
   assert.notEqual(start, -1, message);
@@ -262,6 +265,44 @@ test("project planner preserves its desktop split and mobile action clearance", 
     projectMobileBlock,
     /\.project-actions\s*\{[^}]*position:\s*sticky[^}]*bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/s,
     "project actions should remain above the fixed mobile navigation"
+  );
+});
+
+test("forged wheel detail stacks cleanly and clears the mobile navigation", () => {
+  assert.match(
+    shopProductCss,
+    /\.product-detail\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1\.08fr\)\s+minmax\(420px,\s*0\.92fr\)/s,
+    "product detail should use the approved desktop split"
+  );
+  assert.match(
+    shopProductCss,
+    /\.product-stage-main\s*\{[^}]*aspect-ratio:\s*1[^}]*background:\s*#0d0f11/s,
+    "product media should retain square neutral staging"
+  );
+  assert.match(
+    shopProductCss,
+    /\.product-stage-main\s*>\s*img\s*\{[^}]*object-fit:\s*contain/s,
+    "the wheel must remain fully visible"
+  );
+  assert.match(
+    shopProductCss,
+    /@media \(max-width:\s*1100px\)[\s\S]*?\.product-detail\s*\{[^}]*grid-template-columns:\s*1fr/s,
+    "product detail should stack below 1100px"
+  );
+  const productMobileBlock = mediaBlock(
+    shopProductCss,
+    "@media (max-width: 767px)",
+    "product detail should define its mobile range"
+  );
+  assert.match(
+    productMobileBlock,
+    /\.forged-wheel-page\s*\{[^}]*padding-bottom:\s*calc\(148px \+ env\(safe-area-inset-bottom\)\)/s,
+    "mobile product content should reserve action-bar space"
+  );
+  assert.match(
+    productMobileBlock,
+    /\.product-actions\s*\{[^}]*position:\s*fixed[^}]*bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/s,
+    "mobile product actions should sit above the shared bottom navigation"
   );
 });
 

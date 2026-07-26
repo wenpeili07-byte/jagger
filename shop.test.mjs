@@ -66,7 +66,10 @@ class RuntimeNode {
   }
 }
 
-function createDialogHarness() {
+function createDialogHarness({
+  locationHref = "https://example.test/pages/shop.html",
+  productHref = "./shop/forged-wheel.html",
+} = {}) {
   const product = shopProducts[0];
   const trigger = new RuntimeNode();
   const category = new RuntimeNode({ dataset: { en: "WHEELS", zh: "轮毂" } });
@@ -94,6 +97,8 @@ function createDialogHarness() {
   const dialogCompatibility = new RuntimeNode();
   const dialogInquiry = new RuntimeNode();
   const dialogClose = new RuntimeNode();
+  const productLink = new RuntimeNode();
+  productLink.setAttribute("href", productHref);
   const documentListeners = new Map();
   const shopSelector = new RuntimeNode();
   const mobileVehicleEdit = new RuntimeNode();
@@ -127,7 +132,7 @@ function createDialogHarness() {
     ["[data-mobile-vehicle-chassis]", mobileChassis],
     ["[data-find-parts]", findButton],
   ]);
-  const locationUrl = new URL("https://example.test/pages/shop.html");
+  const locationUrl = new URL(locationHref);
   const location = {
     hash: locationUrl.hash,
     href: locationUrl.href,
@@ -143,6 +148,7 @@ function createDialogHarness() {
     querySelectorAll(selector) {
       if (selector === "[data-product-card]") return [card];
       if (selector === "[data-category-filter]") return [];
+      if (selector === "[data-product-link]") return [productLink];
       return [];
     },
   };
@@ -179,6 +185,7 @@ function createDialogHarness() {
     mobileYear,
     open: () => trigger.listeners.get("click")(),
     productDialog,
+    productLink,
     shopSelector,
     trigger,
   };
@@ -192,6 +199,32 @@ test("shop renders six truthful bilingual sample products", () => {
   assert.match(html, /data-zh="示例车型" data-en="SAMPLE VEHICLE"/);
   assert.doesNotMatch(html, /\$\s?\d|IN STOCK|data-price|sku|part number/i);
   assert.equal((html.match(/data-en="INQUIRE"/g) || []).length, 6);
+});
+
+test("forged wheel card is the only product deep link", () => {
+  assert.match(
+    html,
+    /href="\.\/shop\/forged-wheel\.html"[^>]*data-product-link="forged-wheel"/
+  );
+  assert.equal((html.match(/data-product-link=/g) || []).length, 1);
+  assert.equal((html.match(/data-product-open/g) || []).length, 5);
+});
+
+test("forged wheel link preserves category, vehicle, and its own query values", () => {
+  const harness = createDialogHarness({
+    locationHref: "https://example.test/pages/shop.html?category=wheels",
+    productHref: "./shop/forged-wheel.html?source=shop-card",
+  });
+  const target = new URL(harness.productLink.href, "https://example.test/pages/shop.html");
+
+  assert.deepEqual(Object.fromEntries(target.searchParams), {
+    source: "shop-card",
+    category: "wheels",
+    make: "BMW",
+    model: "G80 M3",
+    year: "2024",
+    chassis: "G8X",
+  });
 });
 
 test("shop renders the approved compact mobile vehicle summary", () => {

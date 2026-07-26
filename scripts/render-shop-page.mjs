@@ -46,6 +46,14 @@ const renderProductCard = (product) => {
     en: String(product.category).toUpperCase(),
     zh: String(product.category),
   };
+  const action = product.id === "forged-wheel"
+    ? `<a
+                  href="./shop/forged-wheel.html"
+                  data-product-link="forged-wheel"
+                  data-zh="查看配置 →"
+                  data-en="CONFIGURE →"
+                >CONFIGURE →</a>`
+    : i18n("button", { zh: "查看详情 →", en: "VIEW DETAILS →" }, ` type="button" data-product-open data-product-id="${escapeAttribute(product.id)}"`);
 
   return `<article
             class="shop-product-card"
@@ -71,7 +79,7 @@ const renderProductCard = (product) => {
               ${i18n("h2", product.title)}
               <div class="shop-product-meta">
                 ${i18n("span", { zh: "请咨询", en: "INQUIRE" })}
-                ${i18n("button", { zh: "查看详情 →", en: "VIEW DETAILS →" }, ` type="button" data-product-open data-product-id="${escapeAttribute(product.id)}"`)}
+                ${action}
               </div>
             </div>
           </article>`;

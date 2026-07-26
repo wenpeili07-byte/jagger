@@ -1,5 +1,6 @@
 (() => {
   const cards = [...document.querySelectorAll("[data-product-card]")];
+  const productLinks = [...document.querySelectorAll("[data-product-link]")];
   const filters = [...document.querySelectorAll("[data-category-filter]")];
   const resultsStatus = document.querySelector("[data-results-status]");
   const emptyState = document.querySelector("[data-results-empty]");
@@ -57,6 +58,24 @@
 
     summaries.forEach((node, index) => {
       if (node) node.textContent = values[index].value || "—";
+    });
+    syncProductLinks();
+  }
+
+  function syncProductLinks() {
+    const source = new URLSearchParams(window.location.search);
+    source.set("make", makeControl.value);
+    source.set("model", modelControl.value);
+    source.set("year", yearControl.value);
+    source.set("chassis", chassisControl.value);
+
+    productLinks.forEach((link) => {
+      const target = new URL(link.getAttribute("href"), window.location.href);
+      ["category", "make", "model", "year", "chassis"].forEach((key) => {
+        const value = source.get(key);
+        if (value) target.searchParams.set(key, value);
+      });
+      link.href = `${target.pathname}${target.search}`;
     });
   }
 
@@ -185,6 +204,7 @@
       const categories = activeCategories();
       updateCategoryQuery(categories);
       applyCatalogState();
+      syncProductLinks();
     });
   });
 
@@ -195,7 +215,7 @@
 
   cards.forEach((card) => {
     const trigger = card.querySelector("[data-product-open]");
-    trigger.addEventListener("click", () => openProductDialog(card, trigger));
+    trigger?.addEventListener("click", () => openProductDialog(card, trigger));
   });
 
   dialogClose.addEventListener("click", () => productDialog.close());

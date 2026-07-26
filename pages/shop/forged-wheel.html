@@ -3,10 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Forged wheel details from LONMA DYNAMIC." />
-    <title>Forged Wheel | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
+    <meta name="description" content="Configure a forged wheel direction and request final fitment verification from LONMA DYNAMIC." />
+    <title>Monoblock Forged Wheel | LONMA DYNAMIC</title>
+    <link rel="stylesheet" href="../../styles.css?v=contact-form-20260723" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=contact-form-20260723" />
+    <link rel="stylesheet" href="../../shop-product.css?v=forged-wheel-20260726" />
   </head>
   <body data-section="shop">
     <main class="site-shell forged-wheel-page">
@@ -27,9 +28,84 @@
           </button>
         </div>
       </header>
-      <section aria-labelledby="forged-wheel-title">
-        <h1 id="forged-wheel-title" data-en="FORGED WHEEL." data-zh="锻造轮毂。">FORGED WHEEL.</h1>
+
+      <section class="product-detail" aria-labelledby="product-title">
+        <div class="product-stage">
+          <a class="product-back" href="../shop.html" data-en="← BACK TO SHOP" data-zh="← 返回商店">← BACK TO SHOP</a>
+          <div class="product-stage-main">
+            <img src="../../assets/images/shop/forged-wheel.webp" alt="Forged performance wheel in satin black" data-en-alt="Forged performance wheel in satin black" data-zh-alt="缎面黑锻造性能轮毂" />
+          </div>
+          <div class="product-thumbnails" aria-label="Product views" data-en-aria-label="Product views" data-zh-aria-label="产品视图">
+            <button type="button" aria-current="true" aria-label="Front wheel view" data-en-aria-label="Front wheel view" data-zh-aria-label="轮毂正面视图"><img src="../../assets/images/shop/forged-wheel.webp" alt="" /></button>
+          </div>
+        </div>
+
+        <div class="product-config">
+          <p class="product-kicker" data-en="WHEELS / FORGED" data-zh="轮毂 / 锻造">WHEELS / FORGED</p>
+          <h1 id="product-title" data-en="MONOBLOCK FORGED WHEEL" data-zh="单片式锻造轮毂">MONOBLOCK FORGED WHEEL</h1>
+          <p class="product-summary" data-en="A lightweight wheel direction configured around vehicle fitment, brake clearance, and complete-car proportion." data-zh="围绕车型适配、刹车空间与整车比例配置的轻量化轮毂方向。">A lightweight wheel direction configured around vehicle fitment, brake clearance, and complete-car proportion.</p>
+          <p class="product-reference-price">
+            <span data-en="REFERENCE PACKAGE" data-zh="参考套装">REFERENCE PACKAGE</span>
+            <strong>US$3,200</strong>
+            <small data-en="Final quote follows fitment verification." data-zh="最终报价以适配确认后为准。">Final quote follows fitment verification.</small>
+          </p>
+
+          <fieldset data-product-fitment>
+            <legend data-en="VEHICLE FITMENT" data-zh="车型适配">VEHICLE FITMENT</legend>
+            <div class="product-fitment-grid">
+              <label><span data-en="MAKE" data-zh="品牌">MAKE</span><select data-fitment-make maxlength="20"><option>BMW</option><option>AUDI</option><option>MERCEDES-BENZ</option></select></label>
+              <label><span data-en="MODEL" data-zh="车型">MODEL</span><input data-fitment-model value="G80 M3" maxlength="40" /></label>
+              <label><span data-en="YEAR" data-zh="年份">YEAR</span><input data-fitment-year value="2024" maxlength="4" inputmode="numeric" /></label>
+              <label><span data-en="CHASSIS" data-zh="底盘">CHASSIS</span><input data-fitment-chassis value="G8X" maxlength="20" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset data-option-group="diameter">
+            <legend data-en="DIAMETER" data-zh="直径">DIAMETER</legend>
+            <div class="product-option-row">
+              <label><input type="radio" name="diameter" value="19 inch" checked /><span>19"</span></label>
+              <label><input type="radio" name="diameter" value="20 inch" /><span>20"</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset data-option-group="width">
+            <legend data-en="WIDTH" data-zh="宽度">WIDTH</legend>
+            <div class="product-option-row">
+              <label><input type="radio" name="width" value="9.5J / 10.5J" checked /><span>9.5J / 10.5J</span></label>
+              <label><input type="radio" name="width" value="10J / 11J" /><span>10J / 11J</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset data-option-group="finish">
+            <legend data-en="FINISH" data-zh="颜色">FINISH</legend>
+            <div class="product-option-row product-finish-row">
+              <label><input type="radio" name="finish" value="Satin Black" checked /><span class="finish-swatch finish-swatch-black" aria-hidden="true"></span><span data-en="SATIN BLACK" data-zh="缎面黑">SATIN BLACK</span></label>
+              <label><input type="radio" name="finish" value="Brushed Silver" /><span class="finish-swatch finish-swatch-silver" aria-hidden="true"></span><span data-en="BRUSHED SILVER" data-zh="拉丝银">BRUSHED SILVER</span></label>
+            </div>
+          </fieldset>
+
+          <label class="product-quantity"><span data-en="QUANTITY" data-zh="数量">QUANTITY</span><input data-product-quantity type="number" min="1" max="4" value="4" /></label>
+          <p class="product-fitment-message" data-fitment-message aria-live="polite"></p>
+
+          <div class="product-actions">
+            <span class="product-action-price"><small data-en="REFERENCE PACKAGE" data-zh="参考套装">REFERENCE PACKAGE</small><strong>US$3,200</strong></span>
+            <a data-add-to-build data-en="ADD TO BUILD" data-zh="加入项目">ADD TO BUILD</a>
+            <a data-fitment-inquiry data-en="REQUEST FITMENT CHECK" data-zh="申请适配确认">REQUEST FITMENT CHECK</a>
+          </div>
+        </div>
       </section>
+
+      <section class="product-specifications" aria-labelledby="product-specifications-title">
+        <p class="product-kicker" data-en="PRODUCT DIRECTION" data-zh="产品方向">PRODUCT DIRECTION</p>
+        <h2 id="product-specifications-title" data-en="SPECIFICATIONS" data-zh="规格">SPECIFICATIONS</h2>
+        <dl>
+          <div><dt data-en="CONSTRUCTION" data-zh="结构">CONSTRUCTION</dt><dd data-en="MONOBLOCK FORGED" data-zh="单片式锻造">MONOBLOCK FORGED</dd></div>
+          <div><dt data-en="APPLICATION" data-zh="用途">APPLICATION</dt><dd data-en="STREET &amp; ROAD PERFORMANCE" data-zh="街道与道路性能">STREET &amp; ROAD PERFORMANCE</dd></div>
+          <div><dt data-en="FINISH" data-zh="颜色">FINISH</dt><dd data-en="SATIN BLACK OR BRUSHED SILVER" data-zh="缎面黑或拉丝银">SATIN BLACK OR BRUSHED SILVER</dd></div>
+          <div><dt data-en="FITMENT" data-zh="适配">FITMENT</dt><dd data-en="CONFIRM BEFORE ORDER" data-zh="下单前确认">CONFIRM BEFORE ORDER</dd></div>
+        </dl>
+      </section>
+
       <footer class="content-footer">
         <span>LONMA DYNAMIC</span>
         <span data-zh="龙马态度 · 2026" data-en="AUTOMOTIVE ATTITUDE · 2026">AUTOMOTIVE ATTITUDE · 2026</span>
@@ -37,5 +113,6 @@
       </footer>
     </main>
     <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
+    <script src="../../shop-product.js?v=forged-wheel-20260726"></script>
   </body>
 </html>
