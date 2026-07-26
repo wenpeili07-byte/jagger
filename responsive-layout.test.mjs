@@ -175,34 +175,64 @@ assert.match(
   /@media \(max-width:\s*767px\)[\s\S]*\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*1fr/s,
   "Shop should use a single product column on mobile"
 );
-assert.match(
-  case02Css,
-  /@media \(max-width:\s*767px\)[\s\S]*\[data-case-marker\]\s*\{[^}]*display:\s*none/s,
-  "Case 02 should hide image markers on mobile"
-);
-test("Case 02 desktop showcase expands with intrinsic rail content", () => {
-  const case02ShowcaseRule = ruleBlock(
+test("Case 02 uses a capped 16:9 poster stage without scaling", () => {
+  const videoStageRule = ruleBlock(
     case02Css,
-    ".case02-showcase",
-    "Case 02 should define its desktop showcase"
+    ".case02-video-stage",
+    "Case 02 should define its poster stage"
   );
-  assert.doesNotMatch(
-    case02ShowcaseRule,
-    /(?:^|\n)\s*height\s*:/,
-    "Case 02 desktop showcase should expand with intrinsic rail content on short viewports"
+  assert.match(videoStageRule, /aspect-ratio:\s*16\s*\/\s*9/);
+  assert.match(videoStageRule, /max-height:\s*var\(--site-first-screen-max\)/);
+  assert.match(videoStageRule, /overflow:\s*hidden/);
+  assert.match(
+    case02Css,
+    /\.case02-video-stage\s*>\s*video\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*object-fit:\s*cover/s
   );
 });
 
-test("Case 02 tablet image preserves the approved 4:3 geometry", () => {
-  const case02TabletBlock = mediaBlock(
+test("Case 02 story stacks in reading order below 1000px", () => {
+  const case02StackBlock = mediaBlock(
     case02Css,
-    "@media (min-width: 768px) and (max-width: 1279px)",
-    "Case 02 should define the approved tablet range"
+    "@media (max-width: 1000px)",
+    "Case 02 should define its stacked story range"
   );
   assert.match(
-    case02TabletBlock,
-    /\.case02-media\s*\{[^}]*aspect-ratio:\s*4\s*\/\s*3/s,
-    "Case 02 should preserve a 4:3 tablet image"
+    case02StackBlock,
+    /\.case02-story-beat\s*\{[^}]*grid-template-columns:\s*1fr/s,
+    "Case 02 story beats should use one column"
+  );
+  assert.doesNotMatch(
+    case02StackBlock,
+    /\border\s*:/,
+    "stacked story beats should preserve their document reading order"
+  );
+});
+
+test("Case 02 mobile moves copy below the poster and keeps useful case links", () => {
+  const case02MobileBlock = mediaBlock(
+    case02Css,
+    "@media (max-width: 767px)",
+    "Case 02 should define its mobile range"
+  );
+  assert.match(
+    case02MobileBlock,
+    /\.case02-video-stage\s*\{[^}]*aspect-ratio:\s*auto/s,
+    "the mobile stage should grow to include copy beneath the poster"
+  );
+  assert.match(
+    case02MobileBlock,
+    /\.case02-video-stage\s*>\s*video\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/s,
+    "the mobile poster should retain its 16:9 frame"
+  );
+  assert.match(
+    case02MobileBlock,
+    /\.case02-video-copy\s*\{[^}]*position:\s*static/s,
+    "mobile copy should leave the poster overlay"
+  );
+  assert.match(
+    case02MobileBlock,
+    /\.case02-page\s+\.detail-pagination a\s*\{[^}]*min-height:\s*48px/s,
+    "adjacent case links should retain useful mobile touch targets"
   );
 });
 const lateCompactCasesBlock = mediaBlock(

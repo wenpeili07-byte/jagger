@@ -16,10 +16,11 @@ for (const id of ["01", "03", "04", "05", "06"]) {
 
 const case02 = read("./pages/cases/case-02.html");
 assert.match(case02, /case-detail\.css\?v=mobile-spacing-20260722/);
-assert.match(case02, /class="case02-showcase"/);
-assert.match(case02, /class="detail-story"/);
+assert.match(case02, /class="case02-video-stage"/);
+assert.match(case02, /class="case02-story"/);
 assert.match(case02, /class="detail-contact"/);
 assert.match(case02, /class="detail-pagination"/);
+assert.equal((case02.match(/class="detail-contact"/g) || []).length, 1);
 assert.doesNotMatch(case02, /<figcaption|case-spec-grid|case-section-kicker|case-detail-meta/);
 
 assert.match(css, /\.detail-hero\s*\{[^}]*grid-template-columns:/s);

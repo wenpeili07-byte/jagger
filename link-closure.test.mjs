@@ -70,13 +70,32 @@ for (const id of caseIds) {
   assert.match(html, /class="detail-pagination"/, `${route} should contain previous and next links`);
   assert.match(html, /<a class="brand"[^>]*data-zh-aria-label="回到首页"[^>]*data-en-aria-label="Back to home"/, `${route} should give the brand bilingual accessible names`);
   assert.match(html, /<nav class="nav"[^>]*data-zh-aria-label="主导航"[^>]*data-en-aria-label="Main navigation"/, `${route} should give navigation a bilingual accessible name`);
-  assert.match(html, /<img[^>]*data-zh-alt="LONMA DYNAMIC [^"]+"[^>]*data-en-alt="LONMA DYNAMIC [^"]+"/, `${route} should give its title-based image alternative in both languages`);
+  if (id === "02") {
+    assert.match(
+      html,
+      /<video[^>]*data-case-video[^>]*data-en-aria-label="Case 02 project film"[^>]*data-zh-aria-label="案例 02 项目影片"/s,
+      `${route} should give its poster stage a bilingual accessible name`
+    );
+  } else {
+    assert.match(html, /<img[^>]*data-zh-alt="LONMA DYNAMIC [^"]+"[^>]*data-en-alt="LONMA DYNAMIC [^"]+"/, `${route} should give its title-based image alternative in both languages`);
+  }
   assert.match(html, /<nav class="detail-pagination"[^>]*data-zh-aria-label="案例分页"[^>]*data-en-aria-label="Case pagination"/, `${route} should give pagination a bilingual accessible name`);
-  const backLink = anchorsWithClass(html, "detail-back")[0];
-  assert.equal(attributeValue(backLink, "href"), "../cases.html", `${route} should return to the cases archive`);
+  if (id === "02") {
+    assert.match(html, /<a href="\.\.\/cases\.html"[^>]*data-zh="← 返回案例"[^>]*data-en="← BACK TO CASES"/);
+  } else {
+    const backLink = anchorsWithClass(html, "detail-back")[0];
+    assert.equal(attributeValue(backLink, "href"), "../cases.html", `${route} should return to the cases archive`);
+  }
   const contactSection = html.match(/<section class="detail-contact">([\s\S]*?)<\/section>/)?.[1];
   assert.ok(contactSection, `${route} should contain a complete contact section`);
-  assert.equal(attributeValue([...contactSection.matchAll(/<a\b[^>]*>/g)][0][0], "href"), "../contact.html", `${route} should send inquiries to contact`);
+  const contactHref = attributeValue([...contactSection.matchAll(/<a\b[^>]*>/g)][0][0], "href");
+  assert.equal(
+    contactHref,
+    id === "02"
+      ? "../contact.html?service=Custom%20Vehicle%20Builds&amp;vehicle=2024%20BMW%20G80%20M3&amp;message=Case%2002%20road%20and%20track%20direction."
+      : "../contact.html",
+    `${route} should send inquiries to contact`
+  );
 
   const pagination = html.match(/<nav class="detail-pagination"[\s\S]*?<\/nav>/);
   assert.ok(pagination, `${route} should contain a complete pagination region`);

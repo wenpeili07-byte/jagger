@@ -133,10 +133,11 @@ test("footer styling is global and not duplicated by content pages", () => {
   assert.doesNotMatch(contentCss, /\.content-footer/);
 });
 
-test("Shop and Case 02 expose their live and synchronized initial states", () => {
+test("Shop and Case 02 expose their stable initial states", () => {
   const shopHtml = read("./pages/shop.html");
   const case02Html = read("./pages/cases/case-02.html");
 
   assert.match(shopHtml, /data-results-status aria-live="polite"/);
-  assert.match(case02Html, /data-case-marker="01" aria-pressed="true" data-active/);
+  assert.match(case02Html, /class="case02-video-stage" data-video-state="poster-only"/);
+  assert.match(case02Html, /class="case02-video-status" disabled/);
 });
