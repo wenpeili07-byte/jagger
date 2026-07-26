@@ -107,6 +107,11 @@ const reviewerVisibleCopyExamples = [
   },
 ];
 
+const case02PaginationCopy = [
+  { english: "← CASE 01", label: "previous case link" },
+  { english: "CASE 03 →", label: "next case link" },
+];
+
 const publicPages = [
   "./index.html",
   "./pages/about.html",
@@ -272,7 +277,7 @@ function isExcludedVisibleTextContext(element) {
     if (current.tag === "head" || ["script", "style", "template"].includes(current.tag)) {
       return true;
     }
-    if (current.tag === "nav" || hasClass(current, "topbar")) {
+    if (hasClass(current, "topbar")) {
       return true;
     }
     if (attributeValue(current.attributes, "aria-hidden") === "true") {
@@ -547,6 +552,23 @@ test("expansion visible-copy coverage includes every reviewer example", () => {
       ).length,
       1,
       `${example.path} should cover ${example.label}`,
+    );
+  }
+});
+
+test("Case 02 pagination links are exhaustive bilingual nodes", () => {
+  const path = "./pages/cases/case-02.html";
+  const coveredElements = assertExpansionVisibleCopy(read(path), path);
+
+  for (const { english, label } of case02PaginationCopy) {
+    assert.equal(
+      coveredElements.filter(
+        (element) =>
+          element.tag === "a" &&
+          normalizedVisibleText(attributeValue(element.attributes, "data-en") ?? "") === english,
+      ).length,
+      1,
+      `${path} should cover the ${label}`,
     );
   }
 });
