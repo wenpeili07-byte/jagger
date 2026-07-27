@@ -31,5 +31,5 @@ test("the project route loads its planner assets and authentic local image", () 
 
   assert.match(html, /href="\.\.\/project\.css\?v=project-planner-redesign-20260726"/);
   assert.match(html, /src="\.\.\/project\.js\?v=project-planner-redesign-20260726"/);
-  assert.match(html, /src="\.\.\/assets\/images\/网页\/optimized\/case-01\.jpg"/);
+  assert.match(html, /src="\.\.\/assets\/images\/网页\/optimized\/case-02\.jpg"/);
 });

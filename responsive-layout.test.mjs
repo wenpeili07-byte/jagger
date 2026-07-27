@@ -285,8 +285,26 @@ test("project planner preserves its desktop split and mobile action clearance", 
   );
   assert.match(
     projectCss,
-    /\.project-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(420px,\s*0\.86fr\)\s+minmax\(0,\s*1\.14fr\)/s,
+    /\.project-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(420px,\s*39fr\)\s+minmax\(0,\s*61fr\)/s,
     "project planner should use the approved desktop split"
+  );
+  assert.match(
+    projectCss,
+    /\.project-visual\s*\{[^}]*min-height:\s*100%[^}]*overflow:\s*hidden/s
+  );
+  assert.match(
+    projectCss,
+    /\.project-visual img\s*\{[^}]*object-fit:\s*cover[^}]*object-position:\s*center 62%/s
+  );
+  assert.match(
+    projectCss,
+    /\.project-visual img\s*\{[^}]*position:\s*absolute[^}]*inset:\s*0/s,
+    "project planner media should not expand the first-screen workspace from its intrinsic ratio"
+  );
+  assert.doesNotMatch(projectCss, /transform:\s*scale\(/);
+  assert.doesNotMatch(
+    projectCss,
+    /\.project-visual img\s*\{[^}]*transition:[^}]*transform/s
   );
   assert.match(
     projectCss,

@@ -146,14 +146,19 @@ function createPlannerHarness(search = "") {
   };
 }
 
-test("planner exposes four bilingual steps and one primary handoff", () => {
+test("planner exposes the approved compact split structure", () => {
   assert.equal((html.match(/data-planner-step=/g) || []).length, 4);
-  assert.match(html, /data-en="VEHICLE" data-zh="车辆"/);
-  assert.match(html, /data-en="GOAL" data-zh="目标"/);
-  assert.match(html, /data-en="DIRECTION" data-zh="方向"/);
-  assert.match(html, /data-en="REVIEW" data-zh="确认"/);
+  assert.match(html, /<ol class="project-progress"/);
+  assert.match(html, /class="project-controls-heading"/);
+  assert.match(html, /id="project-title" data-en="BUILD YOUR PROJECT" data-zh="规划你的项目"/);
+  assert.match(
+    html,
+    /class="project-lede" data-en="Define your vehicle and goals\." data-zh="填写车辆信息与改装目标。"/
+  );
+  assert.match(html, /assets\/images\/网页\/optimized\/case-02\.jpg/);
+  assert.doesNotMatch(html, /class="project-heading"/);
+  assert.doesNotMatch(html, /<figcaption/);
   assert.equal((html.match(/data-planner-submit/g) || []).length, 1);
-  assert.match(html, /assets\/images\/网页\/optimized\/case-01\.jpg/);
 });
 
 test("planner query selections are bounded, cleaned, and preselect parts", () => {
