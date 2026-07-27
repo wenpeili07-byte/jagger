@@ -11,6 +11,26 @@ const js = readFileSync(new URL("./shop.js", import.meta.url), "utf8");
 const css = readFileSync(new URL("./shop.css", import.meta.url), "utf8");
 const { renderShopPage } = shopRenderer;
 
+test("shop uses the approved five two two grid and readable full-card states", () => {
+  assert.match(
+    css,
+    /\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s,
+  );
+  assert.match(
+    css,
+    /@media \(min-width:\s*1400px\)[\s\S]*?\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)/s,
+  );
+  assert.match(
+    css,
+    /@media \(max-width:\s*767px\)[\s\S]*?\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s,
+  );
+  assert.match(css, /\.shop-product-target\s*\{[^}]*position:\s*absolute[^}]*inset:\s*0/s);
+  assert.match(css, /\.shop-product-card:focus-within/);
+  assert.match(css, /\.shop-product-category\s*\{[^}]*font-size:\s*11px/s);
+  assert.match(css, /\.shop-product-card h2\s*\{[^}]*font-size:\s*clamp\(18px,\s*1\.1vw,\s*21px\)/s);
+  assert.match(css, /\.shop-product-meta\s*\{[^}]*font-size:\s*11px/s);
+});
+
 class RuntimeNode {
   constructor({ dataset = {}, value = "" } = {}) {
     this.attributes = new Map();

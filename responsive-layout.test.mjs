@@ -174,8 +174,8 @@ assert.match(
 );
 assert.match(
   shopCss,
-  /@media \(max-width:\s*767px\)[\s\S]*\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*1fr/s,
-  "Shop should use a single product column on mobile"
+  /@media \(max-width:\s*767px\)[\s\S]*\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s,
+  "Shop should use two product columns on mobile"
 );
 test("Case 02 stays full-width and 16:9 on 1900px and 2200px canvases", () => {
   const videoStageRule = ruleBlock(
