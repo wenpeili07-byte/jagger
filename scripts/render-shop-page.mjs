@@ -50,14 +50,28 @@ const renderProductCard = (product) => {
     en: String(product.category).toUpperCase(),
     zh: String(product.category),
   };
-  const action = product.id === "forged-wheel"
-    ? `<a
-                  href="./shop/forged-wheel.html"
-                  data-product-link="forged-wheel"
-                  data-zh="查看配置 →"
-                  data-en="CONFIGURE →"
-                >CONFIGURE →</a>`
-    : i18n("button", { zh: "查看详情 →", en: "VIEW DETAILS →" }, ` type="button" data-product-open data-product-id="${escapeAttribute(product.id)}"`);
+  const actionCopy = product.id === "forged-wheel"
+    ? { zh: "查看配置 →", en: "CONFIGURE →" }
+    : { zh: "查看详情 →", en: "VIEW DETAILS →" };
+  const accessibleAction = product.id === "forged-wheel"
+    ? {
+        en: `Configure ${product.title.en}`,
+        zh: `配置${product.title.zh}`,
+      }
+    : {
+        en: `View details for ${product.title.en}`,
+        zh: `查看${product.title.zh}详情`,
+      };
+  const target = product.id === "forged-wheel"
+    ? `<a class="shop-product-target"
+          href="./shop/forged-wheel.html"
+          data-product-link="forged-wheel"
+          ${i18nAttribute("aria-label", accessibleAction)}></a>`
+    : `<button class="shop-product-target"
+             type="button"
+             data-product-open
+             data-product-id="${escapeAttribute(product.id)}"
+             ${i18nAttribute("aria-label", accessibleAction)}></button>`;
 
   return `<article
             class="shop-product-card"
@@ -83,9 +97,10 @@ const renderProductCard = (product) => {
               ${i18n("h2", product.title)}
               <div class="shop-product-meta">
                 ${i18n("span", { zh: "请咨询", en: "INQUIRE" })}
-                ${action}
+                ${i18n("span", actionCopy, ' class="shop-product-action-copy"')}
               </div>
             </div>
+            ${target}
           </article>`;
 };
 
