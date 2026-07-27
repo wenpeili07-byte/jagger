@@ -10,7 +10,7 @@ const css = [
   readFileSync(new URL("./case-rail.css", import.meta.url), "utf8")
 ].join("\n");
 const js = readFileSync(new URL("./pages/cases.js", import.meta.url), "utf8");
-const sharedAssetVersion = "three-page-expansion-20260726";
+const sharedAssetVersion = "project-planner-redesign-20260726";
 
 assert.match(html, /<section class="cases-hero"/, "cases page should include the PLAN A hero section");
 assert.match(html, /<section class="case-archive"/, "cases page should include the archive section below the hero");
@@ -30,7 +30,7 @@ assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive shou
 assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should not include the old scrolling masked image rail");
 assert.match(html, /36 PERFORMANCE PROJECTS/, "archive should be framed as 36 performance projects");
 assert.match(html, new RegExp(`styles\\.css\\?v=${sharedAssetVersion}`), "cases page should load the current shared stylesheet cache key");
-assert.match(html, /layout-canvas\.css\?v=three-page-expansion-20260726/, "cases page should load the current shared canvas cache key");
+assert.match(html, /layout-canvas\.css\?v=project-planner-redesign-20260726/, "cases page should load the current shared canvas cache key");
 assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");

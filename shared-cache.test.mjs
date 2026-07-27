@@ -5,7 +5,7 @@ import { caseDetails, serviceDetails } from "./detail-pages-data.mjs";
 import { renderCasePage, renderServicePage } from "./scripts/render-detail-pages.mjs";
 import { renderShopPage } from "./scripts/render-shop-page.mjs";
 
-const sharedAssetVersion = "three-page-expansion-20260726";
+const sharedAssetVersion = "project-planner-redesign-20260726";
 const publicPages = [
   "./index.html",
   "./pages/about.html",

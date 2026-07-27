@@ -220,6 +220,40 @@ a {
   gap: 18px;
 }
 
+.project-entry {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 0 16px;
+  color: #fff;
+  background: var(--accent);
+  font: 700 11px var(--mono);
+  letter-spacing: 0;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.project-entry:hover {
+  border-color: var(--accent-bright);
+  color: #fff;
+  background: var(--accent-bright);
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+
+.project-entry:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 3px;
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+
+.project-entry-label-compact {
+  display: none;
+}
+
 .pager {
   display: flex;
   gap: 18px;
@@ -311,6 +345,7 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .nav a,
+  .project-entry,
   .lang-toggle,
   .lang-option,
   .content-footer a {
@@ -811,6 +846,21 @@ h1 span {
   }
 }
 
+@media (min-width: 768px) and (max-width: 1180px) {
+  .top-actions {
+    gap: 10px;
+  }
+
+  .project-entry {
+    padding-inline: 11px;
+    font-size: 10px;
+  }
+
+  .lang-toggle {
+    width: 84px;
+  }
+}
+
 @media (min-width: 768px) and (max-width: 980px) {
   .topbar {
     grid-template-columns: minmax(150px, 1fr) auto minmax(120px, 1fr);
@@ -875,6 +925,7 @@ h1 span {
     grid-row: 1;
     justify-self: end;
     align-self: center;
+    gap: 8px;
   }
 
   .nav {
@@ -949,6 +1000,21 @@ h1 span {
     min-width: 84px;
     min-height: 40px;
     padding: 6px 10px;
+  }
+
+  .project-entry {
+    min-width: 62px;
+    min-height: 40px;
+    padding-inline: 10px;
+    font-size: 10px;
+  }
+
+  .project-entry-label-full {
+    display: none;
+  }
+
+  .project-entry-label-compact {
+    display: inline;
   }
 
   .content-footer {

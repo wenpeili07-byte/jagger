@@ -64,6 +64,13 @@ const pageGroups = [
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const projectHrefFor = (path) => {
+  if (path === "./index.html") return "./pages/project.html";
+  if (path.includes("/cases/") || path.includes("/services/") || path.includes("/shop/")) {
+    return "../project.html";
+  }
+  return "./project.html";
+};
 
 for (const group of pageGroups) {
   for (const path of group.pages) {
@@ -74,8 +81,19 @@ for (const group of pageGroups) {
       assert.match(html, new RegExp(`<body[^>]*data-section="${group.section}"`));
       assert.match(header, /<a class="brand"[^>]*data-zh-aria-label="回到首页"[^>]*data-en-aria-label="Back to home"/);
       assert.match(header, /<nav class="nav"[^>]*data-zh-aria-label="主导航"[^>]*data-en-aria-label="Main navigation"/);
-      assert.equal((header.match(/<a href=/g) || []).length, 5);
+      const nav = header.match(/<nav class="nav"[^>]*>([\s\S]*?)<\/nav>/)?.[1] ?? "";
+      assert.equal((nav.match(/<a href=/g) || []).length, 5);
       assert.match(header, /<a href="(?:\.\/|\.\.\/)?(?:pages\/)?shop\.html"[^>]*>SHOP<\/a>/);
+      assert.match(
+        header,
+        new RegExp(
+          `<a class="project-entry" href="${escapeRegExp(projectHrefFor(path))}">[\\s\\S]*` +
+            `data-zh="开始项目" data-en="START PROJECT"[\\s\\S]*` +
+            `data-zh="规划" data-en="BUILD"[\\s\\S]*<\\/a>[\\s\\S]*` +
+            `<button class="lang-toggle"`
+        )
+      );
+      assert.equal((header.match(/class="project-entry"/g) || []).length, 1);
       assert.match(header, /<button class="lang-toggle"[^>]*aria-label="切换到中文"/);
 
       const currentHref = typeof group.currentHref === "function"
@@ -98,7 +116,8 @@ test("three-page expansion routes expose one complete shared shell", () => {
     const html = read(path);
     const header = html.match(/<header class="topbar">([\s\S]*?)<\/header>/)?.[1] ?? "";
 
-    assert.equal((header.match(/<a href=/g) || []).length, 5, `${path} should expose five navigation links`);
+    const nav = header.match(/<nav class="nav"[^>]*>([\s\S]*?)<\/nav>/)?.[1] ?? "";
+    assert.equal((nav.match(/<a href=/g) || []).length, 5, `${path} should expose five navigation links`);
     assert.equal((header.match(/<button class="lang-toggle"/g) || []).length, 1, `${path} should expose one language toggle`);
     assert.equal((html.match(/<footer class="content-footer">/g) || []).length, 1, `${path} should expose one shared footer`);
   }
