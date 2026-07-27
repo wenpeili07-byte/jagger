@@ -362,6 +362,7 @@
 
 .shop-product-action-copy {
   color: var(--accent-bright);
+  font-size: 11px;
   font-weight: 700;
 }
 

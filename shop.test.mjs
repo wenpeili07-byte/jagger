@@ -29,6 +29,7 @@ test("shop uses the approved five two two grid and readable full-card states", (
   assert.match(css, /\.shop-product-category\s*\{[^}]*font-size:\s*11px/s);
   assert.match(css, /\.shop-product-card h2\s*\{[^}]*font-size:\s*clamp\(18px,\s*1\.1vw,\s*21px\)/s);
   assert.match(css, /\.shop-product-meta\s*\{[^}]*font-size:\s*11px/s);
+  assert.match(css, /\.shop-product-action-copy\s*\{[^}]*font-size:\s*11px/s);
 });
 
 class RuntimeNode {
