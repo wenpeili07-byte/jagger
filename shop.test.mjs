@@ -236,6 +236,16 @@ test("forged wheel card is the only product deep link", () => {
   assert.equal((html.match(/data-product-open/g) || []).length, 5);
 });
 
+test("every shop card exposes one full-card primary target", () => {
+  assert.equal((html.match(/class="shop-product-target"/g) || []).length, 6);
+  assert.equal((html.match(/data-product-link=/g) || []).length, 1);
+  assert.equal((html.match(/data-product-open/g) || []).length, 5);
+  assert.equal((html.match(/class="shop-product-action-copy"/g) || []).length, 6);
+  const metaBlocks = [...html.matchAll(/<div class="shop-product-meta">([\s\S]*?)<\/div>/g)];
+  assert.equal(metaBlocks.length, 6);
+  metaBlocks.forEach(([, markup]) => assert.doesNotMatch(markup, /<(?:a|button)\b/));
+});
+
 test("forged wheel link preserves category, vehicle, and its own query values", () => {
   const harness = createDialogHarness({
     locationHref: "https://example.test/pages/shop.html?category=wheels",
