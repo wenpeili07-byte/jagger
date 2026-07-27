@@ -131,5 +131,9 @@ assert.match(
 );
 assert.match(
   mobileHeader,
+  /\.project-entry\s*\{[^}]*min-height:\s*44px/s
+);
+assert.match(
+  mobileHeader,
   /\.nav\s*\{[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)/s,
 );
