@@ -328,7 +328,7 @@ test("project planner preserves its desktop split and mobile action clearance", 
   );
   assert.match(
     projectMobileBlock,
-    /\.project-actions\s*\{[^}]*position:\s*sticky[^}]*bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/s,
+    /\.project-actions\s*\{[^}]*position:\s*sticky[^}]*bottom:\s*calc\(65px \+ env\(safe-area-inset-bottom\)\)/s,
     "project actions should remain above the fixed mobile navigation"
   );
 });
@@ -379,7 +379,7 @@ test("new pages preserve the shared canvas and mobile stacking", () => {
   assert.match(productCss, /@media \(max-width:\s*1100px\)[\s\S]*\.product-detail\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(case02Css, /@media \(max-width:\s*1000px\)[\s\S]*\.case02-story-beat\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(productCss, /padding-bottom:\s*calc\(148px \+ env\(safe-area-inset-bottom\)\)/);
-  assert.match(projectCss, /bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(projectCss, /bottom:\s*calc\(65px \+ env\(safe-area-inset-bottom\)\)/);
 });
 
 // Task 4: every large desktop should fit the complete homepage inside the shared 973px first screen.

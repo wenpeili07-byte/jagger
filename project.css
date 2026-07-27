@@ -326,13 +326,13 @@
 }
 
 .project-actions button:first-child {
-  margin-right: auto;
   background: transparent;
 }
 
 .project-actions [data-planner-next],
 .project-actions [data-planner-submit] {
-  min-width: min(100%, 280px);
+  flex: 1;
+  min-width: 0;
   border-color: var(--accent);
   color: #fff;
   background: var(--accent);
@@ -494,7 +494,7 @@
   .project-actions {
     position: sticky;
     z-index: 4;
-    bottom: calc(64px + env(safe-area-inset-bottom));
+    bottom: calc(65px + env(safe-area-inset-bottom));
     margin: 10px calc(var(--site-gutter) * -1) calc(-92px - env(safe-area-inset-bottom));
     padding: 12px var(--site-gutter);
     border-top: 1px solid var(--line);

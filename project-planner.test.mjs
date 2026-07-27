@@ -248,6 +248,21 @@ test("inactive progress numbers stay neutral until current or complete", () => {
   );
 });
 
+test("planner primary actions use all remaining space beside Back", () => {
+  const primaryActionRule = css.match(
+    /\.project-actions \[data-planner-next\],\s*\.project-actions \[data-planner-submit\]\s*\{([^}]*)\}/s
+  );
+
+  assert.ok(primaryActionRule, "planner should define a shared primary action rule");
+  assert.match(primaryActionRule[1], /flex:\s*1(?:\s+1\s+auto)?/);
+  assert.doesNotMatch(primaryActionRule[1], /280px/);
+  assert.doesNotMatch(
+    css,
+    /\.project-actions button:first-child\s*\{[^}]*margin-right:\s*auto/s,
+    "Back should not consume space reserved for the primary action"
+  );
+});
+
 test("planner validates transitions and preserves browser-driven selections", () => {
   const harness = createPlannerHarness("?product=forged-wheel&finish=Satin%20Black");
 

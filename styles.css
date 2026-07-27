@@ -240,7 +240,7 @@ a {
 .project-entry:hover {
   border-color: var(--accent-bright);
   color: #fff;
-  background: var(--accent-bright);
+  background: var(--accent);
   box-shadow: 0 0 18px var(--accent-glow);
 }
 
@@ -497,7 +497,7 @@ h1 span {
 .hero-project-action:hover {
   border-color: var(--accent-bright);
   color: #fff;
-  background: var(--accent-bright);
+  background: var(--accent);
   box-shadow: 0 0 18px var(--accent-glow);
 }
 
@@ -516,8 +516,9 @@ h1 span {
 }
 
 .enter-button:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--accent-bright);
+  color: var(--ink);
+  box-shadow: 0 0 18px var(--accent-glow);
 }
 
 .ghost-button:focus-visible,

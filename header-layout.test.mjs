@@ -128,6 +128,51 @@ assert.match(js, /"hero\.projectCta":\s*"开始你的项目 →"/);
 assert.match(js, /"hero\.projectCta":\s*"START YOUR PROJECT →"/);
 assert.match(css, /\.hero-actions\s*\{[^}]*display:\s*flex/s);
 assert.match(css, /\.hero-project-action\s*\{[^}]*background:\s*var\(--accent\)/s);
+assert.match(
+  css,
+  /\.hero-project-action,\s*\.enter-button\s*\{[^}]*min-height:\s*48px/s,
+  "homepage actions should retain 48px targets"
+);
+const smallHomepageActions = mediaBlock(
+  css,
+  "@media (max-width: 620px)",
+  "small homepage action range should exist"
+);
+assert.match(
+  smallHomepageActions,
+  /\.hero-actions\s*\{[^}]*grid-template-columns:\s*1fr/s,
+  "homepage actions should use one column on small screens"
+);
+assert.match(
+  css,
+  /\.hero-project-action:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s,
+  "homepage primary action should keep a visible focus treatment"
+);
+assert.match(
+  css,
+  /\.enter-button:focus-visible[\s,][\s\S]*?\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s,
+  "homepage secondary action should keep a visible focus treatment"
+);
+assert.match(
+  reducedMotionBlock,
+  /\.hero-project-action,[\s\S]*?\{[^}]*transition:\s*none/s,
+  "reduced motion should include the homepage primary action"
+);
+assert.match(
+  css,
+  /\.project-entry:hover\s*\{[^}]*border-color:\s*var\(--accent-bright\)[^}]*color:\s*#fff[^}]*background:\s*var\(--accent\)[^}]*box-shadow:\s*0 0 18px var\(--accent-glow\)/s,
+  "shared primary hover should keep light text on the deep-blue surface"
+);
+assert.match(
+  css,
+  /\.hero-project-action:hover\s*\{[^}]*border-color:\s*var\(--accent-bright\)[^}]*color:\s*#fff[^}]*background:\s*var\(--accent\)[^}]*box-shadow:\s*0 0 18px var\(--accent-glow\)/s,
+  "homepage primary hover should keep light text on the deep-blue surface"
+);
+assert.match(
+  css,
+  /\.enter-button:hover\s*\{[^}]*border-color:\s*var\(--accent-bright\)[^}]*color:\s*var\(--ink\)[^}]*box-shadow:\s*0 0 18px var\(--accent-glow\)/s,
+  "homepage secondary hover should retain light text and use blue only for its border and glow"
+);
 assert.match(css, /grid-template-columns:\s*minmax\(310px,\s*0\.88fr\)\s+minmax\(440px,\s*1\.15fr\)/, "cover should remove the middle spine column");
 assert.match(css, /h1\s*\{[^}]*margin:\s*clamp\(6px,\s*2vw,\s*24px\)\s+0\s+0/s, "hero title should move upward");
 const mobileHeader = mediaBlock(css, "@media (max-width: 767px)", "mobile header range should exist");
