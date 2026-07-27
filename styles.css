@@ -346,6 +346,7 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .nav a,
   .project-entry,
+  .hero-project-action,
   .lang-toggle,
   .lang-option,
   .content-footer a {
@@ -466,19 +467,52 @@ h1 span {
   background: linear-gradient(90deg, rgba(46, 125, 189, 0.22), rgba(46, 125, 189, 0.03));
 }
 
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 24px;
+}
+
+.hero-project-action,
 .enter-button {
-  display: inline-grid;
-  place-items: center;
-  width: 190px;
-  min-height: 54px;
-  margin-top: 24px;
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border-radius: 4px;
+  font: 700 11px var(--mono);
+  letter-spacing: 0;
+  text-decoration: none;
+}
+
+.hero-project-action {
+  border: 1px solid var(--accent);
+  color: #fff;
+  background: var(--accent);
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.hero-project-action:hover {
+  border-color: var(--accent-bright);
+  color: #fff;
+  background: var(--accent-bright);
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+
+.hero-project-action:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 3px;
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+
+.enter-button {
+  width: auto;
+  margin: 0;
   border: 1px solid var(--line);
   color: var(--ink);
-  text-decoration: none;
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
+  background: rgba(17, 19, 21, 0.36);
 }
 
 .enter-button:hover {
@@ -1033,6 +1067,16 @@ h1 span {
 }
 
 @media (max-width: 620px) {
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .hero-project-action,
+  .enter-button {
+    width: 100%;
+  }
+
   .cover {
     padding: 22px 14px 34px;
   }

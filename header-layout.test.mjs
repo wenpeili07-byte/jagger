@@ -118,6 +118,16 @@ assert.match(
   css,
   /\.project-entry:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s
 );
+assert.match(
+  html,
+  /class="note"[\s\S]*class="hero-actions"[\s\S]*href="\.\/pages\/project\.html"[\s\S]*href="#services"[\s\S]*class="roll-table"/
+);
+assert.equal((html.match(/class="hero-project-action"/g) || []).length, 1);
+assert.equal((html.match(/class="enter-button"/g) || []).length, 1);
+assert.match(js, /"hero\.projectCta":\s*"开始你的项目 →"/);
+assert.match(js, /"hero\.projectCta":\s*"START YOUR PROJECT →"/);
+assert.match(css, /\.hero-actions\s*\{[^}]*display:\s*flex/s);
+assert.match(css, /\.hero-project-action\s*\{[^}]*background:\s*var\(--accent\)/s);
 assert.match(css, /grid-template-columns:\s*minmax\(310px,\s*0\.88fr\)\s+minmax\(440px,\s*1\.15fr\)/, "cover should remove the middle spine column");
 assert.match(css, /h1\s*\{[^}]*margin:\s*clamp\(6px,\s*2vw,\s*24px\)\s+0\s+0/s, "hero title should move upward");
 const mobileHeader = mediaBlock(css, "@media (max-width: 767px)", "mobile header range should exist");
