@@ -108,8 +108,13 @@ assert.match(servicesHtml, /01[\s\S]*BUILD[\s\S]*02[\s\S]*PARTS[\s\S]*03[\s\S]*P
 
 for (const caseNumber of ["01", "02", "03", "04", "05", "06"]) {
   const imagePath = `./assets/images/网页/optimized/case-${caseNumber}.jpg`;
+  const expectedUses = caseNumber === "01" ? 3 : 2;
   assert.ok(existsSync(new URL(imagePath, import.meta.url)), `${imagePath} should exist`);
-  assert.equal((servicesHtml.match(new RegExp(`optimized/case-${caseNumber}\\.jpg`, "g")) || []).length, 2, `services should use case-${caseNumber}.jpg for both its sample and square preview`);
+  assert.equal(
+    (servicesHtml.match(new RegExp(`optimized/case-${caseNumber}\\.jpg`, "g")) || []).length,
+    expectedUses,
+    `services should use case-${caseNumber}.jpg for its row media${caseNumber === "01" ? " and mobile opening" : ""}`,
+  );
 }
 
 assert.match(contactHtml, /<form class="contact-form" action="\/api\/contact" method="post" data-contact-form>/, "contact should include a focused project inquiry form");

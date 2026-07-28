@@ -151,3 +151,139 @@ test("shared bottom navigation uses local official icon assets", () => {
     );
   }
 });
+
+test("home uses a compact image-led first screen and removes duplicate case controls", () => {
+  const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+
+  assert.match(
+    mobile,
+    /\.cover\s*\{[^}]*display:\s*block[^}]*min-height:\s*0[^}]*padding:\s*0/s,
+    "home should leave the desktop split and use the full mobile width",
+  );
+  assert.match(
+    mobile,
+    /\.left-panel\s*\{[^}]*min-height:\s*calc\(100svh - 56px\)[^}]*padding:\s*clamp\(34px,\s*8vh,\s*70px\) 20px 28px/s,
+    "home should keep one intentional first screen",
+  );
+  assert.match(
+    mobile,
+    /\.left-panel h1\s*\{[^}]*font-size:\s*clamp\(52px,\s*16vw,\s*72px\)/s,
+    "home brand should be prominent without overflowing",
+  );
+  assert.match(
+    mobile,
+    /\.roll-table\s*\{[^}]*display:\s*none/s,
+    "the duplicate compact case list should be removed from the first screen",
+  );
+  assert.match(
+    mobile,
+    /\.hero-actions\s*\{[^}]*grid-template-columns:\s*1fr[^}]*gap:\s*10px/s,
+    "home actions should stack into full-width touch targets",
+  );
+});
+
+test("services becomes a readable text and thumbnail rail", () => {
+  const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+  const servicesHtml = read("./pages/services.html");
+
+  assert.match(
+    servicesHtml,
+    /<figure class="services-mobile-hero"[\s\S]*?<img src="\.\.\/assets\/images\/网页\/optimized\/case-01\.jpg"/,
+    "services should provide the selected mobile photographic opening",
+  );
+  assert.match(
+    mobile,
+    /\.services-mobile-hero\s*\{[^}]*display:\s*block[^}]*aspect-ratio:\s*16 \/ 9/s,
+    "the photographic opening should use a stable mobile mask",
+  );
+  assert.match(
+    mobile,
+    /\.services-intro\s*\{[^}]*padding:\s*36px 20px 28px/s,
+    "services intro should use the shared mobile gutter",
+  );
+  assert.match(
+    mobile,
+    /\.services-intro h1\s*\{[^}]*font-size:\s*clamp\(42px,\s*13vw,\s*56px\)/s,
+    "services title should remain expressive but controlled",
+  );
+  assert.match(
+    mobile,
+    /\.service-process-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*62%\)\s+minmax\(0,\s*38%\)[^}]*min-height:\s*156px[^}]*aspect-ratio:\s*auto/s,
+    "service rows should use stable copy and image columns",
+  );
+  assert.match(
+    mobile,
+    /\.service-process-copy\s*\{[^}]*padding:\s*42px 34px 22px 64px[^}]*background:\s*#111315/s,
+    "service copy should not sit on top of the image",
+  );
+  assert.match(
+    mobile,
+    /\.service-process-media\s*\{[^}]*position:\s*relative[^}]*grid-column:\s*2[^}]*inset:\s*auto/s,
+    "service images should remain in their own column",
+  );
+  assert.match(
+    mobile,
+    /\.service-process-copy p\s*\{[^}]*font-size:\s*16px/s,
+    "service descriptions should be readable on mobile",
+  );
+});
+
+test("cases uses a horizontal featured rail, make filters, and a two-column archive", () => {
+  const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+
+  assert.match(
+    mobile,
+    /\.cases-hero\s*\{[^}]*display:\s*block[^}]*min-height:\s*0[^}]*padding:\s*34px 20px 24px/s,
+    "cases should release the oversized desktop hero",
+  );
+  assert.match(
+    mobile,
+    /\.mwg_effect060 \.slides\s*\{[^}]*display:\s*flex[^}]*overflow-x:\s*auto[^}]*transform:\s*none !important/s,
+    "featured cases should become a touch-scroll rail",
+  );
+  assert.match(
+    mobile,
+    /\.mwg_effect060 \.slide\.spacer\s*\{[^}]*display:\s*none/s,
+    "desktop rail spacers should not consume mobile space",
+  );
+  assert.match(
+    mobile,
+    /\.filter-block\s*\{[^}]*display:\s*flex[^}]*overflow-x:\s*auto/s,
+    "make filters should become a compact horizontal control",
+  );
+  assert.match(
+    mobile,
+    /\.archive-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)[^}]*gap:\s*24px 12px/s,
+    "archive should use two readable columns",
+  );
+  assert.match(
+    mobile,
+    /\.archive-card img\s*\{[^}]*position:\s*relative[^}]*aspect-ratio:\s*4 \/ 3/s,
+    "project labels should sit outside stable image masks",
+  );
+});
+
+test("about uses compact process rows and a photo-led field note", () => {
+  const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+
+  assert.match(
+    mobile,
+    /\.about-hero\s*\{[^}]*min-height:\s*520px/s,
+    "About should keep a controlled photographic opening",
+  );
+  assert.match(
+    mobile,
+    /\.process-step\s*\{[^}]*grid-template-columns:\s*52px 94px minmax\(0,\s*1fr\)[^}]*min-height:\s*112px[^}]*padding:\s*18px 20px/s,
+    "About process stages should read as one continuous rail",
+  );
+  assert.match(
+    mobile,
+    /\.process-step p\s*\{[^}]*font-size:\s*16px/s,
+    "About process descriptions should be readable",
+  );
+  assert.match(
+    mobile,
+    /\.content-photo-band\s*\{[^}]*min-height:\s*0[^}]*background:\s*#111315/s,
+    "About field note should use natural content height",
+  );
+});
