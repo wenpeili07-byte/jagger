@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { shopProducts, shopVehicles } from "../shop-data.mjs";
+import { renderSeoMeta, seoForRoute } from "../seo-data.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -169,6 +170,9 @@ export const renderForgedWheelPage = (
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Configure a forged wheel direction and request final fitment verification from LONMA DYNAMIC." />
     <title>Monoblock Forged Wheel | LONMA DYNAMIC</title>
+    <!-- SEO:START -->
+    ${renderSeoMeta(seoForRoute("/pages/shop/forged-wheel"))}
+    <!-- SEO:END -->
     <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../shop-product.css?v=project-planner-redesign-20260726" />
@@ -298,6 +302,9 @@ export const renderShopPage = (products = shopProducts) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Browse sample performance-part categories for a selected vehicle and contact LONMA DYNAMIC for fitment and installation details." />
     <title>Shop | LONMA DYNAMIC</title>
+    <!-- SEO:START -->
+    ${renderSeoMeta(seoForRoute("/pages/shop"))}
+    <!-- SEO:END -->
     <link rel="stylesheet" href="../styles.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../layout-canvas.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../shop.css?v=project-planner-redesign-20260726" />
