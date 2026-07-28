@@ -388,3 +388,83 @@ test("contact removes the oversized mobile poster and prioritizes email and form
     "project details should have a useful writing area",
   );
 });
+
+test("case and service detail pages use a compact photo-first mobile reading order", () => {
+  const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+
+  assert.match(
+    mobile,
+    /\.case-detail-page \.detail-hero,[\s\S]*?\.service-detail-page \.detail-hero\s*\{[^}]*display:\s*flex[^}]*height:\s*auto[^}]*flex-direction:\s*column/s,
+    "generic detail pages should use one natural mobile column",
+  );
+  assert.match(
+    mobile,
+    /\.case-detail-page \.detail-copy,[\s\S]*?\.service-detail-page \.detail-copy\s*\{[^}]*min-height:\s*0[^}]*padding:\s*34px 20px 30px/s,
+    "detail copy should no longer reserve a desktop-sized first screen",
+  );
+  assert.match(
+    mobile,
+    /\.case-detail-page \.detail-hero-media,[\s\S]*?\.service-detail-page \.detail-hero-media\s*\{[^}]*aspect-ratio:\s*16 \/ 10/s,
+    "detail photography should use a stable editorial mask",
+  );
+  assert.match(
+    mobile,
+    /\.case-detail-page \.detail-copy h1,[\s\S]*?\.service-detail-page \.detail-copy h1\s*\{[^}]*font-size:\s*clamp\(44px,\s*13vw,\s*58px\)/s,
+    "detail titles should remain prominent without overflowing",
+  );
+  assert.match(
+    mobile,
+    /\.detail-story\s*\{[^}]*padding:\s*44px 20px/s,
+    "generic detail copy should use a compact reading band",
+  );
+});
+
+test("Case 02 preserves its media story while reducing mobile dead space", () => {
+  const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+
+  assert.match(
+    mobile,
+    /\.case02-video-copy\s*\{[^}]*padding:\s*28px 20px 24px/s,
+    "Case 02 opening copy should stay close to its media",
+  );
+  assert.match(
+    mobile,
+    /\.case02-story\s*\{[^}]*padding:\s*52px 20px[^}]*gap:\s*60px/s,
+    "Case 02 story should keep an editorial rhythm without desktop gaps",
+  );
+  assert.match(
+    mobile,
+    /\.case02-story-media,[\s\S]*?\.case02-story-wide\s*\{[^}]*border:\s*0/s,
+    "Case 02 photography should not be boxed on mobile",
+  );
+});
+
+test("product detail keeps configuration compact and its actions clear of navigation", () => {
+  const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+
+  assert.match(
+    mobile,
+    /\.product-stage\s*\{[^}]*padding:\s*20px/s,
+    "product media should align to the shared mobile gutter",
+  );
+  assert.match(
+    mobile,
+    /\.product-config\s*\{[^}]*padding:\s*30px 20px/s,
+    "product configuration should use the shared mobile gutter",
+  );
+  assert.match(
+    mobile,
+    /\.product-config h1\s*\{[^}]*font-size:\s*clamp\(36px,\s*11vw,\s*48px\)/s,
+    "product title should remain prominent without overflowing",
+  );
+  assert.match(
+    mobile,
+    /\.product-fitment-grid,[\s\S]*?\.product-option-row\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s,
+    "product selections should remain compact two-column controls",
+  );
+  assert.match(
+    mobile,
+    /\.product-actions\s*\{[^}]*position:\s*static[^}]*min-height:\s*76px/s,
+    "product actions should stay in the configuration flow instead of covering the product title",
+  );
+});

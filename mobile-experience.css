@@ -1082,6 +1082,211 @@
     min-height: 58px;
   }
 
+  /* Case and service details */
+  .case-detail-page .detail-hero,
+  .service-detail-page .detail-hero {
+    display: flex;
+    height: auto;
+    flex-direction: column;
+  }
+
+  .case-detail-page .detail-copy,
+  .service-detail-page .detail-copy {
+    min-height: 0;
+    padding: 34px 20px 30px;
+  }
+
+  .case-detail-page .detail-back,
+  .service-detail-page .detail-back {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .case-detail-page .detail-index,
+  .service-detail-page .detail-index {
+    margin: 18px 0 0;
+  }
+
+  .case-detail-page .detail-copy h1,
+  .service-detail-page .detail-copy h1 {
+    max-width: 8em;
+    margin: 14px 0 14px;
+    font-size: clamp(44px, 13vw, 58px);
+    line-height: 0.94;
+  }
+
+  .case-detail-page .detail-copy h2 {
+    font-size: 20px;
+    line-height: 1.35;
+  }
+
+  .case-detail-page .detail-intro,
+  .service-detail-page .detail-intro {
+    margin-top: 18px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .service-detail-page .detail-intro {
+    margin-top: 0;
+  }
+
+  .case-detail-page .detail-hero-media,
+  .service-detail-page .detail-hero-media {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+  }
+
+  .detail-story {
+    padding: 44px 20px;
+  }
+
+  .case-detail-page .detail-story p,
+  .service-detail-page .detail-story p:first-child {
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  .detail-process {
+    margin-top: 26px !important;
+    font-size: 11px !important;
+    line-height: 1.7;
+  }
+
+  .case-detail-page .detail-contact,
+  .service-detail-page .detail-contact {
+    align-items: stretch;
+    gap: 22px;
+    padding: 38px 20px;
+    flex-direction: column;
+  }
+
+  .case-detail-page .detail-contact h2,
+  .service-detail-page .detail-contact h2 {
+    font-size: 34px;
+  }
+
+  .case-detail-page .detail-contact a,
+  .service-detail-page .detail-contact a {
+    display: flex;
+    min-height: 54px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--accent);
+    color: #fff;
+    background: var(--accent);
+  }
+
+  .case-detail-page .detail-pagination {
+    padding: 24px 20px;
+  }
+
+  .case-detail-page .detail-pagination a {
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+  }
+
+  /* Case 02 */
+  .case02-video-copy {
+    padding: 28px 20px 24px;
+  }
+
+  .case02-video-copy h1 {
+    font-size: 42px;
+    line-height: 0.96;
+  }
+
+  .case02-video-copy dl {
+    gap: 14px;
+    margin-top: 22px;
+  }
+
+  .case02-story {
+    padding: 52px 20px;
+    gap: 60px;
+  }
+
+  .case02-story-beat {
+    gap: 24px;
+  }
+
+  .case02-story-copy h2 {
+    font-size: 32px;
+  }
+
+  .case02-story-copy h2 + p {
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .case02-story-media,
+  .case02-story-wide {
+    border: 0;
+  }
+
+  /* Product detail */
+  .forged-wheel-page {
+    padding-bottom: calc(164px + env(safe-area-inset-bottom));
+  }
+
+  .product-stage {
+    padding: 20px;
+  }
+
+  .product-stage-main {
+    max-height: none;
+  }
+
+  .product-config {
+    padding: 30px 20px;
+  }
+
+  .product-config h1 {
+    font-size: clamp(36px, 11vw, 48px);
+    line-height: 0.96;
+  }
+
+  .product-summary {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .product-fitment-grid,
+  .product-option-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .product-fitment-grid input,
+  .product-fitment-grid select,
+  .product-quantity input,
+  .product-option-row label {
+    min-height: 54px;
+    font-size: 14px;
+  }
+
+  .product-actions {
+    position: static;
+    right: auto;
+    bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom));
+    left: auto;
+    width: auto;
+    min-height: 76px;
+    grid-template-columns: 82px minmax(0, 0.8fr) minmax(0, 1.2fr);
+    margin: 0;
+    padding: 8px 10px;
+  }
+
+  .product-actions > a {
+    min-height: 60px;
+    font-size: 9px;
+  }
+
+  .product-specifications {
+    padding: 40px 20px;
+  }
+
   .content-footer {
     min-height: 136px;
     padding: 28px var(--mobile-page-gutter) 34px;
