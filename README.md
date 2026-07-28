@@ -9,6 +9,30 @@ Static website for LONMA DYNAMIC, focused on modified car cases, performance par
 - `script.js` controls the case/service hover interactions.
 - `assets/` contains local visual assets.
 
+## Site maintenance
+
+Preview a non-destructive Case 01 cover conversion:
+
+```sh
+node scripts/prepare-case-images.mjs --case 01 --preset cover
+```
+
+The image command is a dry run unless `--write` is included. Source photography
+is never overwritten. See `assets/images/cases/README.md` for naming and size
+guidance.
+
+After changing page titles, descriptions, routes, or the production domain:
+
+```sh
+node scripts/render-detail-pages.mjs
+node scripts/render-shop-page.mjs
+node scripts/render-seo-files.mjs
+node --test
+```
+
+The temporary canonical origin is stored in `seo-data.mjs`. Replace it only
+after the final custom domain is connected.
+
 ## Contact email delivery
 
 The production Contact form uses `api/contact.js` and Resend.

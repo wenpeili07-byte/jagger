@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jagger-sage.vercel.app/sitemap.xml
