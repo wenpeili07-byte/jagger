@@ -172,6 +172,7 @@ export const renderForgedWheelPage = (
     <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../shop-product.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-option3-20260728" />
   </head>
   <body data-section="shop">
     <main class="site-shell forged-wheel-page" data-product-id="${escapeAttribute(product.id)}">
@@ -301,6 +302,7 @@ export const renderShopPage = (products = shopProducts) => {
     <link rel="stylesheet" href="../styles.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../layout-canvas.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../shop.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../mobile-experience.css?v=mobile-option3-20260728" />
   </head>
   <body data-section="shop">
     <main class="site-shell shop-page" ${i18nAttribute("aria-label", { zh: "LONMA DYNAMIC 商店", en: "LONMA DYNAMIC shop" })}>
