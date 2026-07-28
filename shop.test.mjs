@@ -11,6 +11,27 @@ const js = readFileSync(new URL("./shop.js", import.meta.url), "utf8");
 const css = readFileSync(new URL("./shop.css", import.meta.url), "utf8");
 const { renderShopPage } = shopRenderer;
 
+test("shop uses the approved five two two grid and readable full-card states", () => {
+  assert.match(
+    css,
+    /\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s,
+  );
+  assert.match(
+    css,
+    /@media \(min-width:\s*1400px\)[\s\S]*?\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)/s,
+  );
+  assert.match(
+    css,
+    /@media \(max-width:\s*767px\)[\s\S]*?\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s,
+  );
+  assert.match(css, /\.shop-product-target\s*\{[^}]*position:\s*absolute[^}]*inset:\s*0/s);
+  assert.match(css, /\.shop-product-card:focus-within/);
+  assert.match(css, /\.shop-product-category\s*\{[^}]*font-size:\s*11px/s);
+  assert.match(css, /\.shop-product-card h2\s*\{[^}]*font-size:\s*clamp\(18px,\s*1\.1vw,\s*21px\)/s);
+  assert.match(css, /\.shop-product-meta\s*\{[^}]*font-size:\s*11px/s);
+  assert.match(css, /\.shop-product-action-copy\s*\{[^}]*font-size:\s*11px/s);
+});
+
 class RuntimeNode {
   constructor({ dataset = {}, value = "" } = {}) {
     this.attributes = new Map();
@@ -234,6 +255,16 @@ test("forged wheel card is the only product deep link", () => {
   );
   assert.equal((html.match(/data-product-link=/g) || []).length, 1);
   assert.equal((html.match(/data-product-open/g) || []).length, 5);
+});
+
+test("every shop card exposes one full-card primary target", () => {
+  assert.equal((html.match(/class="shop-product-target"/g) || []).length, 6);
+  assert.equal((html.match(/data-product-link=/g) || []).length, 1);
+  assert.equal((html.match(/data-product-open/g) || []).length, 5);
+  assert.equal((html.match(/class="shop-product-action-copy"/g) || []).length, 6);
+  const metaBlocks = [...html.matchAll(/<div class="shop-product-meta">([\s\S]*?)<\/div>/g)];
+  assert.equal(metaBlocks.length, 6);
+  metaBlocks.forEach(([, markup]) => assert.doesNotMatch(markup, /<(?:a|button)\b/));
 });
 
 test("forged wheel link preserves category, vehicle, and its own query values", () => {
@@ -482,8 +513,8 @@ test("checked-in Shop page matches its renderer byte for byte", () => {
 });
 
 test("shop controller supports filters, query links, and dialog focus", () => {
-  assert.match(html, /shop\.css\?v=three-page-expansion-20260726/);
-  assert.match(html, /shop\.js\?v=three-page-expansion-20260726/);
+  assert.match(html, /shop\.css\?v=project-planner-redesign-20260726/);
+  assert.match(html, /shop\.js\?v=project-planner-redesign-20260726/);
   assert.match(js, /new URLSearchParams\(window\.location\.search\)/);
   assert.match(js, /querySelectorAll\("\[data-product-card\]"\)/);
   assert.match(js, /querySelectorAll\("\[data-category-filter\]"\)/);

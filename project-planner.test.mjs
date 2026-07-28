@@ -146,14 +146,19 @@ function createPlannerHarness(search = "") {
   };
 }
 
-test("planner exposes four bilingual steps and one primary handoff", () => {
+test("planner exposes the approved compact split structure", () => {
   assert.equal((html.match(/data-planner-step=/g) || []).length, 4);
-  assert.match(html, /data-en="VEHICLE" data-zh="车辆"/);
-  assert.match(html, /data-en="GOAL" data-zh="目标"/);
-  assert.match(html, /data-en="DIRECTION" data-zh="方向"/);
-  assert.match(html, /data-en="REVIEW" data-zh="确认"/);
+  assert.match(html, /<ol class="project-progress"/);
+  assert.match(html, /class="project-controls-heading"/);
+  assert.match(html, /id="project-title" data-en="BUILD YOUR PROJECT" data-zh="规划你的项目"/);
+  assert.match(
+    html,
+    /class="project-lede" data-en="Define your vehicle and goals\." data-zh="填写车辆信息与改装目标。"/
+  );
+  assert.match(html, /assets\/images\/网页\/optimized\/case-02\.jpg/);
+  assert.doesNotMatch(html, /class="project-heading"/);
+  assert.doesNotMatch(html, /<figcaption/);
   assert.equal((html.match(/data-planner-submit/g) || []).length, 1);
-  assert.match(html, /assets\/images\/网页\/optimized\/case-01\.jpg/);
 });
 
 test("planner query selections are bounded, cleaned, and preselect parts", () => {
@@ -240,6 +245,21 @@ test("inactive progress numbers stay neutral until current or complete", () => {
   assert.match(
     css,
     /\.project-progress button\[aria-current="step"\] span:first-child,\s*\.project-progress button\[data-complete\] span:first-child\s*\{[^}]*color:\s*var\(--accent-bright\)/s
+  );
+});
+
+test("planner primary actions use all remaining space beside Back", () => {
+  const primaryActionRule = css.match(
+    /\.project-actions \[data-planner-next\],\s*\.project-actions \[data-planner-submit\]\s*\{([^}]*)\}/s
+  );
+
+  assert.ok(primaryActionRule, "planner should define a shared primary action rule");
+  assert.match(primaryActionRule[1], /flex:\s*1(?:\s+1\s+auto)?/);
+  assert.doesNotMatch(primaryActionRule[1], /280px/);
+  assert.doesNotMatch(
+    css,
+    /\.project-actions button:first-child\s*\{[^}]*margin-right:\s*auto/s,
+    "Back should not consume space reserved for the primary action"
   );
 });
 

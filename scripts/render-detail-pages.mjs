@@ -30,6 +30,10 @@ const header = (section) => `<header class="topbar">
       <a href="../shop.html">SHOP</a>
     </nav>
     <div class="top-actions">
+      <a class="project-entry" href="../project.html">
+        ${i18n("span", { zh: "开始项目", en: "START PROJECT" }, ' class="project-entry-label-full"')}
+        ${i18n("span", { zh: "规划", en: "BUILD" }, ' class="project-entry-label-compact"')}
+      </a>
       <button class="lang-toggle" type="button" aria-label="切换到中文">
         <span class="lang-option" data-lang-option="zh">中</span>
         <span class="lang-separator" aria-hidden="true">/</span>
@@ -51,8 +55,8 @@ const renderGenericCasePage = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
   </head>
   <body data-section="cases">
@@ -83,7 +87,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
       </nav>
       ${globalFooter()}
     </main>
-    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
+    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
   </body>
 </html>
 `;
@@ -95,10 +99,10 @@ export const renderCase02Page = (record) => `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>Case ${record.id} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
-    <link rel="stylesheet" href="../../case-02.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../case-02.css?v=project-planner-redesign-20260726" />
   </head>
   <body data-section="cases">
     <main class="site-shell case-detail-page case02-page" data-detail-page>
@@ -159,8 +163,8 @@ export const renderCase02Page = (record) => `<!doctype html>
       </nav>
       ${globalFooter()}
     </main>
-    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
-    <script src="../../case-02.js?v=three-page-expansion-20260726"></script>
+    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
+    <script src="../../case-02.js?v=project-planner-redesign-20260726"></script>
   </body>
 </html>
 `;
@@ -180,8 +184,8 @@ export const renderServicePage = (record) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="${escapeAttribute(record.meta)}" />
     <title>${record.label} | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../service-detail.css?v=mobile-spacing-20260722" />
   </head>
   <body data-section="services">
@@ -208,7 +212,7 @@ export const renderServicePage = (record) => {
       </section>
       ${globalFooter(projectHref)}
     </main>
-    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
+    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
   </body>
 </html>
 `;

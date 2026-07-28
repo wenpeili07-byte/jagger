@@ -69,7 +69,7 @@ assert.doesNotMatch(contentCss, /\.content-page\.site-shell\s*\{[^}]*max-width:/
 
 for (const path of publicPages) {
   const html = read(path);
-  assert.match(html, /layout-canvas\.css\?v=three-page-expansion-20260726/, `${path} should load the current shared canvas cache key`);
+  assert.match(html, /layout-canvas\.css\?v=project-planner-redesign-20260726/, `${path} should load the current shared canvas cache key`);
 }
 
 // Task 3: compact header and services rules.
@@ -174,8 +174,8 @@ assert.match(
 );
 assert.match(
   shopCss,
-  /@media \(max-width:\s*767px\)[\s\S]*\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*1fr/s,
-  "Shop should use a single product column on mobile"
+  /@media \(max-width:\s*767px\)[\s\S]*\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s,
+  "Shop should use two product columns on mobile"
 );
 test("Case 02 stays full-width and 16:9 on 1900px and 2200px canvases", () => {
   const videoStageRule = ruleBlock(
@@ -285,8 +285,26 @@ test("project planner preserves its desktop split and mobile action clearance", 
   );
   assert.match(
     projectCss,
-    /\.project-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(420px,\s*0\.86fr\)\s+minmax\(0,\s*1\.14fr\)/s,
+    /\.project-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(420px,\s*39fr\)\s+minmax\(0,\s*61fr\)/s,
     "project planner should use the approved desktop split"
+  );
+  assert.match(
+    projectCss,
+    /\.project-visual\s*\{[^}]*min-height:\s*100%[^}]*overflow:\s*hidden/s
+  );
+  assert.match(
+    projectCss,
+    /\.project-visual img\s*\{[^}]*object-fit:\s*cover[^}]*object-position:\s*center 62%/s
+  );
+  assert.match(
+    projectCss,
+    /\.project-visual img\s*\{[^}]*position:\s*absolute[^}]*inset:\s*0/s,
+    "project planner media should not expand the first-screen workspace from its intrinsic ratio"
+  );
+  assert.doesNotMatch(projectCss, /transform:\s*scale\(/);
+  assert.doesNotMatch(
+    projectCss,
+    /\.project-visual img\s*\{[^}]*transition:[^}]*transform/s
   );
   assert.match(
     projectCss,
@@ -310,7 +328,7 @@ test("project planner preserves its desktop split and mobile action clearance", 
   );
   assert.match(
     projectMobileBlock,
-    /\.project-actions\s*\{[^}]*position:\s*sticky[^}]*bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/s,
+    /\.project-actions\s*\{[^}]*position:\s*sticky[^}]*bottom:\s*calc\(65px \+ env\(safe-area-inset-bottom\)\)/s,
     "project actions should remain above the fixed mobile navigation"
   );
 });
@@ -361,7 +379,7 @@ test("new pages preserve the shared canvas and mobile stacking", () => {
   assert.match(productCss, /@media \(max-width:\s*1100px\)[\s\S]*\.product-detail\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(case02Css, /@media \(max-width:\s*1000px\)[\s\S]*\.case02-story-beat\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(productCss, /padding-bottom:\s*calc\(148px \+ env\(safe-area-inset-bottom\)\)/);
-  assert.match(projectCss, /bottom:\s*calc\(64px \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(projectCss, /bottom:\s*calc\(65px \+ env\(safe-area-inset-bottom\)\)/);
 });
 
 // Task 4: every large desktop should fit the complete homepage inside the shared 973px first screen.

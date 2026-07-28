@@ -5,9 +5,9 @@ const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
 const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const js = readFileSync(new URL("./script.js", import.meta.url), "utf8");
 const renderer = readFileSync(new URL("./scripts/render-detail-pages.mjs", import.meta.url), "utf8");
-const sharedAssetVersion = "three-page-expansion-20260726";
-const contentStylesVersion = "three-page-expansion-20260726";
-const canvasVersion = "three-page-expansion-20260726";
+const sharedAssetVersion = "project-planner-redesign-20260726";
+const contentStylesVersion = "project-planner-redesign-20260726";
+const canvasVersion = "project-planner-redesign-20260726";
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
   assert.notEqual(start, -1, message);
@@ -94,7 +94,7 @@ const reducedMotionBlock = mediaBlock(
 );
 assert.match(
   reducedMotionBlock,
-  /\.nav a,[\s\S]*?\.lang-toggle,[\s\S]*?\.lang-option,[\s\S]*?\.content-footer a\s*\{[^}]*transition:\s*none/s,
+  /\.nav a,[\s\S]*?\.project-entry,[\s\S]*?\.lang-toggle,[\s\S]*?\.lang-option,[\s\S]*?\.content-footer a\s*\{[^}]*transition:\s*none/s,
   "shell glow transitions, including language options, should stop when reduced motion is requested"
 );
 assert.ok(
@@ -104,9 +104,90 @@ assert.ok(
 assert.match(headerMatch[1], /<nav class="nav"[^>]*data-i18n-aria="nav\.label"/, "homepage nav should expose a translated accessible name key");
 assert.match(js, /"nav\.label":\s*"主导航"/, "Chinese translations should include the main navigation label");
 assert.match(js, /"nav\.label":\s*"Main navigation"/, "English translations should include the main navigation label");
+assert.match(headerMatch[1], /class="project-entry-label-full" data-i18n="nav\.projectCta" data-zh="开始项目" data-en="START PROJECT"/, "homepage project entry should use the full translation key");
+assert.match(headerMatch[1], /class="project-entry-label-compact" data-i18n="nav\.projectCtaShort" data-zh="规划" data-en="BUILD"/, "homepage project entry should use the compact translation key");
+assert.match(js, /"nav\.projectCta":\s*"开始项目"/, "Chinese translations should include the full project entry label");
+assert.match(js, /"nav\.projectCtaShort":\s*"规划"/, "Chinese translations should include the compact project entry label");
+assert.match(js, /"nav\.projectCta":\s*"START PROJECT"/, "English translations should include the full project entry label");
+assert.match(js, /"nav\.projectCtaShort":\s*"BUILD"/, "English translations should include the compact project entry label");
+assert.match(
+  css,
+  /\.project-entry\s*\{[^}]*min-height:\s*44px[^}]*background:\s*var\(--accent\)/s
+);
+assert.match(
+  css,
+  /\.project-entry:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s
+);
+assert.match(
+  html,
+  /class="note"[\s\S]*class="hero-actions"[\s\S]*href="\.\/pages\/project\.html"[\s\S]*href="#services"[\s\S]*class="roll-table"/
+);
+assert.equal((html.match(/class="hero-project-action"/g) || []).length, 1);
+assert.equal((html.match(/class="enter-button"/g) || []).length, 1);
+assert.match(js, /"hero\.projectCta":\s*"开始你的项目 →"/);
+assert.match(js, /"hero\.projectCta":\s*"START YOUR PROJECT →"/);
+assert.match(css, /\.hero-actions\s*\{[^}]*display:\s*flex/s);
+assert.match(css, /\.hero-project-action\s*\{[^}]*background:\s*var\(--accent\)/s);
+assert.match(
+  css,
+  /\.hero-project-action,\s*\.enter-button\s*\{[^}]*min-height:\s*48px/s,
+  "homepage actions should retain 48px targets"
+);
+const smallHomepageActions = mediaBlock(
+  css,
+  "@media (max-width: 620px)",
+  "small homepage action range should exist"
+);
+assert.match(
+  smallHomepageActions,
+  /\.hero-actions\s*\{[^}]*grid-template-columns:\s*1fr/s,
+  "homepage actions should use one column on small screens"
+);
+assert.match(
+  css,
+  /\.hero-project-action:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s,
+  "homepage primary action should keep a visible focus treatment"
+);
+assert.match(
+  css,
+  /\.enter-button:focus-visible[\s,][\s\S]*?\{[^}]*outline:\s*2px solid var\(--accent-bright\)/s,
+  "homepage secondary action should keep a visible focus treatment"
+);
+assert.match(
+  reducedMotionBlock,
+  /\.hero-project-action,[\s\S]*?\{[^}]*transition:\s*none/s,
+  "reduced motion should include the homepage primary action"
+);
+assert.match(
+  css,
+  /\.project-entry:hover\s*\{[^}]*border-color:\s*var\(--accent-bright\)[^}]*color:\s*#fff[^}]*background:\s*var\(--accent\)[^}]*box-shadow:\s*0 0 18px var\(--accent-glow\)/s,
+  "shared primary hover should keep light text on the deep-blue surface"
+);
+assert.match(
+  css,
+  /\.hero-project-action:hover\s*\{[^}]*border-color:\s*var\(--accent-bright\)[^}]*color:\s*#fff[^}]*background:\s*var\(--accent\)[^}]*box-shadow:\s*0 0 18px var\(--accent-glow\)/s,
+  "homepage primary hover should keep light text on the deep-blue surface"
+);
+assert.match(
+  css,
+  /\.enter-button:hover\s*\{[^}]*border-color:\s*var\(--accent-bright\)[^}]*color:\s*var\(--ink\)[^}]*box-shadow:\s*0 0 18px var\(--accent-glow\)/s,
+  "homepage secondary hover should retain light text and use blue only for its border and glow"
+);
 assert.match(css, /grid-template-columns:\s*minmax\(310px,\s*0\.88fr\)\s+minmax\(440px,\s*1\.15fr\)/, "cover should remove the middle spine column");
 assert.match(css, /h1\s*\{[^}]*margin:\s*clamp\(6px,\s*2vw,\s*24px\)\s+0\s+0/s, "hero title should move upward");
 const mobileHeader = mediaBlock(css, "@media (max-width: 767px)", "mobile header range should exist");
+assert.match(
+  mobileHeader,
+  /\.project-entry-label-full\s*\{[^}]*display:\s*none/s
+);
+assert.match(
+  mobileHeader,
+  /\.project-entry-label-compact\s*\{[^}]*display:\s*inline/s
+);
+assert.match(
+  mobileHeader,
+  /\.project-entry\s*\{[^}]*min-height:\s*44px/s
+);
 assert.match(
   mobileHeader,
   /\.nav\s*\{[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)/s,

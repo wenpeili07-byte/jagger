@@ -50,14 +50,28 @@ const renderProductCard = (product) => {
     en: String(product.category).toUpperCase(),
     zh: String(product.category),
   };
-  const action = product.id === "forged-wheel"
-    ? `<a
-                  href="./shop/forged-wheel.html"
-                  data-product-link="forged-wheel"
-                  data-zh="查看配置 →"
-                  data-en="CONFIGURE →"
-                >CONFIGURE →</a>`
-    : i18n("button", { zh: "查看详情 →", en: "VIEW DETAILS →" }, ` type="button" data-product-open data-product-id="${escapeAttribute(product.id)}"`);
+  const actionCopy = product.id === "forged-wheel"
+    ? { zh: "查看配置 →", en: "CONFIGURE →" }
+    : { zh: "查看详情 →", en: "VIEW DETAILS →" };
+  const accessibleAction = product.id === "forged-wheel"
+    ? {
+        en: `Configure ${product.title.en}`,
+        zh: `配置${product.title.zh}`,
+      }
+    : {
+        en: `View details for ${product.title.en}`,
+        zh: `查看${product.title.zh}详情`,
+      };
+  const target = product.id === "forged-wheel"
+    ? `<a class="shop-product-target"
+          href="./shop/forged-wheel.html"
+          data-product-link="forged-wheel"
+          ${i18nAttribute("aria-label", accessibleAction)}></a>`
+    : `<button class="shop-product-target"
+             type="button"
+             data-product-open
+             data-product-id="${escapeAttribute(product.id)}"
+             ${i18nAttribute("aria-label", accessibleAction)}></button>`;
 
   return `<article
             class="shop-product-card"
@@ -83,9 +97,10 @@ const renderProductCard = (product) => {
               ${i18n("h2", product.title)}
               <div class="shop-product-meta">
                 ${i18n("span", { zh: "请咨询", en: "INQUIRE" })}
-                ${action}
+                ${i18n("span", actionCopy, ' class="shop-product-action-copy"')}
               </div>
             </div>
+            ${target}
           </article>`;
 };
 
@@ -99,6 +114,10 @@ const header = `<header class="topbar">
           <a href="./shop.html" aria-current="page">SHOP</a>
         </nav>
         <div class="top-actions">
+          <a class="project-entry" href="./project.html">
+            ${i18n("span", { zh: "开始项目", en: "START PROJECT" }, ' class="project-entry-label-full"')}
+            ${i18n("span", { zh: "规划", en: "BUILD" }, ' class="project-entry-label-compact"')}
+          </a>
           <button class="lang-toggle" type="button" aria-label="切换到中文">
             <span class="lang-option" data-lang-option="zh">中</span>
             <span class="lang-separator" aria-hidden="true">/</span>
@@ -150,9 +169,9 @@ export const renderForgedWheelPage = (
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Configure a forged wheel direction and request final fitment verification from LONMA DYNAMIC." />
     <title>Monoblock Forged Wheel | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../../styles.css?v=three-page-expansion-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=three-page-expansion-20260726" />
-    <link rel="stylesheet" href="../../shop-product.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../shop-product.css?v=project-planner-redesign-20260726" />
   </head>
   <body data-section="shop">
     <main class="site-shell forged-wheel-page" data-product-id="${escapeAttribute(product.id)}">
@@ -166,6 +185,10 @@ export const renderForgedWheelPage = (
           <a href="../shop.html" aria-current="page">SHOP</a>
         </nav>
         <div class="top-actions">
+          <a class="project-entry" href="../project.html">
+            ${i18n("span", { zh: "开始项目", en: "START PROJECT" }, ' class="project-entry-label-full"')}
+            ${i18n("span", { zh: "规划", en: "BUILD" }, ' class="project-entry-label-compact"')}
+          </a>
           <button class="lang-toggle" type="button" aria-label="切换到中文">
             <span class="lang-option" data-lang-option="zh">中</span>
             <span class="lang-separator" aria-hidden="true">/</span>
@@ -258,8 +281,8 @@ export const renderForgedWheelPage = (
       </footer>
     </main>
     <script type="application/json" data-product-config>${serializeJson(productConfig)}</script>
-    <script src="../../content-pages.js?v=three-page-expansion-20260726"></script>
-    <script src="../../shop-product.js?v=three-page-expansion-20260726"></script>
+    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
+    <script src="../../shop-product.js?v=project-planner-redesign-20260726"></script>
   </body>
 </html>
 `;
@@ -275,9 +298,9 @@ export const renderShopPage = (products = shopProducts) => {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Browse sample performance-part categories for a selected vehicle and contact LONMA DYNAMIC for fitment and installation details." />
     <title>Shop | LONMA DYNAMIC</title>
-    <link rel="stylesheet" href="../styles.css?v=three-page-expansion-20260726" />
-    <link rel="stylesheet" href="../layout-canvas.css?v=three-page-expansion-20260726" />
-    <link rel="stylesheet" href="../shop.css?v=three-page-expansion-20260726" />
+    <link rel="stylesheet" href="../styles.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../layout-canvas.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../shop.css?v=project-planner-redesign-20260726" />
   </head>
   <body data-section="shop">
     <main class="site-shell shop-page" ${i18nAttribute("aria-label", { zh: "LONMA DYNAMIC 商店", en: "LONMA DYNAMIC shop" })}>
@@ -390,8 +413,8 @@ export const renderShopPage = (products = shopProducts) => {
       ${footer}
     </main>
     <script type="application/json" data-shop-vehicle-data>${serializeJson(shopVehicles.tuples)}</script>
-    <script src="../content-pages.js?v=three-page-expansion-20260726"></script>
-    <script src="../shop.js?v=three-page-expansion-20260726"></script>
+    <script src="../content-pages.js?v=project-planner-redesign-20260726"></script>
+    <script src="../shop.js?v=project-planner-redesign-20260726"></script>
   </body>
 </html>
 `;
