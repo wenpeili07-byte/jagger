@@ -805,6 +805,283 @@
     line-height: 1.6;
   }
 
+  /* Shop */
+  .shop-mobile-intro {
+    display: block;
+    padding: 38px 20px 30px;
+    border-bottom: 1px solid var(--line);
+    background: #111315;
+  }
+
+  .shop-mobile-intro p,
+  .shop-mobile-intro h1 {
+    margin: 0;
+  }
+
+  .shop-mobile-intro > p:first-child {
+    color: var(--accent-bright);
+    font-size: 12px;
+  }
+
+  .shop-mobile-intro h1 {
+    max-width: 7em;
+    margin-top: 16px;
+    font-family: Impact, "Arial Narrow", Arial, Helvetica, sans-serif;
+    font-size: clamp(42px, 13vw, 56px);
+    line-height: 0.94;
+  }
+
+  .shop-mobile-intro > span {
+    display: block;
+    width: 54px;
+    height: 3px;
+    margin: 22px 0 18px;
+    background: var(--accent-bright);
+  }
+
+  .shop-mobile-intro > p:last-child {
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .shop-selector-heading {
+    display: none;
+  }
+
+  .shop-mobile-vehicle-summary {
+    grid-template-columns: 96px minmax(0, 1fr) auto;
+    min-height: 118px;
+    padding: 14px 20px;
+  }
+
+  .shop-mobile-vehicle-summary img {
+    width: 96px;
+    height: 78px;
+  }
+
+  .shop-mobile-vehicle-summary p {
+    font-size: 15px;
+  }
+
+  .shop-mobile-vehicle-summary p > span {
+    font-size: 12px;
+  }
+
+  .shop-filter > summary {
+    min-height: 54px;
+    margin: 16px 20px;
+  }
+
+  .shop-products {
+    padding: 24px 20px 52px;
+  }
+
+  .shop-results-bar p,
+  .shop-sort {
+    font-size: 11px;
+  }
+
+  .shop-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 12px;
+  }
+
+  .shop-product-card {
+    border: 0;
+    background: transparent;
+  }
+
+  .shop-product-card img {
+    border: 1px solid var(--line);
+  }
+
+  .shop-product-copy {
+    min-height: 132px;
+    padding: 13px 2px 4px;
+    border-top: 0;
+  }
+
+  .shop-product-category {
+    margin-bottom: 7px;
+    font-size: 11px;
+  }
+
+  .shop-product-card h2 {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  .shop-product-meta {
+    gap: 3px;
+    font-size: 11px;
+  }
+
+  .shop-product-action-copy {
+    font-size: 10px;
+  }
+
+  /* Project planner */
+  .project-progress {
+    position: sticky;
+    z-index: 30;
+    top: 0;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    background: rgba(13, 15, 17, 0.98);
+  }
+
+  .project-progress button {
+    min-height: 62px;
+    font-size: 10px;
+  }
+
+  .project-controls {
+    padding: 32px 20px calc(100px + env(safe-area-inset-bottom));
+  }
+
+  .project-controls-heading {
+    margin-bottom: 28px;
+  }
+
+  .project-controls-heading h1 {
+    margin-top: 16px;
+    font-size: clamp(42px, 13vw, 56px);
+    line-height: 0.94;
+  }
+
+  .project-lede {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .project-controls h2 {
+    font-size: 30px;
+  }
+
+  .project-fields input,
+  .project-fields select {
+    min-height: 58px;
+    padding-inline: 16px;
+    font-size: 16px;
+  }
+
+  .project-fields label > span {
+    font-size: 11px;
+  }
+
+  .project-choice-list label > span,
+  .project-direction-grid label > span {
+    min-height: 58px;
+  }
+
+  .project-actions {
+    bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom));
+    margin-bottom: calc(-100px - env(safe-area-inset-bottom));
+    padding: 12px 20px;
+  }
+
+  .project-actions button,
+  .project-actions a {
+    min-height: 56px;
+  }
+
+  .project-visual {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Contact */
+  .contact-hero {
+    min-height: 0;
+    background: #111315;
+  }
+
+  .contact-hero .content-hero-media {
+    display: none;
+  }
+
+  .contact-hero .content-hero-shade {
+    display: none;
+  }
+
+  .contact-hero .content-hero-copy {
+    width: 100%;
+    padding: 38px 20px 34px;
+    text-shadow: none;
+  }
+
+  .contact-hero .content-eyebrow {
+    margin-bottom: 22px;
+  }
+
+  .contact-hero .content-display {
+    max-width: 7em;
+    font-size: clamp(46px, 14vw, 60px);
+    line-height: 0.94;
+  }
+
+  .contact-hero .content-local-title {
+    margin-top: 18px;
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  .contact-inquiry {
+    display: block;
+    padding: 0 20px 52px;
+  }
+
+  .contact-intro {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0 0 34px;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  .contact-intro > .content-eyebrow,
+  .contact-intro > h2,
+  .contact-intro > p {
+    display: none;
+  }
+
+  .contact-email {
+    display: flex;
+    min-height: 68px;
+    align-items: center;
+    margin-top: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    font-size: 16px;
+    overflow-wrap: anywhere;
+  }
+
+  .contact-form {
+    gap: 24px;
+  }
+
+  .contact-field {
+    gap: 9px;
+    font-size: 11px;
+  }
+
+  .contact-field input,
+  .contact-field select {
+    min-height: 60px;
+    font-size: 17px;
+  }
+
+  .contact-field textarea {
+    min-height: 160px;
+    font-size: 17px;
+  }
+
+  .contact-submit-row button {
+    min-height: 58px;
+  }
+
   .content-footer {
     min-height: 136px;
     padding: 28px var(--mobile-page-gutter) 34px;

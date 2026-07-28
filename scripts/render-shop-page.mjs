@@ -307,6 +307,15 @@ export const renderShopPage = (products = shopProducts) => {
   <body data-section="shop">
     <main class="site-shell shop-page" ${i18nAttribute("aria-label", { zh: "LONMA DYNAMIC 商店", en: "LONMA DYNAMIC shop" })}>
       ${header}
+      <section class="shop-mobile-intro" aria-labelledby="shop-mobile-title">
+        ${i18n("p", { zh: "商店 / 性能配件", en: "SHOP / PERFORMANCE PARTS" })}
+        ${i18n("h1", { zh: "适配整车方案的性能部件。", en: "PARTS THAT FIT THE BUILD." }, ' id="shop-mobile-title"')}
+        <span aria-hidden="true"></span>
+        ${i18n("p", {
+          zh: "围绕车型筛选，结合完整改装方向选择。",
+          en: "Curated around the platform and the complete build direction.",
+        })}
+      </section>
       <section class="shop-selector" ${i18nAttribute("aria-label", { zh: "示例车型选择", en: "Sample vehicle selection" })}>
         <div class="shop-selector-heading">
           ${i18n("p", { zh: "示例车型", en: "SAMPLE VEHICLE" })}

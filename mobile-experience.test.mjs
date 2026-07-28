@@ -287,3 +287,104 @@ test("about uses compact process rows and a photo-led field note", () => {
     "About field note should use natural content height",
   );
 });
+
+test("shop opens with a product-led introduction and keeps a readable two-column catalog", () => {
+  const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+  const shopHtml = read("./pages/shop.html");
+
+  assert.match(
+    shopHtml,
+    /class="shop-mobile-intro"[\s\S]*?data-en="PARTS THAT FIT THE BUILD\."/,
+    "Shop should include the selected mobile-only product introduction",
+  );
+  assert.match(
+    read("./scripts/render-shop-page.mjs"),
+    /class="shop-mobile-intro"[\s\S]*?PARTS THAT FIT THE BUILD\./,
+    "the shop generator should preserve the mobile introduction",
+  );
+  assert.match(
+    mobile,
+    /\.shop-mobile-intro\s*\{[^}]*display:\s*block[^}]*padding:\s*38px 20px 30px/s,
+    "Shop should open with a deliberate editorial block",
+  );
+  assert.match(
+    mobile,
+    /\.shop-product-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s,
+    "Shop should keep two products per row on mobile",
+  );
+  assert.match(
+    mobile,
+    /\.shop-product-card h2\s*\{[^}]*font-size:\s*16px/s,
+    "product names should remain readable in the two-column grid",
+  );
+  assert.match(
+    mobile,
+    /\.shop-product-copy\s*\{[^}]*min-height:\s*132px/s,
+    "product copy should use a compact but stable height",
+  );
+});
+
+test("project planner uses larger fields and keeps its main action above navigation", () => {
+  const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+
+  assert.match(
+    mobile,
+    /\.project-progress\s*\{[^}]*position:\s*sticky[^}]*top:\s*0[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s,
+    "planner progress should stay visible while completing a step",
+  );
+  assert.match(
+    mobile,
+    /\.project-controls\s*\{[^}]*padding:\s*32px 20px calc\(100px \+ env\(safe-area-inset-bottom\)\)/s,
+    "planner controls should use the shared gutter and action clearance",
+  );
+  assert.match(
+    mobile,
+    /\.project-controls-heading h1\s*\{[^}]*font-size:\s*clamp\(42px,\s*13vw,\s*56px\)/s,
+    "planner heading should carry the selected mobile hierarchy",
+  );
+  assert.match(
+    mobile,
+    /\.project-fields input,[\s\S]*?\.project-fields select\s*\{[^}]*min-height:\s*58px[^}]*font-size:\s*16px/s,
+    "planner form controls should be comfortably tappable",
+  );
+  assert.match(
+    mobile,
+    /\.project-actions\s*\{[^}]*bottom:\s*calc\(var\(--mobile-nav-height\) \+ env\(safe-area-inset-bottom\)\)/s,
+    "planner actions should clear the shared bottom navigation",
+  );
+});
+
+test("contact removes the oversized mobile poster and prioritizes email and form fields", () => {
+  const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+
+  assert.match(
+    mobile,
+    /\.contact-hero\s*\{[^}]*min-height:\s*0[^}]*background:\s*#111315/s,
+    "Contact should use a compact text-led opening",
+  );
+  assert.match(
+    mobile,
+    /\.contact-hero \.content-hero-media\s*\{[^}]*display:\s*none/s,
+    "the desktop poster should not consume the mobile first screen",
+  );
+  assert.match(
+    mobile,
+    /\.contact-inquiry\s*\{[^}]*padding:\s*0 20px 52px/s,
+    "Contact form should align to the shared gutter",
+  );
+  assert.match(
+    mobile,
+    /\.contact-intro\s*\{[^}]*position:\s*static[^}]*width:\s*auto[^}]*height:\s*auto/s,
+    "Contact email should remain visible on mobile",
+  );
+  assert.match(
+    mobile,
+    /\.contact-field input,[\s\S]*?\.contact-field select\s*\{[^}]*min-height:\s*60px[^}]*font-size:\s*17px/s,
+    "contact controls should be readable and comfortably tappable",
+  );
+  assert.match(
+    mobile,
+    /\.contact-field textarea\s*\{[^}]*min-height:\s*160px/s,
+    "project details should have a useful writing area",
+  );
+});
