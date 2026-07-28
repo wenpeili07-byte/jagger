@@ -218,7 +218,7 @@ test("services becomes a readable text and thumbnail rail", () => {
   );
   assert.match(
     mobile,
-    /\.service-process-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*62%\)\s+minmax\(0,\s*38%\)[^}]*min-height:\s*140px[^}]*aspect-ratio:\s*auto/s,
+    /\.service-process-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*62%\)\s+minmax\(0,\s*38%\)[^}]*height:\s*140px[^}]*min-height:\s*140px[^}]*aspect-ratio:\s*auto/s,
     "service rows should keep compact copy and image columns",
   );
   assert.match(

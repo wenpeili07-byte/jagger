@@ -433,6 +433,7 @@
 
   .service-process-row {
     grid-template-columns: minmax(0, 62%) minmax(0, 38%);
+    height: 140px;
     min-height: 140px;
     aspect-ratio: auto;
     overflow: hidden;
