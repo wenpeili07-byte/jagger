@@ -145,7 +145,7 @@ const decode = (value) =>
     .replaceAll("&gt;", ">");
 
 const sharedAssetVersion = "project-planner-redesign-20260726";
-const casesControllerVersion = "english-copy-20260721";
+const casesControllerVersion = "mobile-option3-20260728";
 const chineseText = /[\p{Script=Han}]/u;
 
 class FakeElement {
@@ -366,7 +366,7 @@ test("content controller cache references use the current shared asset version",
 
   const cases = read("./pages/cases.html");
   assert.match(cases, new RegExp(`cases\\.js\\?v=${casesControllerVersion}`));
-  assert.doesNotMatch(cases, /cases\.js\?v=(?!english-copy-20260721)/);
+  assert.doesNotMatch(cases, /cases\.js\?v=(?!mobile-option3-20260728)/);
 
   const { caseDetails, serviceDetails } = await import("./detail-pages-data.mjs");
   const { renderCasePage, renderServicePage } = await import("./scripts/render-detail-pages.mjs");

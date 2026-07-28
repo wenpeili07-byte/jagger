@@ -89,8 +89,13 @@ test("shared mobile shell matches the selected five-action navigation", () => {
   );
   assert.match(
     mobile,
-    /\.nav\s*\{[^}]*position:\s*fixed[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)[^}]*padding-bottom:\s*env\(safe-area-inset-bottom\)/s,
-    "mobile navigation should stay fixed and safe-area aware",
+    /\.nav\s*\{[^}]*position:\s*fixed[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(0,\s*1fr\)\)[^}]*gap:\s*0[^}]*padding-bottom:\s*env\(safe-area-inset-bottom\)/s,
+    "mobile navigation should stay fixed, use equal gapless columns, and remain safe-area aware",
+  );
+  assert.match(
+    mobile,
+    /\.brand\s*\{[^}]*display:\s*flex[^}]*min-height:\s*44px[^}]*align-items:\s*center/s,
+    "the mobile brand link should keep a complete touch target",
   );
   assert.match(
     mobile,
@@ -167,7 +172,7 @@ test("home uses a compact image-led first screen and removes duplicate case cont
   );
   assert.match(
     mobile,
-    /\.left-panel h1\s*\{[^}]*font-size:\s*clamp\(52px,\s*16vw,\s*72px\)/s,
+    /\.left-panel h1\s*\{[^}]*font-size:\s*clamp\(48px,\s*14vw,\s*64px\)/s,
     "home brand should be prominent without overflowing",
   );
   assert.match(
@@ -198,12 +203,12 @@ test("services becomes a readable text and thumbnail rail", () => {
   );
   assert.match(
     mobile,
-    /\.services-intro\s*\{[^}]*padding:\s*36px 20px 28px/s,
+    /\.services-intro\s*\{[^}]*padding:\s*30px 20px 24px/s,
     "services intro should use the shared mobile gutter",
   );
   assert.match(
     mobile,
-    /\.services-intro h1\s*\{[^}]*font-size:\s*clamp\(42px,\s*13vw,\s*56px\)/s,
+    /\.services-intro h1\s*\{[^}]*font-size:\s*clamp\(40px,\s*11vw,\s*50px\)/s,
     "services title should remain expressive but controlled",
   );
   assert.match(
@@ -233,8 +238,13 @@ test("cases uses a horizontal featured rail, make filters, and a two-column arch
 
   assert.match(
     mobile,
-    /\.cases-hero\s*\{[^}]*display:\s*block[^}]*min-height:\s*0[^}]*padding:\s*34px 20px 24px/s,
+    /\.cases-hero\s*\{[^}]*display:\s*block[^}]*min-height:\s*0[^}]*padding:\s*28px 20px 20px/s,
     "cases should release the oversized desktop hero",
+  );
+  assert.match(
+    mobile,
+    /\.cases-title\s*\{[^}]*font-size:\s*clamp\(50px,\s*14vw,\s*64px\)/s,
+    "cases should preserve display impact without losing the archive below",
   );
   assert.match(
     mobile,
@@ -268,8 +278,13 @@ test("about uses compact process rows and a photo-led field note", () => {
 
   assert.match(
     mobile,
-    /\.about-hero\s*\{[^}]*min-height:\s*520px/s,
+    /\.about-hero\s*\{[^}]*min-height:\s*470px/s,
     "About should keep a controlled photographic opening",
+  );
+  assert.match(
+    mobile,
+    /\.about-hero \.content-display\s*\{[^}]*font-size:\s*44px/s,
+    "About should keep the selected compact editorial title scale",
   );
   assert.match(
     mobile,
@@ -304,8 +319,13 @@ test("shop opens with a product-led introduction and keeps a readable two-column
   );
   assert.match(
     mobile,
-    /\.shop-mobile-intro\s*\{[^}]*display:\s*block[^}]*padding:\s*38px 20px 30px/s,
+    /\.shop-mobile-intro\s*\{[^}]*display:\s*block[^}]*padding:\s*30px 20px 24px/s,
     "Shop should open with a deliberate editorial block",
+  );
+  assert.match(
+    mobile,
+    /\.shop-mobile-intro h1\s*\{[^}]*font-size:\s*clamp\(40px,\s*11vw,\s*50px\)/s,
+    "Shop heading should leave useful catalog context above the fold",
   );
   assert.match(
     mobile,
@@ -334,12 +354,12 @@ test("project planner uses larger fields and keeps its main action above navigat
   );
   assert.match(
     mobile,
-    /\.project-controls\s*\{[^}]*padding:\s*32px 20px calc\(100px \+ env\(safe-area-inset-bottom\)\)/s,
+    /\.project-controls\s*\{[^}]*padding:\s*26px 20px calc\(100px \+ env\(safe-area-inset-bottom\)\)/s,
     "planner controls should use the shared gutter and action clearance",
   );
   assert.match(
     mobile,
-    /\.project-controls-heading h1\s*\{[^}]*font-size:\s*clamp\(42px,\s*13vw,\s*56px\)/s,
+    /\.project-controls-heading h1\s*\{[^}]*font-size:\s*clamp\(40px,\s*11vw,\s*50px\)/s,
     "planner heading should carry the selected mobile hierarchy",
   );
   assert.match(
@@ -349,8 +369,8 @@ test("project planner uses larger fields and keeps its main action above navigat
   );
   assert.match(
     mobile,
-    /\.project-actions\s*\{[^}]*bottom:\s*calc\(var\(--mobile-nav-height\) \+ env\(safe-area-inset-bottom\)\)/s,
-    "planner actions should clear the shared bottom navigation",
+    /\.project-actions\s*\{[^}]*bottom:\s*calc\(var\(--mobile-nav-height\) \+ env\(safe-area-inset-bottom\)\)[^}]*margin-inline:\s*0/s,
+    "planner actions should clear the shared bottom navigation without overflowing the viewport",
   );
 });
 
@@ -366,6 +386,11 @@ test("contact removes the oversized mobile poster and prioritizes email and form
     mobile,
     /\.contact-hero \.content-hero-media\s*\{[^}]*display:\s*none/s,
     "the desktop poster should not consume the mobile first screen",
+  );
+  assert.match(
+    mobile,
+    /\.contact-hero \.content-display\s*\{[^}]*font-size:\s*clamp\(42px,\s*12vw,\s*52px\)/s,
+    "Contact should retain a strong title while keeping the form visible",
   );
   assert.match(
     mobile,
@@ -399,7 +424,7 @@ test("case and service detail pages use a compact photo-first mobile reading ord
   );
   assert.match(
     mobile,
-    /\.case-detail-page \.detail-copy,[\s\S]*?\.service-detail-page \.detail-copy\s*\{[^}]*min-height:\s*0[^}]*padding:\s*34px 20px 30px/s,
+    /\.case-detail-page \.detail-copy,[\s\S]*?\.service-detail-page \.detail-copy\s*\{[^}]*min-height:\s*0[^}]*padding:\s*28px 20px 24px/s,
     "detail copy should no longer reserve a desktop-sized first screen",
   );
   assert.match(
@@ -409,7 +434,7 @@ test("case and service detail pages use a compact photo-first mobile reading ord
   );
   assert.match(
     mobile,
-    /\.case-detail-page \.detail-copy h1,[\s\S]*?\.service-detail-page \.detail-copy h1\s*\{[^}]*font-size:\s*clamp\(44px,\s*13vw,\s*58px\)/s,
+    /\.case-detail-page \.detail-copy h1,[\s\S]*?\.service-detail-page \.detail-copy h1\s*\{[^}]*font-size:\s*clamp\(40px,\s*11vw,\s*50px\)/s,
     "detail titles should remain prominent without overflowing",
   );
   assert.match(
@@ -444,17 +469,17 @@ test("product detail keeps configuration compact and its actions clear of naviga
 
   assert.match(
     mobile,
-    /\.product-stage\s*\{[^}]*padding:\s*20px/s,
+    /\.product-stage\s*\{[^}]*padding:\s*16px/s,
     "product media should align to the shared mobile gutter",
   );
   assert.match(
     mobile,
-    /\.product-config\s*\{[^}]*padding:\s*30px 20px/s,
+    /\.product-config\s*\{[^}]*padding:\s*24px 20px/s,
     "product configuration should use the shared mobile gutter",
   );
   assert.match(
     mobile,
-    /\.product-config h1\s*\{[^}]*font-size:\s*clamp\(36px,\s*11vw,\s*48px\)/s,
+    /\.product-config h1\s*\{[^}]*font-size:\s*clamp\(34px,\s*10vw,\s*42px\)/s,
     "product title should remain prominent without overflowing",
   );
   assert.match(

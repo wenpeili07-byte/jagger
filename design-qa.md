@@ -1,73 +1,47 @@
-# Design QA
+**Design QA: Mobile Option 3**
 
-## Mobile Spacing Refinement
+**Source Visual Truth**
+- Shell: `/Users/wenpeili/.codex/generated_images/019edc34-b0b1-7e33-adc9-d777315e90eb/call_OCXIwzMzpsjjE8ybkn15IxZr.png` (`864 x 1821`)
+- Page references: `call_AXibgna0OY403glzhJHmP9C6.png`, `call_pLmRYRoEfAe4aklIsWYyrS4K.png`, `call_wa1K4TzkqaPRO0xCRMUkANrz.png`, `call_mzLApVghLk5IYifKIhErWOEZ.png`, `call_XBb5HjCeDvhqanOp2p8jKsIh.png`, `call_hDJ1M6X8imoE1wQbyUJ6ZJoB.png`, `call_ArxY8zQhbRyMUyJEQQ834CMJ.png`, and `call_BmjTWWqEPoB9KtADrxWaweUV.png` in the same generated-images folder (`852-853 x 1844-1847`).
 
-- Reference: the existing Cases mobile page and the before captures in `audit/mobile-spacing-20260722/` established the target rhythm. The corresponding after captures live in `audit/mobile-spacing-20260722/after/`.
-- Implemented viewport: 390 x 844, English default state, with the shared fixed bottom navigation visible.
-- About: the first image-led section is 540px tall and the process section begins at y=598, 50px earlier than before.
-- Services: the editorial introduction is content-led rather than fixed-height; the first service begins at y=553, 88px earlier than before.
-- Case detail: the lead copy is 420px tall and the first project image begins at y=478, 53px earlier than before.
-- Service detail: the lead copy is 390px tall and the first service image begins at y=448, 80px earlier than before.
-- Cases: intentionally unchanged so its approved masked rail rhythm and label placement remain intact.
-- Desktop regression: all four affected routes were rechecked at 1440 x 900. Their 1440px canvas, desktop navigation, image geometry, and zero horizontal overflow remain unchanged.
-- No unresolved P0/P1/P2 spacing, clipping, or overflow findings remain.
+**Implementation Evidence**
+- Browser-rendered captures: `audit/mobile-option3/*-implementation-426x922.png`
+- Combined source/implementation inputs:
+  - `audit/mobile-option3/comparison-1-final.png`
+  - `audit/mobile-option3/comparison-2-final.png`
+  - `audit/mobile-option3/comparison-3-final.png`
+- Viewport: `426 x 922` CSS px, device scale factor `1`.
+- Implementation captures: `426 x 922` px.
+- Sources were displayed at `426 x 922` inside the comparison boards. This normalizes the approximately 2x source density; the Home source receives a minimal edge crop because its aspect ratio differs slightly.
+- State: English, page scrolled to top, no hover or dialog state.
 
-final result: passed
+**Full-View Comparison**
+- The fixed five-action navigation, compact topbar, dark automotive palette, white condensed display type, blue selection treatment, photographic hierarchy, and square-edged controls align with the selected Option 3 direction.
+- Existing approved LONMA copy, imagery, route structure, bilingual controls, and working controllers were preserved. The source boards are treated as page-composition references rather than replacement content.
+- Final comparison shows a consistent shell and responsive hierarchy across Home, Services, Cases, About, Shop, Project, Contact, Case Detail, and Product Detail.
 
-## Mobile Navigation And First Screens
+**Focused Region Comparison**
+- Header and bottom-navigation regions were checked at native `426px` width in all three comparison boards.
+- Above-the-fold title, image crop, first primary action, and first content transition were checked per route at native width. Separate crops were not needed because each source and implementation remains readable at full native width in the combined boards.
 
-- Reference: approved Home / Shop / Contact mobile direction in `exec-b0c6694e-5a1f-46bd-ab32-b6834e4e90a9.png`.
-- Implemented viewport: 390 x 844 in the in-app browser, English default state.
-- Shared shell: all seven checked routes use a 56px single-row header and a fixed five-item 65px bottom navigation module. English and Chinese labels fit without horizontal overflow.
-- Home: the original automotive hero and case content remain intact while the primary navigation moves to the bottom module.
-- Shop: the selected vehicle is summarized in a compact editable block, the existing filter action remains functional, and the first square product image enters the first viewport.
-- Contact: the source image letterboxing is cropped outside the 470px hero, the secondary introduction remains available to assistive technology without delaying the form, and the first two fields are visible above the bottom navigation.
-- Desktop regression: at 1440 x 900 the navigation returns to the header, uses static positioning, and the page has no horizontal overflow.
-- Remaining P3 difference: the implementation preserves the site's real vehicle and product photography, so crops and visual density differ slightly from the concept composite.
+**Findings**
+- No remaining P0, P1, or P2 visual findings.
+- [P3] The source boards fit more information above the fold by using very small body copy. The implementation intentionally keeps body copy near `15-16px` and touch targets at `44px+`, so some secondary content begins lower.
+- [P3] Home keeps the approved group-car hero and direct project CTA instead of reproducing the source board's engine image and duplicate quick-link list.
+- [P3] Product Detail gives the wheel image more inspection space than the concept board, matching the approved request for a larger product-entry area.
 
-final result: passed
+**Comparison History**
+- Iteration 1: found uneven bottom-navigation columns, a `16px`-high brand link target, `10px` Project overflow at `767px`, and oversized first-screen headings compared with the selected samples.
+- Fixes: removed inherited navigation gaps, raised the brand target to `44px`, reset Project action margins, tightened display type and first-screen spacing, and added `aria-pressed` to case filters.
+- Iteration 2 evidence: `comparison-1-final.png`, `comparison-2-final.png`, and `comparison-3-final.png`; no actionable P0/P1/P2 findings remain.
 
-## Shop
-
-- Reference viewport and state: approved Option 1 image at 1487 x 1058, reviewed against the equivalent 1440 x 1024 English default catalog state. The extra bottom reference edge was disregarded; no horizontal crop was used.
-- Implemented viewport and state: 1440 x 1024, BMW / G80 M3 / 2024 / G8X, six samples, Featured sort, filters clear, dialog closed.
-- P0/P1/P2 findings and fixes: one P2 integration issue was found when the vehicle controls were exercised. Unsupported makes retained the BMW dependent values and Find Parts was inert. The controller now clears and disables unsupported dependent fields, reports the existing bilingual zero-results state, and restores the canonical BMW sample. No unresolved P0/P1/P2 visual findings remain.
-- Remaining P3 polish: the six generic, unbranded square product photographs differ from the illustrative composite, as required by the approved implementation brief. Truthful `SAMPLE`, `INQUIRY ONLY`, and `INQUIRE` copy replaces the reference's unapproved inventory claims.
-
-## Case 02
-
-- Reference viewport and state: approved photo-led Case 02 image at 1487 x 1058, reviewed against the equivalent 1440 x 1024 English state with marker and row 01 active.
-- Implemented viewport and state: 1440 x 1024, real Case 02 hero, four synchronized markers, four category-level parts rows, and the preserved editorial content below the showcase.
-- P0/P1/P2 findings and fixes: the mobile marker rule used the presentation class instead of the required semantic hook. It now targets `[data-case-marker]`, and runtime checks confirm zero visible markers below 768px while all four numbered rows remain. No unresolved P0/P1/P2 visual findings remain.
-- Remaining P3 polish: category-only titles and generic media intentionally replace the reference's illustrative product and fitment claims. The existing back link and editorial continuation remain to preserve the approved Case detail structure.
-
-## Responsive Matrix
-
-| Viewport | Shop | Case 02 |
-| --- | --- | --- |
-| 2200 x 1050 | 3 columns, desktop rail, no overflow | split showcase, 4 markers, no overflow |
-| 1440 x 1024 | 3 columns, desktop rail, no overflow | split showcase, 4 markers, no overflow |
-| 1440 x 900 | 3 columns, desktop rail, no overflow | split showcase, 4 markers, no overflow |
-| 1156 x 900 | 2 columns, collapsed filter, no overflow | stacked showcase, 2-column rail, no overflow |
-| 790 x 900 | 2 columns, collapsed filter, no overflow | stacked showcase, 2-column rail, no overflow |
-| 390 x 844 | 1 column, collapsed filter, no overflow | stacked showcase, markers hidden, 4 rows retained |
-
-All observed images loaded, visible Shop text fit its containers, the Case display title rendered without visible clipping or overlap, and the browser console had no warnings or errors.
+**Interaction And Responsive Evidence**
+- Bottom navigation successfully opened Shop.
+- Language switched to Chinese; a fresh tab opened in English as designed.
+- BMW filtering showed four matching cases and exposed `aria-pressed="true"`.
+- Project Planner advanced from Vehicle to Goal.
+- `36` route/viewport checks at `390`, `767`, `768`, and `1440` px found no horizontal overflow or broken images.
+- Browser console: `0` warnings/errors across nine representative routes.
+- Automated suite: `179/179` passed.
 
 final result: passed
-
-## Three-Page Expansion — 2026-07-26
-
-| Page | 1900×1050 | 1440×900 | 1100×900 | 390×844 | 430×932 |
-| --- | --- | --- | --- | --- | --- |
-| Project Planner | PASS | PASS | PASS | PASS | PASS |
-| Forged Wheel | PASS | PASS | PASS | PASS | PASS |
-| Case 02 Story | PASS | PASS | PASS | PASS | PASS |
-| Contact Prefill | PASS | PASS | PASS | PASS | PASS |
-
-- English-first fresh load: PASS
-- Chinese/English toggle: PASS
-- Keyboard focus: PASS
-- Reduced motion: PASS
-- Entry and back links: PASS
-- Horizontal overflow: PASS
