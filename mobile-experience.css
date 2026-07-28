@@ -428,11 +428,12 @@
 
   .service-process-rail {
     display: block;
+    margin-inline: 16px;
   }
 
   .service-process-row {
     grid-template-columns: minmax(0, 62%) minmax(0, 38%);
-    min-height: 156px;
+    min-height: 140px;
     aspect-ratio: auto;
     overflow: hidden;
     border-top: 1px solid var(--line);
@@ -440,32 +441,32 @@
 
   .service-process-copy {
     grid-row: 1;
-    padding: 42px 34px 22px 64px;
+    padding: 28px 24px 16px 52px;
     background: #111315;
   }
 
   .service-process-copy h2 {
-    margin: 8px 0 8px;
-    font-size: 21px;
+    margin: 6px 0;
+    font-size: 18px;
   }
 
   .service-process-copy p {
     display: -webkit-box;
     overflow: hidden;
-    font-size: 16px;
-    line-height: 1.45;
+    font-size: 13px;
+    line-height: 1.4;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
   }
 
   .service-process-label {
-    font-size: 10px;
+    font-size: 9px;
   }
 
   .service-process-number {
-    top: 22px;
-    left: 20px;
-    font-size: 20px;
+    top: 18px;
+    left: 16px;
+    font-size: 18px;
   }
 
   .service-process-media {
@@ -490,10 +491,10 @@
   }
 
   .service-process-arrow {
-    top: 22px;
-    right: calc(38% + 12px);
+    top: 18px;
+    right: calc(38% + 10px);
     left: auto;
-    font-size: 22px;
+    font-size: 20px;
     transform: none;
   }
 

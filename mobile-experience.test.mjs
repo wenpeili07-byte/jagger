@@ -213,13 +213,18 @@ test("services becomes a readable text and thumbnail rail", () => {
   );
   assert.match(
     mobile,
-    /\.service-process-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*62%\)\s+minmax\(0,\s*38%\)[^}]*min-height:\s*156px[^}]*aspect-ratio:\s*auto/s,
-    "service rows should use stable copy and image columns",
+    /\.service-process-rail\s*\{[^}]*margin-inline:\s*16px/s,
+    "service rail should use the approved inset mobile width",
   );
   assert.match(
     mobile,
-    /\.service-process-copy\s*\{[^}]*padding:\s*42px 34px 22px 64px[^}]*background:\s*#111315/s,
-    "service copy should not sit on top of the image",
+    /\.service-process-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*62%\)\s+minmax\(0,\s*38%\)[^}]*min-height:\s*140px[^}]*aspect-ratio:\s*auto/s,
+    "service rows should keep compact copy and image columns",
+  );
+  assert.match(
+    mobile,
+    /\.service-process-copy\s*\{[^}]*padding:\s*28px 24px 16px 52px[^}]*background:\s*#111315/s,
+    "service copy should fit the compact row without covering the image",
   );
   assert.match(
     mobile,
@@ -228,8 +233,23 @@ test("services becomes a readable text and thumbnail rail", () => {
   );
   assert.match(
     mobile,
-    /\.service-process-copy p\s*\{[^}]*font-size:\s*16px/s,
-    "service descriptions should be readable on mobile",
+    /\.service-process-copy h2\s*\{[^}]*font-size:\s*18px/s,
+    "service titles should match the compact reference scale",
+  );
+  assert.match(
+    mobile,
+    /\.service-process-copy p\s*\{[^}]*font-size:\s*13px[^}]*-webkit-line-clamp:\s*2/s,
+    "service descriptions should use two compact readable lines",
+  );
+  assert.match(
+    mobile,
+    /\.service-process-label\s*\{[^}]*font-size:\s*9px/s,
+    "service labels should use the compact reference scale",
+  );
+  assert.match(
+    mobile,
+    /\.service-process-number\s*\{[^}]*font-size:\s*18px/s,
+    "service numbers should remain visible without dominating the row",
   );
 });
 
