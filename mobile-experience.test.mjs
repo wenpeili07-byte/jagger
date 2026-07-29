@@ -60,7 +60,7 @@ test("all public routes load the Option 3 mobile stylesheet last", () => {
 
     assert.equal(
       links.at(-1),
-      `${expectedPrefix}?v=mobile-option3-20260728`,
+      `${expectedPrefix}?v=mobile-coordination-20260728`,
       `${path} should load the shared mobile stylesheet after page styles`,
     );
   }
@@ -68,7 +68,7 @@ test("all public routes load the Option 3 mobile stylesheet last", () => {
   for (const generator of ["./scripts/render-detail-pages.mjs", "./scripts/render-shop-page.mjs"]) {
     assert.match(
       read(generator),
-      /mobile-experience\.css\?v=mobile-option3-20260728/,
+      /mobile-experience\.css\?v=mobile-coordination-20260728/,
       `${generator} should preserve the mobile stylesheet when regenerating pages`,
     );
   }
@@ -77,6 +77,11 @@ test("all public routes load the Option 3 mobile stylesheet last", () => {
 test("shared mobile shell matches the selected five-action navigation", () => {
   const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
 
+  assert.match(
+    mobile,
+    /:root\s*\{[^}]*--mobile-nav-muted:\s*#a3a6a9/s,
+    "mobile navigation should use a readable shared inactive color",
+  );
   assert.match(
     mobile,
     /\.topbar\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto[^}]*min-height:\s*56px[^}]*padding:\s*0 20px/s,
@@ -99,12 +104,12 @@ test("shared mobile shell matches the selected five-action navigation", () => {
   );
   assert.match(
     mobile,
-    /\.nav a\s*\{[^}]*min-height:\s*76px[^}]*font-size:\s*10px/s,
+    /\.nav a\s*\{[^}]*min-height:\s*76px[^}]*color:\s*var\(--mobile-nav-muted\)[^}]*font-size:\s*10px/s,
     "each bottom navigation destination should have a stable touch target",
   );
   assert.match(
     mobile,
-    /\.project-entry\s*\{[^}]*position:\s*fixed[^}]*bottom:\s*env\(safe-area-inset-bottom\)[^}]*left:\s*40%[^}]*width:\s*20%[^}]*min-height:\s*76px/s,
+    /\.project-entry\s*\{[^}]*position:\s*fixed[^}]*bottom:\s*env\(safe-area-inset-bottom\)[^}]*left:\s*40%[^}]*width:\s*20%[^}]*min-height:\s*76px[^}]*color:\s*var\(--mobile-nav-muted\)/s,
     "Build should occupy the center navigation position instead of the topbar",
   );
   assert.match(
@@ -190,7 +195,24 @@ test("home uses a compact image-led first screen and removes duplicate case cont
 test("services becomes a readable text and thumbnail rail", () => {
   const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
   const servicesHtml = read("./pages/services.html");
+  const mobileDescriptions = [...servicesHtml.matchAll(/class="service-process-description-mobile"/g)];
 
+  assert.equal(mobileDescriptions.length, 6, "each service should provide purpose-written mobile copy");
+  assert.match(
+    servicesHtml,
+    /class="service-process-description-mobile"[^>]*data-zh="外观、轮毂、避震与刹车升级。"[^>]*data-en="Exterior, wheels, suspension, and brakes\."/,
+    "the first service should use concise bilingual mobile copy",
+  );
+  assert.match(
+    servicesHtml,
+    /class="service-process-description-mobile"[^>]*data-zh="ECU 特调、数据记录与道路测试。"[^>]*data-en="ECU tuning, logging, and road testing\."/,
+    "ECU mobile copy should fit without truncation",
+  );
+  assert.match(
+    servicesHtml,
+    /class="service-process-description-mobile"[^>]*data-zh="进排气升级，兼顾声浪与动力响应。"[^>]*data-en="Intake and exhaust for sound and response\."/,
+    "the last service should use concise bilingual mobile copy",
+  );
   assert.match(
     servicesHtml,
     /<figure class="services-mobile-hero"[\s\S]*?<img src="\.\.\/assets\/images\/网页\/optimized\/case-01\.jpg"/,
@@ -223,8 +245,13 @@ test("services becomes a readable text and thumbnail rail", () => {
   );
   assert.match(
     mobile,
-    /\.service-process-copy\s*\{[^}]*padding:\s*28px 24px 16px 52px[^}]*background:\s*#111315/s,
+    /\.service-process-copy\s*\{[^}]*padding:\s*24px 24px 12px 52px[^}]*background:\s*#111315/s,
     "service copy should fit the compact row without covering the image",
+  );
+  assert.match(
+    mobile,
+    /\.service-process-description-full\s*\{[^}]*display:\s*none[^}]*\}[\s\S]*?\.service-process-description-mobile\s*\{[^}]*display:\s*inline/s,
+    "mobile should replace long desktop descriptions with concise equivalents",
   );
   assert.match(
     mobile,
@@ -278,8 +305,18 @@ test("cases uses a horizontal featured rail, make filters, and a two-column arch
   );
   assert.match(
     mobile,
-    /\.filter-block\s*\{[^}]*display:\s*flex[^}]*overflow-x:\s*auto/s,
-    "make filters should become a compact horizontal control",
+    /\.archive-filter::after\s*\{(?=[^}]*content:\s*"→")(?=[^}]*color:\s*var\(--accent-bright\))[^}]*\}/s,
+    "make filters should expose a visible horizontal-scroll cue",
+  );
+  assert.match(
+    mobile,
+    /\.filter-block\s*\{[^}]*display:\s*flex[^}]*overflow-x:\s*auto[^}]*padding:\s*0 28px 6px 0/s,
+    "make filters should reserve space for the horizontal-scroll cue",
+  );
+  assert.match(
+    mobile,
+    /\.filter-option\s*\{[^}]*min-width:\s*max-content[^}]*padding:\s*0 12px[^}]*font-size:\s*12px/s,
+    "compact filter labels should reveal BMW before the scroll edge",
   );
   assert.match(
     mobile,

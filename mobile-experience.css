@@ -3,6 +3,7 @@
   :root {
     --mobile-nav-height: 76px;
     --mobile-page-gutter: 20px;
+    --mobile-nav-muted: #a3a6a9;
   }
 
   body {
@@ -111,7 +112,7 @@
     padding: 8px 2px 7px;
     overflow: hidden;
     border-right: 1px solid rgba(232, 231, 226, 0.08);
-    color: #8d9195;
+    color: var(--mobile-nav-muted);
     background: transparent;
     font-size: 10px;
     letter-spacing: 0.04em;
@@ -216,7 +217,7 @@
     border-right: 1px solid rgba(232, 231, 226, 0.08);
     border-left: 1px solid rgba(232, 231, 226, 0.08);
     border-radius: 0;
-    color: #8d9195;
+    color: var(--mobile-nav-muted);
     background: #0d0f11;
     box-shadow: none;
     font-size: 10px;
@@ -442,7 +443,7 @@
 
   .service-process-copy {
     grid-row: 1;
-    padding: 28px 24px 16px 52px;
+    padding: 24px 24px 12px 52px;
     background: #111315;
   }
 
@@ -458,6 +459,14 @@
     line-height: 1.4;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+  }
+
+  .service-process-description-full {
+    display: none;
+  }
+
+  .service-process-description-mobile {
+    display: inline;
   }
 
   .service-process-label {
@@ -614,10 +623,21 @@
     position: relative;
     top: auto;
     padding: 0 0 26px;
-    overflow: hidden;
+    overflow: visible;
     border: 0;
     background: transparent;
     backdrop-filter: none;
+  }
+
+  .archive-filter::after {
+    position: absolute;
+    top: 14px;
+    right: 0;
+    color: var(--accent-bright);
+    font-size: 18px;
+    line-height: 1;
+    content: "→";
+    pointer-events: none;
   }
 
   .archive-filter > p,
@@ -630,18 +650,21 @@
 
   .filter-block {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     margin-top: 0;
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding: 0 28px 6px 0;
+    scrollbar-color: var(--accent) transparent;
+    scrollbar-width: thin;
   }
 
   .filter-option {
-    min-width: 92px;
+    min-width: max-content;
     flex: 0 0 auto;
     justify-content: center;
     min-height: 48px;
-    padding: 0 16px;
+    padding: 0 12px;
+    font-size: 12px;
   }
 
   .filter-option small {

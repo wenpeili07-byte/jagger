@@ -62,7 +62,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
     <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
-    <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-option3-20260728" />
+    <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="cases">
     <main class="site-shell case-detail-page" data-detail-page>
@@ -111,7 +111,7 @@ export const renderCase02Page = (record) => `<!doctype html>
     <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
     <link rel="stylesheet" href="../../case-02.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-option3-20260728" />
+    <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="cases">
     <main class="site-shell case-detail-page case02-page" data-detail-page>
@@ -199,7 +199,7 @@ export const renderServicePage = (record) => {
     <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
     <link rel="stylesheet" href="../../service-detail.css?v=mobile-spacing-20260722" />
-    <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-option3-20260728" />
+    <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="services">
     <main class="site-shell service-detail-page" data-detail-page>
