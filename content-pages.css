@@ -376,6 +376,10 @@
   line-height: 1.5;
 }
 
+.service-process-description-mobile {
+  display: none;
+}
+
 .service-process-media {
   position: relative;
   z-index: 1;
