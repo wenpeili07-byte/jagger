@@ -286,6 +286,10 @@
   line-height: 1.6;
 }
 
+.services-mobile-hero {
+  display: none;
+}
+
 .service-process-rail {
   display: grid;
   grid-template-rows: repeat(6, minmax(0, 1fr));

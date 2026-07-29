@@ -24,7 +24,9 @@ function setArchiveFilter(filter) {
   const languageValues = getFilterLanguageValues(filter);
 
   filterButtons.forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.filter === filter);
+    const isActive = button.dataset.filter === filter;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
   });
 
   archiveCards.forEach((card) => {
@@ -42,6 +44,8 @@ function setArchiveFilter(filter) {
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => setArchiveFilter(button.dataset.filter));
 });
+
+setArchiveFilter("all");
 
 function initIndependentRailScroll() {
   const rail = document.querySelector(".mwg_effect060 .slides");

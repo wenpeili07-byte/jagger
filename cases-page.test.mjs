@@ -34,7 +34,7 @@ assert.match(html, /layout-canvas\.css\?v=project-planner-redesign-20260726/, "c
 assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
-assert.match(html, /<script src="\.\/cases\.js\?v=english-copy-20260721"><\/script>/, "cases page should load the English-first archive filter script");
+assert.match(html, /<script src="\.\/cases\.js\?v=mobile-option3-20260728"><\/script>/, "cases page should load the current accessible archive filter script");
 assert.match(html, /<body data-section="cases">/, "cases page should expose its navigation section to the shared language controller");
 assert.match(html, new RegExp(`<script src="\\.\\.\\/content-pages\\.js\\?v=${sharedAssetVersion}"><\\/script>`), "cases page should load the current shared language controller");
 assert.match(html, /data-lang-option="zh"/, "cases page should identify the Chinese language option");
@@ -195,6 +195,13 @@ test("selected make survives a shared language switch", () => {
     assert.equal(activeFilterLabel.textContent, label);
     assert.equal(activeFilterLabel.dataset.en, label);
     assert.equal(activeFilterLabel.dataset.zh, label);
+    for (const button of filters) {
+      assert.equal(
+        button.getAttribute("aria-pressed"),
+        String(button.dataset.filter === filter),
+        "brand filters should expose their selected state",
+      );
+    }
 
     langToggle.dispatch("click");
     assert.equal(activeFilterLabel.textContent, label);
