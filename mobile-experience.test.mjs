@@ -57,10 +57,13 @@ test("all public routes load the Option 3 mobile stylesheet last", () => {
       : path.includes("/cases/") || path.includes("/services/") || path.includes("/shop/")
         ? "../../mobile-experience.css"
         : "../mobile-experience.css";
+    const expectedVersion = path === "./pages/services.html"
+      ? "services-mobile-compact-20260729"
+      : "mobile-coordination-20260728";
 
     assert.equal(
       links.at(-1),
-      `${expectedPrefix}?v=mobile-coordination-20260728`,
+      `${expectedPrefix}?v=${expectedVersion}`,
       `${path} should load the shared mobile stylesheet after page styles`,
     );
   }
@@ -225,12 +228,12 @@ test("services becomes a readable text and thumbnail rail", () => {
   );
   assert.match(
     mobile,
-    /\.services-intro\s*\{[^}]*padding:\s*30px 20px 24px/s,
+    /\.services-intro\s*\{[^}]*padding:\s*28px 20px 24px/s,
     "services intro should use the shared mobile gutter",
   );
   assert.match(
     mobile,
-    /\.services-intro h1\s*\{[^}]*font-size:\s*clamp\(40px,\s*11vw,\s*50px\)/s,
+    /\.services-intro h1\s*\{[^}]*font-size:\s*clamp\(38px,\s*10vw,\s*46px\)/s,
     "services title should remain expressive but controlled",
   );
   assert.match(
@@ -240,12 +243,12 @@ test("services becomes a readable text and thumbnail rail", () => {
   );
   assert.match(
     mobile,
-    /\.service-process-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*62%\)\s+minmax\(0,\s*38%\)[^}]*height:\s*140px[^}]*min-height:\s*140px[^}]*aspect-ratio:\s*auto/s,
+    /\.service-process-row\s*\{[^}]*--mobile-service-media-width:\s*clamp\(96px,\s*31vw,\s*120px\)[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+var\(--mobile-service-media-width\)[^}]*grid-template-rows:\s*132px[^}]*height:\s*132px[^}]*aspect-ratio:\s*auto/s,
     "service rows should keep compact copy and image columns",
   );
   assert.match(
     mobile,
-    /\.service-process-copy\s*\{[^}]*padding:\s*24px 24px 12px 52px[^}]*background:\s*#111315/s,
+    /\.service-process-copy\s*\{[^}]*padding:\s*14px 30px 12px 48px[^}]*background:\s*#111315/s,
     "service copy should fit the compact row without covering the image",
   );
   assert.match(
@@ -260,13 +263,13 @@ test("services becomes a readable text and thumbnail rail", () => {
   );
   assert.match(
     mobile,
-    /\.service-process-copy h2\s*\{[^}]*font-size:\s*18px/s,
+    /\.service-process-copy h2\s*\{[^}]*font-size:\s*18px[^}]*line-height:\s*1\.05/s,
     "service titles should match the compact reference scale",
   );
   assert.match(
     mobile,
-    /\.service-process-copy p\s*\{[^}]*font-size:\s*13px[^}]*-webkit-line-clamp:\s*2/s,
-    "service descriptions should use two compact readable lines",
+    /\.service-process-copy p\s*\{[^}]*font-size:\s*11px[^}]*line-height:\s*1\.35[^}]*-webkit-line-clamp:\s*3/s,
+    "service descriptions should use three compact readable lines",
   );
   assert.match(
     mobile,
@@ -275,8 +278,13 @@ test("services becomes a readable text and thumbnail rail", () => {
   );
   assert.match(
     mobile,
-    /\.service-process-number\s*\{[^}]*font-size:\s*18px/s,
+    /\.service-process-number\s*\{[^}]*z-index:\s*4[^}]*font-size:\s*16px/s,
     "service numbers should remain visible without dominating the row",
+  );
+  assert.match(
+    mobileCss,
+    /@media \(max-width:\s*360px\)\s*\{[\s\S]*?\.service-process-row\s*\{[^}]*grid-template-rows:\s*144px[^}]*height:\s*144px[\s\S]*?\.service-process-copy p\s*\{[^}]*-webkit-line-clamp:\s*4/s,
+    "very narrow screens should preserve the longest bilingual description",
   );
 });
 

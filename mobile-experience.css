@@ -387,14 +387,14 @@
 
   .services-intro {
     min-height: 0;
-    padding: 30px 20px 24px;
+    padding: 28px 20px 24px;
     border-right: 0;
     border-bottom: 1px solid var(--line);
   }
 
   .services-intro h1 {
     max-width: 7em;
-    font-size: clamp(40px, 11vw, 50px);
+    font-size: clamp(38px, 10vw, 46px);
     line-height: 0.96;
   }
 
@@ -404,8 +404,8 @@
 
   .services-intro > p:not(.content-eyebrow):not(.services-intro-signature) {
     margin-top: 16px;
-    font-size: 16px;
-    line-height: 1.58;
+    font-size: 13px;
+    line-height: 1.55;
   }
 
   .services-mobile-hero {
@@ -433,9 +433,12 @@
   }
 
   .service-process-row {
-    grid-template-columns: minmax(0, 62%) minmax(0, 38%);
-    height: 140px;
-    min-height: 140px;
+    --mobile-service-media-width: clamp(96px, 31vw, 120px);
+
+    grid-template-columns: minmax(0, 1fr) var(--mobile-service-media-width);
+    grid-template-rows: 132px;
+    height: 132px;
+    min-height: 132px;
     aspect-ratio: auto;
     overflow: hidden;
     border-top: 1px solid var(--line);
@@ -443,22 +446,27 @@
 
   .service-process-copy {
     grid-row: 1;
-    padding: 24px 24px 12px 52px;
+    padding: 14px 30px 12px 48px;
     background: #111315;
   }
 
+  .service-process-row[data-active] .service-process-copy {
+    background: #171a1d;
+  }
+
   .service-process-copy h2 {
-    margin: 6px 0;
+    margin: 4px 0;
     font-size: 18px;
+    line-height: 1.05;
   }
 
   .service-process-copy p {
     display: -webkit-box;
     overflow: hidden;
-    font-size: 13px;
-    line-height: 1.4;
+    font-size: 11px;
+    line-height: 1.35;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
   }
 
   .service-process-description-full {
@@ -474,9 +482,10 @@
   }
 
   .service-process-number {
-    top: 18px;
+    z-index: 4;
+    top: 16px;
     left: 16px;
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .service-process-media {
@@ -501,11 +510,11 @@
   }
 
   .service-process-arrow {
-    top: 18px;
-    right: calc(38% + 10px);
+    top: 50%;
+    right: calc(var(--mobile-service-media-width) + 8px);
     left: auto;
     font-size: 20px;
-    transform: none;
+    transform: translateY(-50%);
   }
 
   .service-process-row:focus-visible .service-process-media {
@@ -1320,5 +1329,22 @@
   .content-footer {
     min-height: 136px;
     padding: 28px var(--mobile-page-gutter) 34px;
+  }
+}
+
+@media (max-width: 360px) {
+  .service-process-row {
+    grid-template-rows: 144px;
+    height: 144px;
+    min-height: 144px;
+  }
+
+  .service-process-copy {
+    padding-right: 26px;
+    padding-left: 46px;
+  }
+
+  .service-process-copy p {
+    -webkit-line-clamp: 4;
   }
 }
