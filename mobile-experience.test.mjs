@@ -57,9 +57,11 @@ test("all public routes load the Option 3 mobile stylesheet last", () => {
       : path.includes("/cases/") || path.includes("/services/") || path.includes("/shop/")
         ? "../../mobile-experience.css"
         : "../mobile-experience.css";
-    const expectedVersion = path === "./pages/services.html"
-      ? "services-mobile-compact-20260729"
-      : "mobile-coordination-20260728";
+    const expectedVersion = path === "./index.html"
+      ? "mobile-home-cinematic-type-20260730"
+      : path === "./pages/services.html"
+        ? "services-mobile-compact-20260729"
+        : "mobile-coordination-20260728";
 
     assert.equal(
       links.at(-1),
@@ -165,33 +167,124 @@ test("shared bottom navigation uses local official icon assets", () => {
   }
 });
 
-test("home uses a compact image-led first screen and removes duplicate case controls", () => {
+test("home exposes the selected cinematic mobile journal", () => {
   const mobile = mediaBlock(mobileCss, "@media (max-width: 767px)");
+  const homeHtml = read("./index.html");
 
   assert.match(
-    mobile,
-    /\.cover\s*\{[^}]*display:\s*block[^}]*min-height:\s*0[^}]*padding:\s*0/s,
-    "home should leave the desktop split and use the full mobile width",
+    homeHtml,
+    /<section class="mobile-home-journal"[\s\S]*?<figure class="mobile-home-hero">[\s\S]*?assets\/images\/mobile\/home-c-hero\.webp[\s\S]*?data-i18n="mobileHome\.headline"[\s\S]*?data-i18n="mobileHome\.tagline"/,
+    "home should use a single-car project image that matches the selected cinematic hero",
+  );
+  assert.match(
+    homeHtml,
+    /class="mobile-home-build"[\s\S]*?href="\.\/pages\/cases\/case-01\.html"[\s\S]*?assets\/images\/mobile\/home-c-featured\.webp[\s\S]*?612[\s\S]*?760[\s\S]*?3\.2/,
+    "home should expose one focused featured-build dossier with a working case link",
+  );
+  assert.match(
+    homeHtml,
+    /class="mobile-home-build-meta"[\s\S]*?<span>BMW G80 M3<\/span>[\s\S]*?<span>2024 · G8X<\/span>/,
+    "featured-build metadata should follow the selected two-line hierarchy",
+  );
+  assert.match(
+    homeHtml,
+    /class="mobile-home-specs"[\s\S]*?612[\s\S]*?760[\s\S]*?3\.2s[\s\S]*?class="mobile-home-view"/,
+    "the case action should share the compact specification rail like the selected concept",
+  );
+  assert.match(
+    homeHtml,
+    /class="mobile-home-entry-list"[\s\S]*?href="\.\/pages\/services\.html"[\s\S]*?href="\.\/pages\/cases\.html"[\s\S]*?href="\.\/pages\/shop\.html"/,
+    "home should expose Services, Cases, and Shop as image-led entries",
+  );
+  assert.match(
+    homeHtml,
+    /class="mobile-home-project-cta" href="\.\/pages\/project\.html">[\s\S]*?class="mobile-home-project-label-en">START YOUR PROJECT<\/span>[\s\S]*?class="mobile-home-project-label-zh">开始你的项目<\/span>/,
+    "home should keep clean bilingual project labels and let CSS own the trailing arrow",
   );
   assert.match(
     mobile,
-    /\.left-panel\s*\{[^}]*min-height:\s*calc\(100svh - 56px\)[^}]*padding:\s*clamp\(34px,\s*8vh,\s*70px\) 20px 28px/s,
-    "home should keep one intentional first screen",
+    /body\[data-section="home"\] \.mobile-home-journal\s*\{[^}]*display:\s*block/s,
+    "the cinematic journal should be enabled only for the mobile homepage",
   );
   assert.match(
     mobile,
-    /\.left-panel h1\s*\{[^}]*font-size:\s*clamp\(48px,\s*14vw,\s*64px\)/s,
-    "home brand should be prominent without overflowing",
+    /body\[data-section="home"\] \.cover,[\s\S]*?body\[data-section="home"\] \.service-section,[\s\S]*?body\[data-section="home"\] \.content-footer\s*\{[^}]*display:\s*none/s,
+    "the former duplicate home presentation should leave the mobile flow",
   );
   assert.match(
     mobile,
-    /\.roll-table\s*\{[^}]*display:\s*none/s,
-    "the duplicate compact case list should be removed from the first screen",
+    /body\[data-section="home"\] \.topbar\s*\{[^}]*grid-template-rows:\s*40px[^}]*min-height:\s*40px[^}]*padding:\s*0 14px/s,
+    "the home header should match the compact concept proportion",
   );
   assert.match(
     mobile,
-    /\.hero-actions\s*\{[^}]*grid-template-columns:\s*1fr[^}]*gap:\s*10px/s,
-    "home actions should stack into full-width touch targets",
+    /body\[data-section="home"\] \.brand\s*\{[^}]*min-height:\s*40px[^}]*font-size:\s*13px[^}]*letter-spacing:\s*0\.18em/s,
+    "the home wordmark should match the source scale and tracking",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-hero\s*\{[^}]*min-height:\s*290px[^}]*overflow:\s*hidden/s,
+    "the mobile hero should match the selected 390 by 844 composition",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-hero h1\s*\{[^}]*font-family:\s*"DIN Condensed"[^}]*font-size:\s*30px/s,
+    "the hero title should match the source display scale",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-headline\s*\{[^}]*font-family:\s*var\(--sans\)[^}]*font-size:\s*8\.5px[^}]*letter-spacing:\s*1\.3px[^}]*word-spacing:\s*2px/s,
+    "the hero kicker should use the source's tracked sans lettering",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-tagline\s*\{[^}]*max-width:\s*180px[^}]*font-size:\s*10px/s,
+    "the hero description should wrap into the same compact two-line measure",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-build\s*\{[^}]*grid-template-columns:\s*18px minmax\(0,\s*38%\) 22px minmax\(0,\s*1fr\) 18px/s,
+    "the featured build should use the source image inset and copy gap",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-build > img\s*\{[^}]*height:\s*82px/s,
+    "the featured build media should preserve the concept's shallow dossier proportion",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-specs\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)[^}]*min-height:\s*42px/s,
+    "the three specifications and case action should share one compact row",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-entry\s*\{[^}]*min-height:\s*86px[^}]*overflow:\s*hidden/s,
+    "each destination should match the selected one-screen image-band rhythm",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-entry-copy\s*\{[^}]*width:\s*min\(40%,\s*156px\)/s,
+    "destination copy should leave most of each band to the image",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-entry-number\s*\{[^}]*font-size:\s*14px/s,
+    "destination numbers should match the source hierarchy",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-entry-copy strong\s*\{[^}]*font-family:\s*"DIN Condensed"[^}]*font-size:\s*21px[^}]*letter-spacing:\s*0\.2px/s,
+    "destination titles should match the source display hierarchy",
+  );
+  assert.match(
+    mobile,
+    /\.mobile-home-project-cta\s*\{[^}]*min-height:\s*48px[^}]*justify-content:\s*center[^}]*font-family:\s*var\(--sans\)[^}]*font-size:\s*10px[^}]*letter-spacing:\s*0\.8px[^}]*word-spacing:\s*2px/s,
+    "the project action should center the tracked source label while staying tappable",
+  );
+  assert.match(
+    mobile,
+    /body\[data-section="home"\] \.project-entry\s*\{[^}]*color:\s*var\(--accent-bright\)/s,
+    "the center Build destination should carry the selected concept's blue state",
   );
 });
 
