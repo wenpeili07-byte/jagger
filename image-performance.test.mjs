@@ -1,10 +1,15 @@
 import assert from "node:assert/strict";
+import { access, readFile, stat } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 import {
   buildDerivativePlan,
   responsiveImages,
   srcsetFor,
 } from "./image-performance.mjs";
+
+const root = dirname(fileURLToPath(import.meta.url));
 
 test("responsive image manifest preserves approved sources and widths", () => {
   assert.deepEqual(
@@ -39,4 +44,28 @@ test("srcset output uses generated WebP widths and relative prefixes", () => {
   const srcset = srcsetFor("case-01", "../");
   assert.match(srcset, /\.\.\/assets\/images\/generated\/case-01\/case-01-640w\.webp 640w/);
   assert.match(srcset, /\.\.\/assets\/images\/generated\/case-01\/case-01-1600w\.webp 1600w/);
+});
+
+test("every planned derivative exists and is smaller than its source", async () => {
+  for (const record of responsiveImages) {
+    const sourceStats = await stat(resolve(root, record.source));
+
+    for (const { destination } of buildDerivativePlan(record)) {
+      const target = resolve(root, destination);
+      await access(target);
+      const generatedStats = await stat(target);
+      assert.ok(
+        generatedStats.size < sourceStats.size,
+        `${destination} should be smaller than ${record.source}`,
+      );
+    }
+  }
+});
+
+test("responsive image generator cannot delete or overwrite source files", async () => {
+  const source = await readFile(resolve(root, "scripts/generate-responsive-images.mjs"), "utf8");
+  assert.match(source, /assets\/images\/generated/);
+  assert.match(source, /withoutEnlargement:\s*true/);
+  assert.doesNotMatch(source, /\bunlink\b|\brmSync\b|\brename\b|\btruncate\b/);
+  assert.doesNotMatch(source, /toFile\(record\.source\)/);
 });
