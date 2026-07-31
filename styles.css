@@ -56,7 +56,28 @@ a {
   min-height: 100vh;
   border: 1px solid var(--line);
   isolation: isolate;
-  --active-case-scene: url("./assets/images/网页/首页背景.jpg");
+  --active-case-scene: image-set(
+    url("./assets/images/generated/hero/hero-2400w.webp") type("image/webp"),
+    url("./assets/images/网页/首页背景.jpg") type("image/jpeg")
+  );
+}
+
+@media (max-width: 1600px) {
+  .site-shell:not(.cases-page) {
+    --active-case-scene: image-set(
+      url("./assets/images/generated/hero/hero-1440w.webp") type("image/webp"),
+      url("./assets/images/网页/首页背景.jpg") type("image/jpeg")
+    );
+  }
+}
+
+@media (max-width: 980px) {
+  .site-shell:not(.cases-page) {
+    --active-case-scene: image-set(
+      url("./assets/images/generated/hero/hero-960w.webp") type("image/webp"),
+      url("./assets/images/网页/首页背景.jpg") type("image/jpeg")
+    );
+  }
 }
 
 .site-shell::before,
@@ -784,37 +805,55 @@ h1 span {
 .film-card[data-index="0"],
 .case-feature-card[data-index="0"],
 .archive-card[data-index="0"] {
-  --scene: url("./assets/images/网页/optimized/case-01.jpg");
+  --scene: image-set(
+    url("./assets/images/generated/case-01/case-01-1600w.webp") type("image/webp"),
+    url("./assets/images/网页/optimized/case-01.jpg") type("image/jpeg")
+  );
 }
 
 .film-card[data-index="1"],
 .case-feature-card[data-index="1"],
 .archive-card[data-index="1"] {
-  --scene: url("./assets/images/网页/optimized/case-02.jpg");
+  --scene: image-set(
+    url("./assets/images/generated/case-02/case-02-960w.webp") type("image/webp"),
+    url("./assets/images/网页/optimized/case-02.jpg") type("image/jpeg")
+  );
 }
 
 .film-card[data-index="2"],
 .case-feature-card[data-index="2"],
 .archive-card[data-index="2"] {
-  --scene: url("./assets/images/网页/optimized/case-03.jpg");
+  --scene: image-set(
+    url("./assets/images/generated/case-03/case-03-960w.webp") type("image/webp"),
+    url("./assets/images/网页/optimized/case-03.jpg") type("image/jpeg")
+  );
 }
 
 .film-card[data-index="3"],
 .case-feature-card[data-index="3"],
 .archive-card[data-index="3"] {
-  --scene: url("./assets/images/网页/optimized/case-04.jpg");
+  --scene: image-set(
+    url("./assets/images/generated/case-04/case-04-960w.webp") type("image/webp"),
+    url("./assets/images/网页/optimized/case-04.jpg") type("image/jpeg")
+  );
 }
 
 .film-card[data-index="4"],
 .case-feature-card[data-index="4"],
 .archive-card[data-index="4"] {
-  --scene: url("./assets/images/网页/optimized/case-05.jpg");
+  --scene: image-set(
+    url("./assets/images/generated/case-05/case-05-960w.webp") type("image/webp"),
+    url("./assets/images/网页/optimized/case-05.jpg") type("image/jpeg")
+  );
 }
 
 .film-card[data-index="5"],
 .case-feature-card[data-index="5"],
 .archive-card[data-index="5"] {
-  --scene: url("./assets/images/网页/optimized/case-06.jpg");
+  --scene: image-set(
+    url("./assets/images/generated/case-06/case-06-1600w.webp") type("image/webp"),
+    url("./assets/images/网页/optimized/case-06.jpg") type("image/jpeg")
+  );
 }
 
 .detail-panel {
@@ -1128,7 +1167,10 @@ h1 span {
 }
 
 .cases-page {
-  --cases-active-scene: url("./assets/images/网页/optimized/case-01.jpg");
+  --cases-active-scene: image-set(
+    url("./assets/images/generated/case-01/case-01-1600w.webp") type("image/webp"),
+    url("./assets/images/网页/optimized/case-01.jpg") type("image/jpeg")
+  );
   --active-case-scene: var(--cases-active-scene);
   background: transparent;
 }

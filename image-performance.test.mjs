@@ -10,6 +10,7 @@ import {
 } from "./image-performance.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
+const read = (path) => readFile(resolve(root, path), "utf8");
 
 test("responsive image manifest preserves approved sources and widths", () => {
   assert.deepEqual(
@@ -26,6 +27,7 @@ test("responsive image manifest preserves approved sources and widths", () => {
     assert.match(record.outputDirectory, /^assets\/images\/generated\//);
     assert.notEqual(record.outputDirectory, record.source);
     assert.equal(record.quality, 80);
+    assert.ok(record.sourceWidth > 0 && record.sourceHeight > 0);
   }
 });
 
@@ -68,4 +70,56 @@ test("responsive image generator cannot delete or overwrite source files", async
   assert.match(source, /withoutEnlargement:\s*true/);
   assert.doesNotMatch(source, /\bunlink\b|\brmSync\b|\brename\b|\btruncate\b/);
   assert.doesNotMatch(source, /toFile\(record\.source\)/);
+});
+
+test("high-traffic pages advertise responsive WebP sources", async () => {
+  const [home, about, services, cases, contact, project, shop] = await Promise.all([
+    read("index.html"),
+    read("pages/about.html"),
+    read("pages/services.html"),
+    read("pages/cases.html"),
+    read("pages/contact.html"),
+    read("pages/project.html"),
+    read("pages/shop.html"),
+  ]);
+
+  assert.match(home, /srcset="[^"]*hero-960w\.webp 960w[^"]*hero-2400w\.webp 2400w"/);
+  assert.match(about, /srcset="[^"]*hero-960w\.webp 960w[^"]*hero-2400w\.webp 2400w"/);
+  assert.match(about, /fetchpriority="high"/);
+  assert.match(services, /case-01-640w\.webp 640w/);
+  assert.match(cases, /case-01-640w\.webp 640w/);
+  assert.match(contact, /case-06-640w\.webp 640w/);
+  assert.match(project, /case-02-640w\.webp 640w/);
+  assert.match(shop, /case-01-640w\.webp 640w/);
+
+  for (const html of [home, about, services, cases, contact, project, shop]) {
+    for (const match of html.matchAll(/<img\b[^>]*>/gs)) {
+      const tag = match[0];
+      assert.ok(
+        !(tag.includes('fetchpriority="high"') && tag.includes('loading="lazy"')),
+        "a priority image must not be lazy-loaded",
+      );
+    }
+  }
+});
+
+test("background scenes use generated WebP with JPEG fallback", async () => {
+  const styles = await read("styles.css");
+  assert.match(styles, /--active-case-scene:\s*image-set\([^;]*hero-2400w\.webp[^;]*首页背景\.jpg/);
+  assert.match(styles, /--scene:\s*image-set\([^;]*case-01-1600w\.webp[^;]*case-01\.jpg/);
+  assert.match(styles, /--cases-active-scene:\s*image-set\([^;]*case-01-1600w\.webp[^;]*case-01\.jpg/);
+});
+
+test("generated detail pages inherit responsive case markup while social images stay JPEG", async () => {
+  const [renderer, casePage, servicePage] = await Promise.all([
+    read("scripts/render-detail-pages.mjs"),
+    read("pages/cases/case-01.html"),
+    read("pages/services/build.html"),
+  ]);
+
+  assert.match(renderer, /srcsetFor/);
+  assert.match(casePage, /case-01-640w\.webp 640w/);
+  assert.match(servicePage, /case-01-640w\.webp 640w/);
+  assert.match(casePage, /<meta property="og:image" content="[^"]*case-01\.jpg" \/>/);
+  assert.match(servicePage, /<meta property="og:image" content="[^"]*case-01\.jpg" \/>/);
 });
