@@ -63,7 +63,7 @@ function isSanityImageUrl(value) {
     const url = new URL(value)
     const pathSegments = url.pathname.match(SANITY_IMAGE_PATH)?.slice(1)
     return url.protocol === 'https:' && url.hostname === 'cdn.sanity.io' &&
-      !url.username && !url.password && !url.hash && Boolean(pathSegments) &&
+      !url.username && !url.password && !url.hash && !url.pathname.includes('%') && Boolean(pathSegments) &&
       pathSegments.every((segment) => {
         const decodedSegment = decodeURIComponent(segment)
         return decodedSegment && decodedSegment !== '.' && decodedSegment !== '..' &&

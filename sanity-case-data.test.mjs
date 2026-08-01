@@ -75,6 +75,21 @@ test('Sanity image URLs reject srcset candidate injection, credentials, and frag
   )
 })
 
+test('Sanity image paths reject double-encoded segments and accept canonical production assets', () => {
+  const dimensions = {width: 1600, height: 900}
+  assert.equal(
+    buildResponsiveSanityImage({asset: {url: 'https://cdn.sanity.io/images/v54qppoy/production/%252e%252e.jpg', metadata: {dimensions}}}),
+    null,
+  )
+  assert.equal(
+    buildResponsiveSanityImage({asset: {url: 'https://cdn.sanity.io/images/v54qppoy/production/%252f.jpg', metadata: {dimensions}}}),
+    null,
+  )
+  assert.ok(
+    buildResponsiveSanityImage({asset: {url: 'https://cdn.sanity.io/images/v54qppoy/production/asset-1600x900-jpg.jpg', metadata: {dimensions}}}),
+  )
+})
+
 test('invalid image cover sources reject the full record', () => {
   assert.equal(normalizeCaseRecord(validCase({cover: {imagePath: '/assets/videos/case-01.mp4'}})), null)
   assert.equal(normalizeCaseRecord(validCase({cover: {asset: {url: 'https://cdn.sanity.io/images/x/y/car.jpg'}}})), null)
