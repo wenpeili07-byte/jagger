@@ -79,23 +79,24 @@ const renderGenericCasePage = (record) => `<!doctype html>
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="cases">
-    <main class="site-shell case-detail-page" data-detail-page>
+    <main class="site-shell case-detail-page" data-detail-page data-case-slug="case-${record.id}">
       ${header("cases")}
       <section class="detail-hero">
         <div class="detail-copy">
           ${i18n("a", { zh: "← 返回案例", en: "← BACK TO CASES" }, ' class="detail-back" href="../cases.html"')}
-          <p class="detail-index">CASE ${record.id}</p>
-          ${i18n("h1", record.title)}
-          ${i18n("h2", record.subtitle)}
-          ${i18n("p", record.intro, ' class="detail-intro"')}
+          <p class="detail-index" data-cms="caseNumber">CASE ${record.id}</p>
+          ${i18n("h1", record.title, ' data-cms="title"')}
+          ${i18n("h2", record.subtitle, ' data-cms="subtitle"')}
+          ${i18n("p", record.intro, ' class="detail-intro" data-cms="lede"')}
         </div>
         <figure class="detail-hero-media">
-          <img src="../../${record.image}" ${responsiveImageAttributes(record.image, "../../", "(max-width: 768px) 100vw, 50vw", { priority: true })} ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
+          <img data-cms="cover" src="../../${record.image}" ${responsiveImageAttributes(record.image, "../../", "(max-width: 768px) 100vw, 50vw", { priority: true })} ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
         </figure>
       </section>
       <section class="detail-story">
-        ${i18n("p", record.story)}
+        ${i18n("p", record.story, ' data-cms="story"')}
       </section>
+      <div class="detail-media-sections" data-cms-media-sections></div>
       <section class="detail-contact">
         ${i18n("h2", { zh: "讨论你的下一台车", en: "DISCUSS YOUR NEXT BUILD" })}
         ${i18n("a", { zh: "开始咨询 →", en: "START AN INQUIRY →" }, ' href="../contact.html"')}
@@ -107,6 +108,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
       ${globalFooter()}
     </main>
     <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
+    <script type="module" src="../../sanity-case-detail.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
 `;

@@ -12,6 +12,14 @@ for (const id of ["01", "03", "04", "05", "06"]) {
   assert.match(html, /class="detail-story"/);
   assert.match(html, /class="detail-contact"/);
   assert.doesNotMatch(html, /<figcaption|case-spec-grid|case-section-kicker|case-detail-meta/);
+  assert.match(html, new RegExp(`data-case-slug="case-${id}"`));
+  assert.match(html, /data-cms="title"/);
+  assert.match(html, /data-cms="subtitle"/);
+  assert.match(html, /data-cms="lede"/);
+  assert.match(html, /data-cms="story"/);
+  assert.match(html, /data-cms="cover"/);
+  assert.match(html, /data-cms-media-sections/);
+  assert.match(html, /<script type="module" src="\.\.\/\.\.\/sanity-case-detail\.js/);
 }
 
 const case02 = read("./pages/cases/case-02.html");
@@ -22,6 +30,7 @@ assert.match(case02, /class="detail-contact"/);
 assert.match(case02, /class="detail-pagination"/);
 assert.equal((case02.match(/class="detail-contact"/g) || []).length, 1);
 assert.doesNotMatch(case02, /<figcaption|case-spec-grid|case-section-kicker|case-detail-meta/);
+assert.doesNotMatch(case02, /sanity-case-detail\.js/);
 
 assert.match(css, /\.detail-hero\s*\{[^}]*grid-template-columns:/s);
 assert.match(css, /\.detail-hero-media img\s*\{[^}]*object-fit:\s*cover/s);
