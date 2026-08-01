@@ -12,6 +12,7 @@ const mediaSection = readFileSync(new URL("./sanity/schemaTypes/mediaSection.js"
 const structure = readFileSync(new URL("./sanity/structure.js", import.meta.url), "utf8");
 const readme = readFileSync(new URL("./sanity/README.md", import.meta.url), "utf8");
 const vercelConfigUrl = new URL("./sanity/vercel.json", import.meta.url);
+const cliConfigUrl = new URL("./sanity/sanity.cli.js", import.meta.url);
 
 assert.equal(packageJson.name, "lonma-dynamic-sanity-studio", "Sanity Studio should have a dedicated package");
 assert.equal(packageJson.type, "module", "Sanity Studio should use ESM config files");
@@ -24,6 +25,12 @@ assert.match(config, /structureTool\(\{structure: caseStructure\}\)/, "Sanity co
 assert.match(config, /apiVersion:\s*'2026-08-01'/, "Sanity config should use the approved API date");
 assert.match(config, /projectId:\s*env\.SANITY_STUDIO_PROJECT_ID\s*\|\|\s*'v54qppoy'/, "Sanity config should use the production project id");
 assert.match(config, /schema:\s*\{\s*types:\s*schemaTypes/s, "Sanity config should register schema types");
+
+assert.ok(existsSync(cliConfigUrl), "Sanity CLI config should bind project and dataset commands");
+const cliConfig = readFileSync(cliConfigUrl, "utf8");
+assert.match(cliConfig, /import\s+\{defineCliConfig\}\s+from\s+['"]sanity\/cli['"]/);
+assert.match(cliConfig, /api:\s*\{\s*projectId:\s*['"]v54qppoy['"],?\s*dataset:\s*['"]production['"],?\s*\}/s);
+assert.doesNotMatch(cliConfig, /token|secret/i, "Sanity CLI config must not contain credentials");
 
 assert.match(schemaIndex, /localizedString/, "Sanity schema index should export localized strings");
 assert.match(schemaIndex, /localizedText/, "Sanity schema index should export localized text");
@@ -54,6 +61,7 @@ assert.match(readme, /published documents only/i, "Sanity README should describe
 assert.match(readme, /static HTML[\s\S]*fallback/i, "Sanity README should describe the static fallback");
 assert.match(readme, /same deterministic IDs/i, "Sanity README should describe repeatable imports");
 assert.match(readme, /never.*commit.*secrets/i, "Sanity README should prohibit committed secrets");
+assert.match(readme, /sanity\.cli\.js[\s\S]*project[\s\S]*dataset/i, "Sanity README should document the checked-in CLI project and dataset config");
 assert.doesNotMatch(readme, /Build scope|CTA copy and link/i, "Sanity README should list only fields the current case schema supports");
 
 assert.ok(existsSync(vercelConfigUrl), "Sanity Studio should include a Vercel SPA fallback");

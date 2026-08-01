@@ -21,7 +21,9 @@ complete fallback whenever CMS data is unavailable or invalid.
 
 From the repository root, work in the Studio directory. Its committed
 `package-lock.json` provides the versioned dependency tree used by this
-workflow.
+workflow. The checked-in `sanity.cli.js` binds CLI commands to project
+`v54qppoy` and dataset `production`; run dataset, CORS, and import commands
+from this directory so they use that configuration.
 
 ```bash
 cd sanity
