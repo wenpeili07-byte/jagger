@@ -125,3 +125,18 @@ test("Case CMS feature assets use the integration cache version", () => {
     }
   }
 });
+
+test("Case CMS transitive modules use the integration cache version", () => {
+  for (const path of ["./sanity-case-overview.js", "./sanity-case-detail.js"]) {
+    assert.match(
+      read(path),
+      new RegExp(`from ['"]\\.\\/sanity-case-data\\.js\\?v=${sharedAssetVersion}['"]`),
+      `${path} should not load stale Case data logic`,
+    );
+  }
+  assert.match(
+    read("./sanity-case-data.js"),
+    new RegExp(`from ['"]\\.\\/sanity-content-config\\.js\\?v=${sharedAssetVersion}['"]`),
+    "Case data should not load a stale public Sanity configuration",
+  );
+});

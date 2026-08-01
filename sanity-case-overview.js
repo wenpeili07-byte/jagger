@@ -1,4 +1,4 @@
-import {fetchPublishedCases} from './sanity-case-data.js'
+import {fetchPublishedCases} from './sanity-case-data.js?v=sanity-case-cms-20260801'
 
 const warnedRoots = new WeakSet()
 const notifiedRoots = new WeakSet()

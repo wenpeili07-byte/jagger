@@ -1,4 +1,4 @@
-import {sanityPublicConfig} from './sanity-content-config.js'
+import {sanityPublicConfig} from './sanity-content-config.js?v=sanity-case-cms-20260801'
 
 const CASE_SLUG = /^case-0[1-6]$/
 const CASE_BRANDS = new Set(['bmw', 'audi', 'mercedes-benz'])
