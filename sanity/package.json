@@ -13,5 +13,7 @@
     "sanity": "^3.99.0",
     "styled-components": "^6.1.19"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "esbuild-register": "^3.6.0"
+  }
 }

@@ -25,9 +25,20 @@ workflow. The checked-in `sanity.cli.ts` binds CLI commands to project
 `v54qppoy` and dataset `production`; run dataset, CORS, and import commands
 from this directory so they use that configuration.
 
+Install the lockfile before running either the root tests or Studio commands:
+
+```sh
+npm ci
+cd ..
+node --test
+```
+
+The root CLI-config test evaluates `sanity.cli.ts` through the explicitly
+declared `esbuild-register` development dependency.
+
 ```bash
 cd sanity
-npm install
+npm ci
 npm run dev
 npx sanity login
 npx sanity dataset import seed/case-pages.ndjson production --replace

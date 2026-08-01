@@ -27,8 +27,13 @@ After changing page titles, descriptions, routes, or the production domain:
 node scripts/render-detail-pages.mjs
 node scripts/render-shop-page.mjs
 node scripts/render-seo-files.mjs
+npm ci --prefix sanity
 node --test
 ```
+
+The Sanity install supplies the checked-in CLI config evaluator used by the
+root test suite. Keep `sanity/package-lock.json` in sync with
+`sanity/package.json` so a clean checkout can reproduce the same test run.
 
 The temporary canonical origin is stored in `seo-data.mjs`. Replace it only
 after the final custom domain is connected.
@@ -47,7 +52,7 @@ repository root and follow the versioned Studio dependencies in
 
 ```sh
 cd sanity
-npm install
+npm ci
 npm run dev
 npx sanity login
 npx sanity dataset import seed/case-pages.ndjson production --replace
