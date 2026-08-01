@@ -12,7 +12,7 @@ test("Case 02 opens with a poster-only native video stage", () => {
   assert.match(html, /class="case02-video-stage"/);
   assert.match(
     html,
-    /<video[^>]*data-case-video[^>]*poster="[^"]*case-02\.jpg"[^>]*controls[^>]*preload="metadata"/s
+    /<video[^>]*data-case-video[^>]*poster="[^"]*generated\/case-02\/case-02-960w\.webp"[^>]*controls[^>]*preload="metadata"/s
   );
   assert.match(html, /data-video-state="poster-only"/);
   assert.match(html, /data-en="FINAL FILM COMING SOON"/);

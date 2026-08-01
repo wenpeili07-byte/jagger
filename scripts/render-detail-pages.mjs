@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { caseDetails, serviceDetails } from "../detail-pages-data.mjs";
+import { responsiveImages, srcsetFor } from "../image-performance.mjs";
 import { renderSeoMeta, seoForRoute } from "../seo-data.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -20,6 +21,19 @@ const i18n = (tag, values, attributes = "") =>
   `<${tag}${attributes} data-zh="${escapeAttribute(values.zh)}" data-en="${escapeAttribute(values.en)}">${escapeText(values.en)}</${tag}>`;
 const i18nAttribute = (attribute, values) =>
   `${attribute}="${escapeAttribute(values.en)}" data-zh-${attribute}="${escapeAttribute(values.zh)}" data-en-${attribute}="${escapeAttribute(values.en)}"`;
+const responsiveImageAttributes = (source, prefix, sizes, { priority = false } = {}) => {
+  const record = responsiveImages.find((candidate) => candidate.source === source);
+  if (!record) return "";
+
+  return [
+    `srcset="${srcsetFor(record.id, prefix)}"`,
+    `sizes="${sizes}"`,
+    `width="${record.sourceWidth}"`,
+    `height="${record.sourceHeight}"`,
+    priority ? 'fetchpriority="high"' : 'loading="lazy"',
+    'decoding="async"',
+  ].join(" ");
+};
 
 const header = (section) => `<header class="topbar">
     <a class="brand" href="../../index.html" ${i18nAttribute("aria-label", { zh: "回到首页", en: "Back to home" })}>LONMA DYNAMIC</a>
@@ -76,7 +90,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
           ${i18n("p", record.intro, ' class="detail-intro"')}
         </div>
         <figure class="detail-hero-media">
-          <img src="../../${record.image}" ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
+          <img src="../../${record.image}" ${responsiveImageAttributes(record.image, "../../", "(max-width: 768px) 100vw, 50vw", { priority: true })} ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
         </figure>
       </section>
       <section class="detail-story">
@@ -119,7 +133,7 @@ export const renderCase02Page = (record) => `<!doctype html>
       <section class="case02-video-stage" data-video-state="poster-only" aria-labelledby="case02-title">
         <video
           data-case-video
-          poster="../../assets/images/网页/optimized/case-02.jpg"
+          poster="../../assets/images/generated/case-02/case-02-960w.webp"
           controls
           preload="metadata"
           aria-label="Case 02 project film"
@@ -212,7 +226,7 @@ export const renderServicePage = (record) => {
           ${i18n("p", record.intro, ' class="detail-intro"')}
         </div>
         <figure class="detail-hero-media">
-          <img src="../../${record.image}" ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
+          <img src="../../${record.image}" ${responsiveImageAttributes(record.image, "../../", "(max-width: 768px) 100vw, 50vw", { priority: true })} ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
         </figure>
       </section>
       <section class="detail-story">

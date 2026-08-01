@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { srcsetFor } from "../image-performance.mjs";
 import { shopProducts, shopVehicles } from "../shop-data.mjs";
 import { renderSeoMeta, seoForRoute } from "../seo-data.mjs";
 
@@ -329,7 +330,7 @@ export const renderShopPage = (products = shopProducts) => {
           ${i18n("h1", { zh: "选择你的车型", en: "SELECT YOUR VEHICLE" })}
         </div>
         <div class="shop-mobile-vehicle-summary" data-mobile-vehicle-summary>
-          <img src="../assets/images/网页/optimized/case-01.jpg" alt="BMW G80 M3 sample vehicle" data-zh-alt="BMW G80 M3 示例车型" data-en-alt="BMW G80 M3 sample vehicle" />
+          <img src="../assets/images/网页/optimized/case-01.jpg" srcset="${srcsetFor("case-01", "../")}" sizes="(max-width: 768px) 96px, 180px" alt="BMW G80 M3 sample vehicle" data-zh-alt="BMW G80 M3 示例车型" data-en-alt="BMW G80 M3 sample vehicle" width="1920" height="1282" decoding="async" />
           <p>
             <strong><span data-mobile-vehicle-make>BMW</span> <span data-mobile-vehicle-model>G80 M3</span></strong>
             <span><span data-mobile-vehicle-year>2024</span> · <span data-mobile-vehicle-chassis>G8X</span></span>

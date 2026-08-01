@@ -22,7 +22,7 @@ assert.doesNotMatch(html, /class="case-feature-card/, "PLAN A hero should no lon
 assert.match(html, /<section class="mwg_effect060"/, "PLAN A hero should use the effect 060 masked vertical image rail");
 assert.match(html, /<div class="pin-height">[\s\S]*<div class="container">[\s\S]*<div class="slides">/, "effect 060 rail should use a pin-height, fixed container, and vertical slides list");
 assert.doesNotMatch(html, /<div class="content">|Featured Projects|2022 → 2026/, "effect 060 rail should not show the white title block or its text");
-assert.equal((html.match(/data-scene="\.\.\/assets\/images\/网页\/optimized\/case-/g) || []).length, 6, "effect 060 rail should show six optimized case image slides");
+assert.equal((html.match(/data-scene="\.\.\/assets\/images\/generated\/case-/g) || []).length, 6, "effect 060 rail should use six generated WebP scene images");
 assert.equal((html.match(/<img[^>]+src="\.\.\/assets\/images\/网页\/optimized\/case-/g) || []).length, 12, "case rail and archive should use optimized case images");
 assert.doesNotMatch(html, /assets\/images\/网页\/案例[1-6]\//, "cases page should avoid loading oversized original case images");
 assert.equal((html.match(/class="slide spacer"/g) || []).length, 4, "effect 060 rail should include spacer slides so five positions stay visible");
