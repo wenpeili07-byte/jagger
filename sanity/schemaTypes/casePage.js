@@ -13,12 +13,39 @@ export default defineType({
   ],
   fields: [
     defineField({name: 'caseNumber', title: 'Case Number', type: 'string', validation: (Rule) => Rule.required(), group: 'overview'}),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'caseNumber'}, validation: (Rule) => Rule.required(), group: 'publishing'}),
+    defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      options: {source: 'caseNumber'},
+      validation: (Rule) => Rule.required().custom(async (value, context) => {
+        if (!value?.current) return true
+
+        const id = context.document?._id?.replace(/^drafts\./, '')
+        const count = await context.getClient({apiVersion: '2026-08-01'}).fetch(
+          'count(*[_type == "casePage" && slug.current == $slug && !(_id in [$id, "drafts." + $id])])',
+          {slug: value.current, id},
+        )
+
+        return count === 0 || 'Slug must be unique'
+      }),
+      group: 'publishing',
+    }),
     defineField({
       name: 'order',
       title: 'Display Order',
       type: 'number',
-      validation: (Rule) => Rule.required().integer().min(1).max(36),
+      validation: (Rule) => Rule.required().integer().min(1).max(36).custom(async (value, context) => {
+        if (!Number.isInteger(value)) return true
+
+        const id = context.document?._id?.replace(/^drafts\./, '')
+        const count = await context.getClient({apiVersion: '2026-08-01'}).fetch(
+          'count(*[_type == "casePage" && order == $order && !(_id in [$id, "drafts." + $id])])',
+          {order: value, id},
+        )
+
+        return count === 0 || 'Display order must be unique'
+      }),
       group: 'publishing',
     }),
     defineField({
@@ -53,7 +80,17 @@ export default defineType({
     defineField({name: 'subtitle', title: 'Subtitle', type: 'localizedString', group: 'overview'}),
     defineField({name: 'lede', title: 'Hero Description', type: 'localizedText', group: 'overview'}),
     defineField({name: 'story', title: 'Opening Narrative', type: 'localizedText', group: 'overview'}),
-    defineField({name: 'cover', title: 'Cover Image', type: 'caseImage', validation: (Rule) => Rule.required(), group: 'media'}),
+    defineField({
+      name: 'cover',
+      title: 'Cover Image',
+      type: 'caseImage',
+      validation: (Rule) => Rule.required().custom((value) => {
+        const hasUpload = Boolean(value?.asset?.asset?._ref)
+        const hasPath = Boolean(value?.imagePath?.trim())
+        return hasUpload !== hasPath || 'Provide exactly one cover source: an uploaded image or an existing site image path'
+      }),
+      group: 'media',
+    }),
     defineField({
       name: 'video',
       title: 'Video',
