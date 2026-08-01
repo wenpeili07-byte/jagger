@@ -22,13 +22,43 @@ function isCaseSlug(value) {
   return typeof value === 'string' && CASE_SLUG.test(value)
 }
 
-function localMediaUrl(value) {
+function decodeLocalPath(pathname) {
+  let decodedPath = pathname
+  for (let index = 0; index < 8; index += 1) {
+    if (/%(?:2f|5c)/i.test(decodedPath)) return null
+    const nextPath = decodeURIComponent(decodedPath)
+    if (nextPath === decodedPath) return decodedPath
+    decodedPath = nextPath
+  }
+  return null
+}
+
+function isCanonicalLocalAssetPath(value, directory) {
   if (!value.startsWith('/')) return false
 
   try {
     const url = new URL(value, 'https://lonma.invalid')
-    return !url.search && !url.hash &&
-      (url.pathname.startsWith('/assets/images/') || url.pathname.startsWith('/assets/videos/'))
+    const decodedPath = decodeLocalPath(url.pathname)
+    if (!decodedPath) return false
+    const segments = decodedPath.split('/')
+    return !url.search && !url.hash && decodedPath.startsWith(directory) &&
+      decodedPath.length > directory.length &&
+      segments.slice(1).every((segment) => segment && segment !== '.' && segment !== '..')
+  } catch {
+    return false
+  }
+}
+
+function isCanonicalLocalMediaPath(value) {
+  return isCanonicalLocalAssetPath(value, '/assets/images/') ||
+    isCanonicalLocalAssetPath(value, '/assets/videos/')
+}
+
+function isSanityImageUrl(value) {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:' && url.hostname === 'cdn.sanity.io' &&
+      url.pathname.startsWith('/images/')
   } catch {
     return false
   }
@@ -36,7 +66,7 @@ function localMediaUrl(value) {
 
 export function isSafeMediaUrl(value) {
   if (typeof value !== 'string' || !value.trim() || value !== value.trim()) return false
-  if (localMediaUrl(value)) return true
+  if (isCanonicalLocalMediaPath(value)) return true
 
   try {
     const url = new URL(value)
@@ -44,12 +74,6 @@ export function isSafeMediaUrl(value) {
   } catch {
     return false
   }
-}
-
-function sourceForImage(image) {
-  const imagePath = text(image?.imagePath)
-  const assetUrl = text(image?.asset?.url)
-  return imagePath || assetUrl
 }
 
 function imageDimensions(image) {
@@ -74,18 +98,22 @@ function sanitySrcset(src, width) {
 }
 
 export function buildResponsiveSanityImage(image) {
-  const src = sourceForImage(image)
-  if (!isSafeMediaUrl(src)) return null
-
-  const dimensions = imageDimensions(image)
+  const imagePath = text(image?.imagePath)
+  const assetUrl = text(image?.asset?.url)
   const alt = normalizeLocalized(image?.alt)
-  const normalized = {src, alt, ...(dimensions || {})}
-
-  if (src.startsWith('https://cdn.sanity.io/') && dimensions) {
-    normalized.srcset = sanitySrcset(src, dimensions.width)
+  if (isCanonicalLocalAssetPath(imagePath, '/assets/images/')) {
+    return {src: imagePath, alt}
   }
 
-  return normalized
+  const dimensions = imageDimensions(image)
+  if (!isSanityImageUrl(assetUrl) || !dimensions) return null
+
+  return {
+    src: assetUrl,
+    alt,
+    ...dimensions,
+    srcset: sanitySrcset(assetUrl, dimensions.width),
+  }
 }
 
 export function normalizeLocalized(value, fallback = '') {
@@ -163,6 +191,18 @@ export function normalizeCaseRecord(record) {
   }
 }
 
+function ensureUniqueCases(cases) {
+  const slugs = new Set()
+  const orders = new Set()
+  for (const caseRecord of cases) {
+    if (slugs.has(caseRecord.slug)) throw new Error(`Sanity response contains duplicate case slug: ${caseRecord.slug}`)
+    if (orders.has(caseRecord.order)) throw new Error(`Sanity response contains duplicate case order: ${caseRecord.order}`)
+    slugs.add(caseRecord.slug)
+    orders.add(caseRecord.order)
+  }
+  return cases
+}
+
 export function buildCaseQueryUrl(slug) {
   if (slug !== undefined && !isCaseSlug(slug)) {
     throw new TypeError('Sanity case slug must be case-01 through case-36')
@@ -188,7 +228,7 @@ export async function fetchPublishedCases({slug, fetchImpl = fetch, timeoutMs = 
     if (!response.ok) throw new Error(`Sanity request failed with ${response.status}`)
     const payload = await response.json()
     const records = Array.isArray(payload.result) ? payload.result : [payload.result]
-    return records.map(normalizeCaseRecord).filter(Boolean)
+    return ensureUniqueCases(records.map(normalizeCaseRecord).filter(Boolean))
   } finally {
     clearTimeout(timeout)
   }
