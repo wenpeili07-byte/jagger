@@ -1,8 +1,11 @@
 # LONMA DYNAMIC Sanity Studio
 
-This is a separate Sanity Studio test setup for comparing CMS editing experience against Decap CMS.
+The Studio manages the six published LONMA DYNAMIC Case documents. The public
+website reads published documents only and retains its local static HTML as a
+complete fallback whenever CMS data is unavailable or invalid.
 
-It does not replace the live site or the existing Decap setup yet.
+- Public Studio: https://lonma-sanity-studio.vercel.app/
+- Temporary website: https://jagger-sage.vercel.app/
 
 ## What It Edits
 
@@ -16,29 +19,32 @@ It does not replace the live site or the existing Decap setup yet.
 - Build scope
 - CTA copy and link
 
-## Run Locally
+## Edit And Import
 
-Create or open a Sanity project first, then create `.env.local` in this folder:
-
-```text
-SANITY_STUDIO_PROJECT_ID="your-project-id"
-SANITY_STUDIO_DATASET="production"
-```
-
-Install and run from this folder:
+From the repository root, work in the Studio directory. Its committed
+`package-lock.json` provides the versioned dependency tree used by this
+workflow.
 
 ```bash
-pnpm install
-pnpm dev
+cd sanity
+npm install
+npm run dev
+npx sanity login
+npx sanity dataset import seed/case-pages.ndjson production --replace
 ```
 
-Then open:
+The local Studio runs at:
 
 ```text
 http://127.0.0.1:3333/
 ```
 
-## Notes
+The seed contains six published `casePage` documents with deterministic IDs.
+Reimporting with `--replace` updates the same deterministic IDs rather than
+creating another set of cases. Do not run the import against production until
+the records have been reviewed.
 
-The main website is still static and still reads `content/cases/case-01.json`.
-This Sanity Studio is only for comparing the editing experience first.
+## Security
+
+Never commit secrets, tokens, or `.env.local` files. The website uses only the
+public published-content API and does not contain Sanity write credentials.

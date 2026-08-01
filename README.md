@@ -33,6 +33,31 @@ node --test
 The temporary canonical origin is stored in `seo-data.mjs`. Replace it only
 after the final custom domain is connected.
 
+## Case CMS
+
+The six editable Case pages are managed in the public Sanity Studio at
+https://lonma-sanity-studio.vercel.app/. The temporary website is
+https://jagger-sage.vercel.app/. Browser updates use published documents only;
+the local static HTML remains the complete fallback if CMS content is missing,
+invalid, or unavailable.
+
+To edit locally or reimport the deterministic six-case seed, start from this
+repository root and follow the versioned Studio dependencies in
+`sanity/package-lock.json`:
+
+```sh
+cd sanity
+npm install
+npm run dev
+npx sanity login
+npx sanity dataset import seed/case-pages.ndjson production --replace
+```
+
+The import reuses the same deterministic document IDs, so it updates the six
+records rather than creating duplicates. Never commit secrets, Sanity tokens,
+or `.env.local` files, and do not import into production without reviewing the
+seed first.
+
 ## Contact email delivery
 
 The production Contact form uses `api/contact.js` and Resend.
