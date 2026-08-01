@@ -195,6 +195,47 @@ test('detail loader fetches, patches, and emits once per successful root', async
   assert.equal(events, 1)
 })
 
+test('detail loader returns a Promise without side effects when no root exists', async () => {
+  let fetches = 0
+  let events = 0
+  let warnings = 0
+  const result = loadDetailCase({
+    root: null,
+    fetchCases: async () => { fetches += 1; return [record] },
+    eventTarget: {dispatchEvent: () => { events += 1 }},
+    warn: () => { warnings += 1 },
+  })
+
+  assert.equal(typeof result?.then, 'function')
+  assert.equal(await result, false)
+  assert.equal(fetches, 0)
+  assert.equal(events, 0)
+  assert.equal(warnings, 0)
+})
+
+test('detail loader returns a Promise without side effects when a root has no slug', async () => {
+  const fixture = createFixture()
+  delete fixture.root.dataset.caseSlug
+  const before = snapshot(fixture)
+  let fetches = 0
+  let events = 0
+  let warnings = 0
+  const result = loadDetailCase({
+    root: fixture.root,
+    document,
+    fetchCases: async () => { fetches += 1; return [record] },
+    eventTarget: {dispatchEvent: () => { events += 1 }},
+    warn: () => { warnings += 1 },
+  })
+
+  assert.equal(typeof result?.then, 'function')
+  assert.equal(await result, false)
+  assert.equal(snapshot(fixture), before)
+  assert.equal(fetches, 0)
+  assert.equal(events, 0)
+  assert.equal(warnings, 0)
+})
+
 test('detail loader shares one in-flight request for concurrent calls', async () => {
   const fixture = createFixture()
   let fetches = 0

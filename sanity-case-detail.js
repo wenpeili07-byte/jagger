@@ -127,7 +127,7 @@ export function loadDetailCase({
   document = globalThis.document,
 } = {}) {
   const slug = root?.dataset.caseSlug
-  if (!slug) return false
+  if (!slug) return Promise.resolve(false)
   if (notifiedRoots.has(root)) return Promise.resolve(true)
   const pending = pendingRoots.get(root)
   if (pending) return pending

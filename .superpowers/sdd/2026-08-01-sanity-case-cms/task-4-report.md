@@ -104,3 +104,32 @@ node --test *.test.mjs
 ```
 
 Results: Task 4 suite 30 passed, 0 failed. Full non-audit suite 228 passed, 0 failed.
+
+## Third Review Fix Round
+
+### RED
+
+Added failing Promise-contract tests for a missing root and a root without `data-case-slug`. Both tests assert a thenable resolving `false` without a fetch, DOM write, event, or warning.
+
+Command run with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs
+```
+
+Observed the expected failures: both early exits returned a plain boolean rather than a Promise.
+
+### GREEN
+
+`loadDetailCase` now returns `Promise.resolve(false)` for every missing-root or missing-slug path. Existing completed-root and in-flight paths continue returning promises, including the exact shared in-flight promise for concurrent callers.
+
+No generated pages, Case 02, Services, CSS/layout, generator, audit, or images changed in this review round.
+
+Verification with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs case-detail.test.mjs content-pages.test.mjs link-closure.test.mjs image-performance.test.mjs
+node --test *.test.mjs
+```
+
+Results: Task 4 suite 32 passed, 0 failed. Full non-audit suite 230 passed, 0 failed.
