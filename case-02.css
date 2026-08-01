@@ -127,6 +127,15 @@
   grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
 }
 
+.case02-story-full {
+  display: grid;
+  gap: clamp(36px, 5vw, 72px);
+}
+
+.case02-story-full .case02-story-copy {
+  max-width: 620px;
+}
+
 .case02-story-copy {
   position: relative;
   padding-top: 24px;
@@ -186,6 +195,7 @@
 }
 
 .case02-story-beat[data-motion="fade"],
+.case02-story-full[data-motion="fade"],
 .case02-story-wide[data-motion="fade"] {
   animation: case02-reveal 420ms ease-out both;
 }
@@ -195,6 +205,10 @@
 }
 
 .case02-story-wide[data-motion="fade"] {
+  animation-delay: 140ms;
+}
+
+.case02-story-full[data-motion="fade"] {
   animation-delay: 140ms;
 }
 
@@ -320,6 +334,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .case02-story-beat[data-motion],
+  .case02-story-full[data-motion],
   .case02-story-wide[data-motion] {
     animation: none;
     transition: none;

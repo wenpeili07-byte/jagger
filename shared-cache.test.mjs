@@ -5,7 +5,7 @@ import { caseDetails, serviceDetails } from "./detail-pages-data.mjs";
 import { renderCasePage, renderServicePage } from "./scripts/render-detail-pages.mjs";
 import { renderShopPage } from "./scripts/render-shop-page.mjs";
 
-const sharedAssetVersion = "project-planner-redesign-20260726";
+const sharedAssetVersion = "sanity-case-cms-20260801";
 const publicPages = [
   "./index.html",
   "./pages/about.html",

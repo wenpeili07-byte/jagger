@@ -236,6 +236,8 @@ test('restores static cover attributes and rail scene when a CMS replacement fai
 
 test('overview covers apply and restore safe Sanity hotspot positions', () => {
   const card = caseNode('case-01')
+  card.dataset.scene = '../assets/images/static-scene.webp'
+  card.dataset.scenePosition = '50% 50%'
   const cover = card.slots['[data-cms-cover]']
   cover.setAttribute('src', '../assets/images/static.jpg')
   cover.style.objectPosition = '50% 50%'
@@ -254,6 +256,8 @@ test('overview covers apply and restore safe Sanity hotspot positions', () => {
 
   assert.equal(applyCasesOverview([replacement], root), 1)
   assert.equal(cover.style.objectPosition, '72% 38%')
+  assert.equal(card.dataset.scenePosition, '72% 38%')
   cover.dispatch('error')
   assert.equal(cover.style.objectPosition, '50% 50%')
+  assert.equal(card.dataset.scenePosition, '50% 50%')
 })

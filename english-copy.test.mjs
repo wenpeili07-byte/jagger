@@ -144,7 +144,7 @@ const decode = (value) =>
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">");
 
-const sharedAssetVersion = "project-planner-redesign-20260726";
+const sharedAssetVersion = "sanity-case-cms-20260801";
 const casesControllerVersion = "mobile-option3-20260728";
 const chineseText = /[\p{Script=Han}]/u;
 

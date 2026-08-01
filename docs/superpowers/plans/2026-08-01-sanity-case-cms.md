@@ -607,8 +607,8 @@ Expected: FAIL because `applyCaseVideo` and Case 02 CMS markers do not exist.
 Set `data-case-slug="case-02"` on the main element. Mark Case number, title, vehicle model, year, poster/video, and `.case02-story` media container. Load the shared detail module after `case-02.js`, preserving the existing controller order:
 
 ```html
-<script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
-<script src="../../case-02.js?v=project-planner-redesign-20260726"></script>
+<script src="../../content-pages.js?v=sanity-case-cms-20260801"></script>
+<script src="../../case-02.js?v=sanity-case-cms-20260801"></script>
 <script type="module" src="../../sanity-case-detail.js?v=sanity-case-cms-20260801"></script>
 ```
 

@@ -173,6 +173,25 @@ function createMediaImage(item, document, sizes, onImageError) {
   return image
 }
 
+function createCase02Copy(item, document, number) {
+  const copy = document.createElement('div')
+  copy.className = 'case02-story-copy'
+  const index = document.createElement('p')
+  index.textContent = String(number).padStart(2, '0')
+  copy.append(index)
+  if (isLocalized(item.heading) && (item.heading.en || item.heading.zh)) {
+    const heading = document.createElement('h2')
+    applyLocalizedNode(heading, item.heading)
+    copy.append(heading)
+  }
+  if (isLocalized(item.body) && (item.body.en || item.body.zh)) {
+    const body = document.createElement('p')
+    applyLocalizedNode(body, item.body)
+    copy.append(body)
+  }
+  return copy
+}
+
 function renderCase02MediaSections(items, document, onImageError) {
   const fragment = document.createDocumentFragment()
   let beat = 0
@@ -185,8 +204,18 @@ function renderCase02MediaSections(items, document, onImageError) {
       : 'case02-story-media'
     figure.append(createMediaImage(item, document, '(max-width: 768px) 100vw, 70vw', onImageError))
 
+    const hasCopy = (isLocalized(item.heading) && (item.heading.en || item.heading.zh)) ||
+      (isLocalized(item.body) && (item.body.en || item.body.zh))
     if (item.layout === 'full') {
-      fragment.append(figure)
+      if (!hasCopy) {
+        fragment.append(figure)
+        continue
+      }
+      beat += 1
+      const section = document.createElement('section')
+      section.className = 'case02-story-full'
+      section.append(createCase02Copy(item, document, beat), figure)
+      fragment.append(section)
       continue
     }
 
@@ -195,21 +224,7 @@ function renderCase02MediaSections(items, document, onImageError) {
     section.className = item.layout === 'textRight'
       ? 'case02-story-beat case02-story-beat-test'
       : 'case02-story-beat case02-story-beat-direction'
-    const copy = document.createElement('div')
-    copy.className = 'case02-story-copy'
-    const number = document.createElement('p')
-    number.textContent = String(beat).padStart(2, '0')
-    copy.append(number)
-    if (isLocalized(item.heading) && (item.heading.en || item.heading.zh)) {
-      const heading = document.createElement('h2')
-      applyLocalizedNode(heading, item.heading)
-      copy.append(heading)
-    }
-    if (isLocalized(item.body) && (item.body.en || item.body.zh)) {
-      const body = document.createElement('p')
-      applyLocalizedNode(body, item.body)
-      copy.append(body)
-    }
+    const copy = createCase02Copy(item, document, beat)
 
     if (item.layout === 'textRight') section.append(figure, copy)
     else section.append(copy, figure)

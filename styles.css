@@ -1172,12 +1172,13 @@ h1 span {
     url("./assets/images/网页/optimized/case-01.jpg") type("image/jpeg")
   );
   --active-case-scene: var(--cases-active-scene);
+  --cases-active-position: center center;
   background: transparent;
 }
 
 .cases-page::before {
   background-image: var(--cases-active-scene);
-  background-position: center center;
+  background-position: var(--cases-active-position);
   background-size: cover;
   transition: none;
 }

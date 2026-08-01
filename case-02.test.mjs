@@ -94,7 +94,7 @@ test("Case 02 poster-only controller never attempts playback", () => {
       return null;
     },
     querySelectorAll(selector) {
-      if (selector === ".case02-story-beat, .case02-story-wide") return motionNodes;
+      if (selector === ".case02-story-beat, .case02-story-full, .case02-story > .case02-story-wide") return motionNodes;
       return [];
     },
   };

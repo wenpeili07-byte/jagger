@@ -73,8 +73,8 @@ const renderGenericCasePage = (record) => `<!doctype html>
     <!-- SEO:START -->
     ${renderSeoMeta(seoForRoute(`/pages/cases/case-${record.id}`))}
     <!-- SEO:END -->
-    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
@@ -107,7 +107,7 @@ const renderGenericCasePage = (record) => `<!doctype html>
       </nav>
       ${globalFooter()}
     </main>
-    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
+    <script src="../../content-pages.js?v=sanity-case-cms-20260801"></script>
     <script type="module" src="../../sanity-case-detail.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
@@ -123,10 +123,10 @@ export const renderCase02Page = (record) => `<!doctype html>
     <!-- SEO:START -->
     ${renderSeoMeta(seoForRoute(`/pages/cases/case-${record.id}`))}
     <!-- SEO:END -->
-    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
-    <link rel="stylesheet" href="../../case-02.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../case-02.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="cases">
@@ -188,8 +188,8 @@ export const renderCase02Page = (record) => `<!doctype html>
       </nav>
       ${globalFooter()}
     </main>
-    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
-    <script src="../../case-02.js?v=project-planner-redesign-20260726"></script>
+    <script src="../../content-pages.js?v=sanity-case-cms-20260801"></script>
+    <script src="../../case-02.js?v=sanity-case-cms-20260801"></script>
     <script type="module" src="../../sanity-case-detail.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
@@ -213,8 +213,8 @@ export const renderServicePage = (record) => {
     <!-- SEO:START -->
     ${renderSeoMeta(seoForRoute(`/pages/services/${record.id}`))}
     <!-- SEO:END -->
-    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../service-detail.css?v=mobile-spacing-20260722" />
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
@@ -242,7 +242,7 @@ export const renderServicePage = (record) => {
       </section>
       ${globalFooter(projectHref)}
     </main>
-    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
+    <script src="../../content-pages.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
 `;

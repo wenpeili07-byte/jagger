@@ -69,7 +69,7 @@ assert.doesNotMatch(contentCss, /\.content-page\.site-shell\s*\{[^}]*max-width:/
 
 for (const path of publicPages) {
   const html = read(path);
-  assert.match(html, /layout-canvas\.css\?v=project-planner-redesign-20260726/, `${path} should load the current shared canvas cache key`);
+  assert.match(html, /layout-canvas\.css\?v=sanity-case-cms-20260801/, `${path} should load the current shared canvas cache key`);
 }
 
 // Task 3: compact header and services rules.

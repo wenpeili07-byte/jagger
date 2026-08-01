@@ -10,7 +10,7 @@ const css = [
   readFileSync(new URL("./case-rail.css", import.meta.url), "utf8")
 ].join("\n");
 const js = readFileSync(new URL("./pages/cases.js", import.meta.url), "utf8");
-const sharedAssetVersion = "project-planner-redesign-20260726";
+const sharedAssetVersion = "sanity-case-cms-20260801";
 
 assert.match(html, /<section class="cases-hero"/, "cases page should include the PLAN A hero section");
 assert.match(html, /<section class="case-archive"/, "cases page should include the archive section below the hero");
@@ -30,7 +30,7 @@ assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive shou
 assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should not include the old scrolling masked image rail");
 assert.match(html, /36 PERFORMANCE PROJECTS/, "archive should be framed as 36 performance projects");
 assert.match(html, new RegExp(`styles\\.css\\?v=${sharedAssetVersion}`), "cases page should load the current shared stylesheet cache key");
-assert.match(html, /layout-canvas\.css\?v=project-planner-redesign-20260726/, "cases page should load the current shared canvas cache key");
+assert.match(html, /layout-canvas\.css\?v=sanity-case-cms-20260801/, "cases page should load the current shared canvas cache key");
 assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
@@ -62,7 +62,7 @@ assert.equal(
   6,
   "all six archive actions should be bilingual"
 );
-assert.match(html, /function fadeToScene\(scene\)/, "cases page should keep a single inline scene fade controller");
+assert.match(html, /function fadeToScene\(scene, position\)/, "cases page should keep a single inline scene fade controller");
 assert.doesNotMatch(html, /@keyframes sceneFadeIn/, "cases page should use the shared stylesheet fade animation instead of duplicating it inline");
 assert.equal((css.match(/@keyframes sceneFadeIn/g) || []).length, 1, "shared stylesheet should define the background fade-in animation once");
 assert.match(css, /@keyframes sceneFadeIn\s*\{\s*0%\s*\{\s*opacity:\s*0\.16;\s*\}\s*100%\s*\{\s*opacity:\s*1;\s*\}\s*\}/s, "case background fade should only fade from transparent to solid");
@@ -73,10 +73,13 @@ assert.doesNotMatch(html, /scene-fade-layer/, "cases page should not keep old fa
 assert.match(html, /\["mouseenter",\s*"focus",\s*"click"\]/, "case background should use one stable hover event plus focus and click");
 assert.doesNotMatch(html, /pointerenter/, "case background should not bind both pointerenter and mouseenter");
 assert.match(html, /activeScene === scene/, "case background should not restart the fade when the active scene is unchanged");
+assert.match(html, /card\.dataset\.scenePosition/, "case background should read the hydrated scene hotspot");
+assert.match(html, /--cases-active-position/, "case background should apply the hydrated scene hotspot");
 
 assert.match(css, /\.cover,\s*\.cases-hero\s*\{[^}]*min-height:\s*min\(calc\(100vh - var\(--site-header-height\)\),\s*var\(--site-first-screen-max\)\)/s, "PLAN A hero should use the shared 1900x1050 first-screen variables without stretching on taller displays");
 assert.match(css, /\.cases-page\s*\{[^}]*background:\s*transparent/s, "case page shell should stay transparent so the fixed background scene is visible");
-assert.match(css, /\.cases-page::before\s*\{[^}]*background-image:\s*var\(--cases-active-scene\)[^}]*background-position:\s*center center[^}]*background-size:\s*cover/s, "case page background should use one centered full-bleed scene image");
+assert.match(css, /\.cases-page\s*\{[^}]*--cases-active-position:\s*center center/s, "case page should define a safe default scene focus");
+assert.match(css, /\.cases-page::before\s*\{[^}]*background-image:\s*var\(--cases-active-scene\)[^}]*background-position:\s*var\(--cases-active-position\)[^}]*background-size:\s*cover/s, "case page background should use the active CMS scene focus");
 assert.doesNotMatch(css, /\.cases-page::before\s*\{[^}]*background-image:\s*var\(--cases-active-scene\),/s, "case page background should not duplicate the same image in multiple layers");
 assert.match(css, /\.cases-gap\s*\{[^}]*height:\s*100px/s, "hero and archive should be separated by 100px");
 assert.match(css, /\.archive-layout\s*\{[^}]*grid-template-columns:\s*260px\s+minmax\(0,\s*1fr\)/s, "archive should use a left filter sidebar");

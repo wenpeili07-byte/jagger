@@ -70,6 +70,7 @@ function getImageFallback(image, sceneNode) {
     objectPosition: image.style?.objectPosition || '',
     sceneNode,
     scene: sceneNode ? snapshotDatasetValue(sceneNode, 'scene') : null,
+    scenePosition: sceneNode ? snapshotDatasetValue(sceneNode, 'scenePosition') : null,
   }
   imageFallbacks.set(image, fallback)
   image.addEventListener('error', () => {
@@ -81,6 +82,7 @@ function getImageFallback(image, sceneNode) {
     if (image.style) image.style.objectPosition = fallback.objectPosition
     if (fallback.sceneNode && fallback.scene) {
       restoreDatasetValue(fallback.sceneNode, 'scene', fallback.scene)
+      restoreDatasetValue(fallback.sceneNode, 'scenePosition', fallback.scenePosition)
     }
   })
   return fallback
@@ -92,9 +94,10 @@ function applyResponsiveImage(image, cover, sceneNode) {
   const currentLocalPath = localAssetPath(image.getAttribute('src'))
   const nextLocalPath = localAssetPath(cover.src)
   const matchesStaticLocalImage = currentLocalPath && currentLocalPath === nextLocalPath
+  const objectPosition = OBJECT_POSITION.test(cover.objectPosition) ? cover.objectPosition : 'center center'
+  const fallback = getImageFallback(image, sceneNode)
+  fallback.active = true
   if (!matchesStaticLocalImage) {
-    const fallback = getImageFallback(image, sceneNode)
-    fallback.active = true
     image.setAttribute('src', cover.src)
     if (cover.srcset) image.setAttribute('srcset', cover.srcset)
     else {
@@ -103,11 +106,10 @@ function applyResponsiveImage(image, cover, sceneNode) {
     }
     if (Number.isFinite(cover.width)) image.setAttribute('width', String(cover.width))
     if (Number.isFinite(cover.height)) image.setAttribute('height', String(cover.height))
-    if (image.style) {
-      image.style.objectPosition = OBJECT_POSITION.test(cover.objectPosition) ? cover.objectPosition : ''
-    }
     if (sceneNode) sceneNode.dataset.scene = cover.src
   }
+  if (image.style) image.style.objectPosition = objectPosition
+  if (sceneNode) sceneNode.dataset.scenePosition = objectPosition
 
   image.dataset.enAlt = cover.alt?.en || ''
   image.dataset.zhAlt = cover.alt?.zh || cover.alt?.en || ''

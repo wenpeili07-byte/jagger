@@ -5,9 +5,9 @@ const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
 const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const js = readFileSync(new URL("./script.js", import.meta.url), "utf8");
 const renderer = readFileSync(new URL("./scripts/render-detail-pages.mjs", import.meta.url), "utf8");
-const sharedAssetVersion = "project-planner-redesign-20260726";
-const contentStylesVersion = "project-planner-redesign-20260726";
-const canvasVersion = "project-planner-redesign-20260726";
+const sharedAssetVersion = "sanity-case-cms-20260801";
+const contentStylesVersion = "sanity-case-cms-20260801";
+const canvasVersion = "sanity-case-cms-20260801";
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
   assert.notEqual(start, -1, message);

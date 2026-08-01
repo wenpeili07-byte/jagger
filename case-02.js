@@ -18,7 +18,7 @@
 
   const refreshStoryMotion = () => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.querySelectorAll(".case02-story-beat, .case02-story-wide").forEach((node) => {
+    document.querySelectorAll(".case02-story-beat, .case02-story-full, .case02-story > .case02-story-wide").forEach((node) => {
       node.dataset.motion = reducedMotion ? "none" : "fade";
     });
   };

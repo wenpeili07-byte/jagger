@@ -266,16 +266,21 @@ test('Case 02 keeps its approved story hierarchy when CMS media sections replace
   const mediaSections = [
     record.mediaSections[0],
     {...record.mediaSections[0], layout: 'textRight', heading: {en: 'TEST, ADJUST, REPEAT', zh: '测试、调整、再测试'}},
+    {...record.mediaSections[0], layout: 'full', heading: {en: 'FULL WIDTH NOTE', zh: '全宽说明'}},
     {...record.mediaSections[0], layout: 'full', heading: {en: '', zh: ''}, body: {en: '', zh: ''}},
   ]
   assert.equal(applyDetailCase({...record, slug: 'case-02', mediaSections}, fixture.root, document), true)
-  assert.equal(fixture.media.children.length, 3)
+  assert.equal(fixture.media.children.length, 4)
   assert.equal(fixture.media.children[0].className, 'case02-story-beat case02-story-beat-direction')
   assert.equal(fixture.media.children[0].children[0].className, 'case02-story-copy')
   assert.equal(fixture.media.children[0].children[0].children[1].tagName, 'h2')
   assert.equal(fixture.media.children[1].className, 'case02-story-beat case02-story-beat-test')
   assert.equal(fixture.media.children[1].children[0].className, 'case02-story-media')
-  assert.equal(fixture.media.children[2].className, 'case02-story-media case02-story-wide')
+  assert.equal(fixture.media.children[2].className, 'case02-story-full')
+  assert.equal(fixture.media.children[2].children[0].className, 'case02-story-copy')
+  assert.equal(fixture.media.children[2].children[0].children[1].textContent, 'FULL WIDTH NOTE')
+  assert.equal(fixture.media.children[2].children[1].className, 'case02-story-media case02-story-wide')
+  assert.equal(fixture.media.children[3].className, 'case02-story-media case02-story-wide')
 })
 
 test('a failed CMS story image restores the complete static Case 02 story', () => {
