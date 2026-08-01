@@ -95,7 +95,8 @@ function imageDimensions(image) {
     : null
 }
 
-function sanitySrcset(src, width) {
+export function buildResponsiveSanitySrcset(src, width) {
+  if (!isSanityImageUrl(src) || !Number.isFinite(width) || width <= 0) return ''
   const url = new URL(src)
   return IMAGE_WIDTHS.filter((candidate) => candidate <= width)
     .map((candidate) => {
@@ -122,7 +123,7 @@ export function buildResponsiveSanityImage(image) {
     src: assetUrl,
     alt,
     ...dimensions,
-    srcset: sanitySrcset(assetUrl, dimensions.width),
+    srcset: buildResponsiveSanitySrcset(assetUrl, dimensions.width),
   }
 }
 

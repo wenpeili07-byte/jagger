@@ -103,7 +103,7 @@ test('valid detail content writes bilingual fields, responsive cover, and photo 
   assert.equal(title.textContent, 'CMS TITLE')
   assert.deepEqual(title.dataset, {en: 'CMS TITLE', zh: 'CMS 标题'})
   assert.equal(cover.getAttribute('src'), record.cover.src)
-  assert.equal(cover.getAttribute('srcset'), record.cover.srcset)
+  assert.equal(cover.getAttribute('srcset'), 'https://cdn.sanity.io/images/project/production/cover.jpg?w=640&auto=format 640w, https://cdn.sanity.io/images/project/production/cover.jpg?w=960&auto=format 960w, https://cdn.sanity.io/images/project/production/cover.jpg?w=1600&auto=format 1600w')
   assert.equal(cover.getAttribute('width'), '1600')
   assert.equal(cover.getAttribute('height'), '900')
   assert.equal(cover.getAttribute('alt'), 'Cover EN')
@@ -144,6 +144,19 @@ test('local CMS images clear stale responsive and dimension attributes', () => {
   assert.equal(image.getAttribute('height'), null)
 })
 
+test('Sanity images replace a supplied unsafe srcset with derived candidates', () => {
+  const image = new FakeElement('img')
+  assert.equal(applyResponsiveImage(image, {
+    src: 'https://cdn.sanity.io/images/project/production/cover.jpg',
+    alt: {en: 'Cover', zh: '封面'},
+    width: 960,
+    height: 540,
+    srcset: 'javascript:alert(1) 640w',
+  }), true)
+  assert.equal(image.getAttribute('srcset'), 'https://cdn.sanity.io/images/project/production/cover.jpg?w=640&auto=format 640w, https://cdn.sanity.io/images/project/production/cover.jpg?w=960&auto=format 960w')
+  assert.equal(image.getAttribute('sizes'), '100vw')
+})
+
 test('unsafe media sections are skipped without replacing static media', () => {
   const unsafeSources = [
     'javascript:alert(1)',
@@ -178,6 +191,56 @@ test('detail loader fetches, patches, and emits once per successful root', async
 
   assert.equal(await loadDetailCase(options), true)
   assert.equal(await loadDetailCase(options), true)
+  assert.equal(fetches, 1)
+  assert.equal(events, 1)
+})
+
+test('detail loader shares one in-flight request for concurrent calls', async () => {
+  const fixture = createFixture()
+  let fetches = 0
+  let release
+  const options = {
+    root: fixture.root,
+    document,
+    fetchCases: () => {
+      fetches += 1
+      return new Promise((resolve) => { release = () => resolve([record]) })
+    },
+    eventTarget: {dispatchEvent: () => {}},
+    warn: () => {},
+  }
+
+  const first = loadDetailCase(options)
+  const second = loadDetailCase(options)
+  assert.equal(first, second)
+  assert.equal(fetches, 1)
+  release()
+  assert.equal(await first, true)
+})
+
+test('detail loader completes before synchronous update listeners can reenter', async () => {
+  const fixture = createFixture()
+  let fetches = 0
+  let events = 0
+  let reentrant
+  const options = {
+    root: fixture.root,
+    document,
+    fetchCases: async () => {
+      fetches += 1
+      return [record]
+    },
+    eventTarget: {
+      dispatchEvent: () => {
+        events += 1
+        reentrant = loadDetailCase(options)
+      },
+    },
+    warn: () => {},
+  }
+
+  assert.equal(await loadDetailCase(options), true)
+  assert.equal(await reentrant, true)
   assert.equal(fetches, 1)
   assert.equal(events, 1)
 })

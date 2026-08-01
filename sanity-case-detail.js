@@ -1,7 +1,8 @@
-import {fetchPublishedCases, isSafeCaseImage} from './sanity-case-data.js'
+import {buildResponsiveSanitySrcset, fetchPublishedCases, isSafeCaseImage} from './sanity-case-data.js'
 
 const warnedRoots = new WeakSet()
 const notifiedRoots = new WeakSet()
+const pendingRoots = new WeakMap()
 
 function isLocalized(value) {
   return value && typeof value.en === 'string' && typeof value.zh === 'string'
@@ -21,8 +22,9 @@ export function applyResponsiveImage(image, source, sizes = '100vw') {
   image.setAttribute('src', source.src)
   const hasDimensions = Number.isFinite(source.width) && source.width > 0 &&
     Number.isFinite(source.height) && source.height > 0
-  if (source.srcset && hasDimensions) {
-    image.setAttribute('srcset', source.srcset)
+  const srcset = hasDimensions ? buildResponsiveSanitySrcset(source.src, source.width) : ''
+  if (srcset) {
+    image.setAttribute('srcset', srcset)
     image.setAttribute('sizes', sizes)
   } else {
     image.removeAttribute('srcset')
@@ -117,7 +119,7 @@ export function applyDetailCase(record, root, document = globalThis.document) {
   return true
 }
 
-export async function loadDetailCase({
+export function loadDetailCase({
   root = globalThis.document?.querySelector('[data-detail-page][data-case-slug]'),
   fetchCases = fetchPublishedCases,
   eventTarget = globalThis.window,
@@ -126,20 +128,29 @@ export async function loadDetailCase({
 } = {}) {
   const slug = root?.dataset.caseSlug
   if (!slug) return false
-  if (notifiedRoots.has(root)) return true
-  try {
-    const [record] = await fetchCases({slug})
-    if (!applyDetailCase(record, root, document)) return false
-    eventTarget.dispatchEvent(new Event('lonma:content-updated'))
-    notifiedRoots.add(root)
-    return true
-  } catch (error) {
-    if (!warnedRoots.has(root)) {
-      warn('Unable to load published case content; keeping static page.', error)
-      warnedRoots.add(root)
+  if (notifiedRoots.has(root)) return Promise.resolve(true)
+  const pending = pendingRoots.get(root)
+  if (pending) return pending
+
+  const load = (async () => {
+    try {
+      const [record] = await fetchCases({slug})
+      if (!applyDetailCase(record, root, document)) return false
+      notifiedRoots.add(root)
+      eventTarget.dispatchEvent(new Event('lonma:content-updated'))
+      return true
+    } catch (error) {
+      if (!warnedRoots.has(root)) {
+        warn('Unable to load published case content; keeping static page.', error)
+        warnedRoots.add(root)
+      }
+      return false
+    } finally {
+      pendingRoots.delete(root)
     }
-    return false
-  }
+  })()
+  pendingRoots.set(root, load)
+  return load
 }
 
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {

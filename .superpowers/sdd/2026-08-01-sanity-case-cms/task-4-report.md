@@ -73,3 +73,34 @@ node --test *.test.mjs
 ```
 
 Results: Task 4 suite 27 passed, 0 failed. Full non-audit suite 225 passed, 0 failed.
+
+## Second Review Fix Round
+
+### RED
+
+Added failing tests for an unsafe caller-supplied `srcset`, two simultaneous loads for one root, and synchronous reentry from a `lonma:content-updated` listener.
+
+Command run with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs
+```
+
+Observed expected failures: caller `srcset` was written unchanged, concurrent calls returned distinct in-flight requests, and synchronous event reentry fetched twice.
+
+### GREEN
+
+Exported `buildResponsiveSanitySrcset` from the Task 2 data boundary. The renderer now ignores all caller-provided `srcset` values and derives candidates only from a validated canonical Sanity source URL and its width. Local images continue to clear responsive attributes.
+
+Added a per-root `WeakMap` for in-flight work and retained the completed-root `WeakSet`. Concurrent calls share one promise; successful completion is recorded before dispatching the update event, so synchronous listeners cannot trigger another request, patch, or event. Failed and empty requests clear their in-flight entry and remain retryable, with the existing once-only warning behavior preserved.
+
+No generator, generated page, Case 02, Service page, CSS/layout, audit, or image file changed in this review round.
+
+Verification with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs case-detail.test.mjs content-pages.test.mjs link-closure.test.mjs image-performance.test.mjs
+node --test *.test.mjs
+```
+
+Results: Task 4 suite 30 passed, 0 failed. Full non-audit suite 228 passed, 0 failed.
