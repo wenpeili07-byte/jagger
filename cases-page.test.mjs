@@ -37,6 +37,9 @@ assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail
 assert.match(html, /<script src="\.\/cases\.js\?v=mobile-option3-20260728"><\/script>/, "cases page should load the current accessible archive filter script");
 assert.match(html, /<body data-section="cases">/, "cases page should expose its navigation section to the shared language controller");
 assert.match(html, new RegExp(`<script src="\\.\\.\\/content-pages\\.js\\?v=${sharedAssetVersion}"><\\/script>`), "cases page should load the current shared language controller");
+assert.equal((html.match(/class="slide[^\"]*"[^>]*data-case-slug="case-0[1-6]"/g) || []).length, 6, "all six existing rail slides should expose stable case slugs");
+assert.equal((html.match(/class="archive-card"[^>]*data-case-slug="case-0[1-6]"/g) || []).length, 6, "all six existing archive cards should expose stable case slugs");
+assert.match(html, /content-pages\.js[^<]*<\/script>\s*<script type="module" src="\.\.\/sanity-case-overview\.js/, "the overview CMS module should load after language support");
 assert.match(html, /data-lang-option="zh"/, "cases page should identify the Chinese language option");
 assert.match(html, /data-lang-option="en"/, "cases page should identify the English language option");
 assert.match(
@@ -45,12 +48,12 @@ assert.match(
   "cases hero should provide both localized headings"
 );
 assert.equal(
-  (html.match(/class="slide[^"]*"[^>]*data-scene=[^>]*>[\s\S]*?<span class="slide-label" data-zh=/g) || []).length,
+  (html.match(/class="slide[^"]*"[^>]*data-scene=[^>]*>[\s\S]*?<span class="slide-label"[^>]*data-zh=/g) || []).length,
   6,
   "all six rail labels should be bilingual"
 );
 assert.equal(
-  (html.match(/<h3 data-zh="[^"]+" data-en="[^"]+">/g) || []).length,
+  (html.match(/<h3[^>]*data-zh="[^"]+" data-en="[^"]+">/g) || []).length,
   7,
   "the vehicle filter and all six archive titles should be bilingual"
 );
