@@ -126,6 +126,14 @@ export function buildResponsiveSanityImage(image) {
   }
 }
 
+export function isSafeCaseImage(image) {
+  const src = image?.src
+  if (typeof src !== 'string' || !src || src !== src.trim()) return false
+  if (isCanonicalLocalAssetPath(src, '/assets/images/')) return true
+  return isSanityImageUrl(src) && Number.isFinite(image.width) && image.width > 0 &&
+    Number.isFinite(image.height) && image.height > 0
+}
+
 export function normalizeLocalized(value, fallback = '') {
   const fallbackEnglish = typeof fallback === 'object' && fallback !== null
     ? text(fallback.en)

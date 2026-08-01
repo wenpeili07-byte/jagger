@@ -42,3 +42,34 @@ node --test sanity-case-detail.test.mjs case-detail.test.mjs content-pages.test.
 Result: 23 tests passed, 0 failed.
 
 `git diff -- pages/services` was empty after regeneration, so all regenerated Service detail pages are byte-for-byte unchanged. `pages/cases/case-02.html` has no diff and no `sanity-case-detail.js` reference.
+
+## Review Fix Round
+
+### RED
+
+Added failing regression tests for stale local-image width and height removal, unsafe photo-story sources (`javascript:`, local video paths, arbitrary remote URLs, and dimensionless Sanity URLs), all-invalid media fallback preservation, and repeated detail-loader success/failure lifecycle behavior.
+
+Command run with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs
+```
+
+Observed four expected failures: stale `width`, unsafe media rendering, and incompatible repeated-loader lifecycle calls.
+
+### GREEN
+
+Exported `isSafeCaseImage` from the Task 2 data boundary and reused it in the detail renderer. Local images are restricted to canonical `/assets/images/` paths; remote images require canonical Sanity CDN image URLs and finite positive dimensions. Dimensionless local images now clear `srcset`, `sizes`, `width`, and `height`. Invalid media sections are skipped, preserving the static container when none remain.
+
+The detail loader now accepts testable dependencies and follows the overview lifecycle policy: a successfully patched root fetches, writes, and dispatches only once; repeated failures may retry but warn only once per root.
+
+No generator, generated page, Case 02, Service page, CSS, audit, or image file changed in this review round, so regeneration was not needed.
+
+Verification with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs case-detail.test.mjs content-pages.test.mjs link-closure.test.mjs image-performance.test.mjs
+node --test *.test.mjs
+```
+
+Results: Task 4 suite 27 passed, 0 failed. Full non-audit suite 225 passed, 0 failed.

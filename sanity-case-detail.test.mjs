@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import {readFileSync} from 'node:fs'
 import test from 'node:test'
-import {applyDetailCase, renderMediaSections} from './sanity-case-detail.js'
+import {applyDetailCase, applyResponsiveImage, loadDetailCase, renderMediaSections} from './sanity-case-detail.js'
 
 class FakeElement {
   constructor(tagName = 'div') {
@@ -48,6 +48,7 @@ function createFixture() {
   const media = new FakeElement()
   media.append(new FakeElement('section'))
   const root = {
+    dataset: {caseSlug: 'case-01'},
     querySelector(selector) {
       return selector === '[data-cms-media-sections]' ? media : slots[selector] ?? null
     },
@@ -123,6 +124,83 @@ test('empty media does not replace the static media section', () => {
   const originalChild = fixture.media.children[0]
   assert.equal(applyDetailCase({...record, mediaSections: []}, fixture.root, document), true)
   assert.equal(fixture.media.children[0], originalChild)
+})
+
+test('local CMS images clear stale responsive and dimension attributes', () => {
+  const image = new FakeElement('img')
+  image.setAttribute('srcset', '/assets/images/static-640.jpg 640w')
+  image.setAttribute('sizes', '50vw')
+  image.setAttribute('width', '1920')
+  image.setAttribute('height', '1282')
+
+  assert.equal(applyResponsiveImage(image, {
+    src: '/assets/images/replacement.jpg',
+    alt: {en: 'Replacement', zh: '替换图'},
+    srcset: '/assets/images/replacement-640.jpg 640w',
+  }), true)
+  assert.equal(image.getAttribute('srcset'), null)
+  assert.equal(image.getAttribute('sizes'), null)
+  assert.equal(image.getAttribute('width'), null)
+  assert.equal(image.getAttribute('height'), null)
+})
+
+test('unsafe media sections are skipped without replacing static media', () => {
+  const unsafeSources = [
+    'javascript:alert(1)',
+    '/assets/videos/case-01.mp4',
+    'https://example.com/story.jpg',
+    'https://cdn.sanity.io/images/project/production/story.jpg',
+  ]
+  for (const src of unsafeSources) {
+    const unsafe = {...record.mediaSections[0], image: {src, alt: record.mediaSections[0].image.alt}}
+    assert.equal(renderMediaSections([unsafe], document).children.length, 0)
+    const fixture = createFixture()
+    const staticChild = fixture.media.children[0]
+    assert.equal(applyDetailCase({...record, mediaSections: [unsafe]}, fixture.root, document), true)
+    assert.equal(fixture.media.children[0], staticChild)
+  }
+})
+
+test('detail loader fetches, patches, and emits once per successful root', async () => {
+  const fixture = createFixture()
+  let fetches = 0
+  let events = 0
+  const options = {
+    root: fixture.root,
+    document,
+    fetchCases: async () => {
+      fetches += 1
+      return [record]
+    },
+    eventTarget: {dispatchEvent: () => { events += 1 }},
+    warn: () => {},
+  }
+
+  assert.equal(await loadDetailCase(options), true)
+  assert.equal(await loadDetailCase(options), true)
+  assert.equal(fetches, 1)
+  assert.equal(events, 1)
+})
+
+test('detail loader warns once when repeated requests fail', async () => {
+  const fixture = createFixture()
+  let fetches = 0
+  let warnings = 0
+  const options = {
+    root: fixture.root,
+    document,
+    fetchCases: async () => {
+      fetches += 1
+      throw new Error('offline')
+    },
+    eventTarget: {dispatchEvent: () => assert.fail('failure must not emit an update')},
+    warn: () => { warnings += 1 },
+  }
+
+  assert.equal(await loadDetailCase(options), false)
+  assert.equal(await loadDetailCase(options), false)
+  assert.equal(fetches, 2)
+  assert.equal(warnings, 1)
 })
 
 test('media renderer creates no markup strings', () => {

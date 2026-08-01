@@ -1,4 +1,7 @@
-import {fetchPublishedCases} from './sanity-case-data.js'
+import {fetchPublishedCases, isSafeCaseImage} from './sanity-case-data.js'
+
+const warnedRoots = new WeakSet()
+const notifiedRoots = new WeakSet()
 
 function isLocalized(value) {
   return value && typeof value.en === 'string' && typeof value.zh === 'string'
@@ -13,19 +16,24 @@ function applyLocalizedNode(node, value) {
 }
 
 export function applyResponsiveImage(image, source, sizes = '100vw') {
-  if (!image || !source || typeof source.src !== 'string' || !source.src) return false
+  if (!image || !isSafeCaseImage(source)) return false
 
   image.setAttribute('src', source.src)
-  if (source.srcset) {
+  const hasDimensions = Number.isFinite(source.width) && source.width > 0 &&
+    Number.isFinite(source.height) && source.height > 0
+  if (source.srcset && hasDimensions) {
     image.setAttribute('srcset', source.srcset)
     image.setAttribute('sizes', sizes)
   } else {
     image.removeAttribute('srcset')
     image.removeAttribute('sizes')
   }
-  if (Number.isFinite(source.width) && Number.isFinite(source.height)) {
+  if (hasDimensions) {
     image.setAttribute('width', String(source.width))
     image.setAttribute('height', String(source.height))
+  } else {
+    image.removeAttribute('width')
+    image.removeAttribute('height')
   }
   if (isLocalized(source.alt)) {
     image.dataset.enAlt = source.alt.en
@@ -37,7 +45,7 @@ export function applyResponsiveImage(image, source, sizes = '100vw') {
 
 function hasMediaItem(item) {
   return item && ['full', 'textLeft', 'textRight'].includes(item.layout) &&
-    item.image && typeof item.image.src === 'string' && item.image.src
+    isSafeCaseImage(item.image)
 }
 
 export function renderMediaSections(items, document) {
@@ -80,7 +88,7 @@ export function renderMediaSections(items, document) {
 
 function isDetailRecord(record) {
   return record && typeof record === 'object' && isLocalized(record.title) &&
-    record.title.en && record.cover && typeof record.cover.src === 'string' && record.cover.src
+    record.title.en && isSafeCaseImage(record.cover)
 }
 
 export function applyDetailCase(record, root, document = globalThis.document) {
@@ -109,24 +117,27 @@ export function applyDetailCase(record, root, document = globalThis.document) {
   return true
 }
 
-let didWarn = false
-
-function warnOnce(error) {
-  if (didWarn) return
-  didWarn = true
-  console.warn('Unable to load published case content; keeping static page.', error)
-}
-
-export async function loadDetailCase(root = document.querySelector('[data-detail-page][data-case-slug]')) {
+export async function loadDetailCase({
+  root = globalThis.document?.querySelector('[data-detail-page][data-case-slug]'),
+  fetchCases = fetchPublishedCases,
+  eventTarget = globalThis.window,
+  warn = console.warn,
+  document = globalThis.document,
+} = {}) {
   const slug = root?.dataset.caseSlug
   if (!slug) return false
+  if (notifiedRoots.has(root)) return true
   try {
-    const [record] = await fetchPublishedCases({slug})
-    if (!applyDetailCase(record, root)) return false
-    window.dispatchEvent(new Event('lonma:content-updated'))
+    const [record] = await fetchCases({slug})
+    if (!applyDetailCase(record, root, document)) return false
+    eventTarget.dispatchEvent(new Event('lonma:content-updated'))
+    notifiedRoots.add(root)
     return true
   } catch (error) {
-    warnOnce(error)
+    if (!warnedRoots.has(root)) {
+      warn('Unable to load published case content; keeping static page.', error)
+      warnedRoots.add(root)
+    }
     return false
   }
 }
