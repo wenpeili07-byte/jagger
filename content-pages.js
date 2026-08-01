@@ -1,12 +1,6 @@
 (() => {
   const supportedLanguages = ["zh", "en"];
   const langToggle = document.querySelector(".lang-toggle");
-  const languageOptions = [...document.querySelectorAll("[data-lang-option]")];
-  const translatedNodes = [...document.querySelectorAll("[data-zh][data-en]")];
-  const placeholderNodes = [...document.querySelectorAll("[data-zh-placeholder][data-en-placeholder]")];
-  const ariaLabelNodes = [...document.querySelectorAll("[data-zh-aria-label][data-en-aria-label]")];
-  const alternativeTextNodes = [...document.querySelectorAll("[data-zh-alt][data-en-alt]")];
-  const navLinks = [...document.querySelectorAll(".nav a")];
   const navLabels = {
     "about.html": { zh: "关于", en: "ABOUT" },
     "services.html": { zh: "业务", en: "SERVICES" },
@@ -39,6 +33,7 @@
 
   function updateNavigation(language) {
     const currentSection = document.body.dataset.section;
+    const navLinks = [...document.querySelectorAll(".nav a")];
 
     navLinks.forEach((link) => {
       const pageName = link.getAttribute("href").split("/").pop();
@@ -58,6 +53,7 @@
   }
 
   function updateLanguageToggle(language) {
+    const languageOptions = [...document.querySelectorAll("[data-lang-option]")];
     languageOptions.forEach((option) => {
       option.classList.toggle("is-current", option.dataset.langOption === language);
     });
@@ -67,29 +63,38 @@
     }
   }
 
-  function setLanguage(language) {
-    currentLanguage = supportedLanguages.includes(language) ? language : "en";
-    document.documentElement.lang = currentLanguage === "zh" ? "zh-CN" : "en";
-    document.body.dataset.lang = currentLanguage;
+  function applyLanguage(language) {
+    const translatedNodes = [...document.querySelectorAll("[data-zh][data-en]")];
+    const placeholderNodes = [...document.querySelectorAll("[data-zh-placeholder][data-en-placeholder]")];
+    const ariaLabelNodes = [...document.querySelectorAll("[data-zh-aria-label][data-en-aria-label]")];
+    const alternativeTextNodes = [...document.querySelectorAll("[data-zh-alt][data-en-alt]")];
+
+    document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
+    document.body.dataset.lang = language;
 
     translatedNodes.forEach((node) => {
-      node.textContent = node.dataset[currentLanguage];
+      node.textContent = node.dataset[language];
     });
 
     placeholderNodes.forEach((node) => {
-      node.setAttribute("placeholder", node.dataset[`${currentLanguage}Placeholder`]);
+      node.setAttribute("placeholder", node.dataset[`${language}Placeholder`]);
     });
 
     ariaLabelNodes.forEach((node) => {
-      node.setAttribute("aria-label", node.dataset[`${currentLanguage}AriaLabel`]);
+      node.setAttribute("aria-label", node.dataset[`${language}AriaLabel`]);
     });
 
     alternativeTextNodes.forEach((node) => {
-      node.setAttribute("alt", node.dataset[`${currentLanguage}Alt`]);
+      node.setAttribute("alt", node.dataset[`${language}Alt`]);
     });
 
-    updateNavigation(currentLanguage);
-    updateLanguageToggle(currentLanguage);
+    updateNavigation(language);
+    updateLanguageToggle(language);
+  }
+
+  function setLanguage(language) {
+    currentLanguage = supportedLanguages.includes(language) ? language : "en";
+    applyLanguage(currentLanguage);
     setStoredLanguage(currentLanguage);
   }
 
@@ -100,6 +105,12 @@
   }
 
   setLanguage(currentLanguage);
+
+  if (typeof window.addEventListener === "function") {
+    window.addEventListener("lonma:content-updated", () => {
+      applyLanguage(currentLanguage);
+    });
+  }
 
   const serviceRows = Array.from(document.querySelectorAll("[data-service-row]"));
 

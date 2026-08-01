@@ -1,5 +1,8 @@
 import {fetchPublishedCases} from './sanity-case-data.js'
 
+const warnedRoots = new WeakSet()
+const notifiedRoots = new WeakSet()
+
 function applyLocalizedNode(node, value) {
   if (!node || !value?.en) return
   node.dataset.en = value.en
@@ -24,8 +27,14 @@ function vehicleLabel(vehicle) {
 function applyResponsiveImage(image, cover) {
   if (!image || !cover?.src) return
   image.setAttribute('src', cover.src)
-  image.setAttribute('alt', cover.alt?.en || '')
+  image.dataset.enAlt = cover.alt?.en || ''
+  image.dataset.zhAlt = cover.alt?.zh || cover.alt?.en || ''
+  image.setAttribute('alt', image.dataset.enAlt)
   if (cover.srcset) image.setAttribute('srcset', cover.srcset)
+  else {
+    image.removeAttribute('srcset')
+    image.removeAttribute('sizes')
+  }
   if (Number.isFinite(cover.width)) image.setAttribute('width', String(cover.width))
   if (Number.isFinite(cover.height)) image.setAttribute('height', String(cover.height))
 }
@@ -83,14 +92,21 @@ export async function loadCasesOverview({
   eventTarget = window,
   warn = console.warn,
 } = {}) {
+  const trackRoot = root && (typeof root === 'object' || typeof root === 'function')
   try {
     const records = await fetchCases()
     if (records.length === 0) return 0
     const updated = applyCasesOverview(records, root)
-    if (updated > 0) eventTarget.dispatchEvent(new Event('lonma:content-updated'))
+    if (updated > 0 && (!trackRoot || !notifiedRoots.has(root))) {
+      eventTarget.dispatchEvent(new Event('lonma:content-updated'))
+      if (trackRoot) notifiedRoots.add(root)
+    }
     return updated
   } catch {
-    warn('Sanity case overview unavailable; using static content.')
+    if (!trackRoot || !warnedRoots.has(root)) {
+      warn('Sanity case overview unavailable; using static content.')
+      if (trackRoot) warnedRoots.add(root)
+    }
     return 0
   }
 }

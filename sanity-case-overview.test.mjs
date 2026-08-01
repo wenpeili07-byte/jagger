@@ -59,6 +59,10 @@ class FakeNode {
   getAttribute(name) {
     return this.attributes.get(name) || null
   }
+
+  removeAttribute(name) {
+    this.attributes.delete(name)
+  }
 }
 
 function caseNode(slug) {
@@ -128,4 +132,45 @@ test('keeps static content on empty or failed overview requests', async () => {
   assert.equal(await loadCasesOverview({fetchCases: async () => { throw new Error('offline') }, root, eventTarget, warn: () => { warnings += 1 }}), 0)
   assert.equal(warnings, 1, 'a request error should produce one fallback warning')
   assert.equal(dispatched, 0)
+})
+
+test('notifies and warns once per overview root lifecycle', async () => {
+  let warnings = 0
+  const failedRoot = {querySelectorAll: () => [], querySelector: () => null}
+  const warn = () => { warnings += 1 }
+
+  await loadCasesOverview({fetchCases: async () => { throw new Error('offline') }, root: failedRoot, eventTarget: {}, warn})
+  await loadCasesOverview({fetchCases: async () => { throw new Error('offline') }, root: failedRoot, eventTarget: {}, warn})
+  assert.equal(warnings, 1, 'a repeated request failure should warn only once for its root')
+
+  let dispatched = 0
+  const card = caseNode('case-01')
+  const successfulRoot = {
+    querySelectorAll: () => [card],
+    querySelector: () => null,
+  }
+  const eventTarget = {dispatchEvent: () => { dispatched += 1 }}
+
+  await loadCasesOverview({fetchCases: async () => records, root: successfulRoot, eventTarget, warn})
+  await loadCasesOverview({fetchCases: async () => records, root: successfulRoot, eventTarget, warn})
+  assert.equal(dispatched, 1, 'a repeated successful update should notify only once for its root')
+})
+
+test('replaces local CMS cover attributes without retaining stale responsive sources', () => {
+  const card = caseNode('case-01')
+  const cover = card.slots['[data-cms-cover]']
+  cover.setAttribute('srcset', '../assets/images/generated/old-cover.webp 960w')
+  cover.setAttribute('sizes', '25vw')
+  const root = {
+    querySelectorAll: () => [card],
+    querySelector: () => null,
+  }
+
+  assert.equal(applyCasesOverview([records[0]], root), 1)
+  assert.equal(cover.getAttribute('src'), '/assets/images/case-01.jpg')
+  assert.equal(cover.getAttribute('srcset'), null)
+  assert.equal(cover.getAttribute('sizes'), null)
+  assert.equal(cover.dataset.enAlt, 'Car 1')
+  assert.equal(cover.dataset.zhAlt, '车辆 1')
+  assert.equal(cover.getAttribute('alt'), 'Car 1')
 })
