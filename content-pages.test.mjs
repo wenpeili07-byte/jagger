@@ -412,6 +412,7 @@ test("content updates reapply the active language to nodes added after startup",
 
   const translatedNodes = [new FakeElement({ dataset: { zh: "原始中文", en: "STATIC ENGLISH" } })];
   const alternativeTextNodes = [];
+  const metadataNodes = [];
   const windowListeners = new Map();
   const nodesBySelector = new Map([
     [".lang-toggle", []],
@@ -420,6 +421,7 @@ test("content updates reapply the active language to nodes added after startup",
     ["[data-zh-placeholder][data-en-placeholder]", []],
     ["[data-zh-aria-label][data-en-aria-label]", []],
     ["[data-zh-alt][data-en-alt]", alternativeTextNodes],
+    ["[data-zh-content][data-en-content]", metadataNodes],
     [".nav a", []],
     ["[data-service-row]", []],
   ]);
@@ -449,11 +451,17 @@ test("content updates reapply the active language to nodes added after startup",
     attributes: { alt: "NEW ENGLISH ALT" },
     dataset: { zhAlt: "新的中文替代文字", enAlt: "NEW ENGLISH ALT" },
   });
+  const cmsDescription = new FakeElement({
+    attributes: { content: "NEW ENGLISH DESCRIPTION" },
+    dataset: { zhContent: "新的中文描述", enContent: "NEW ENGLISH DESCRIPTION" },
+  });
   translatedNodes.push(cmsTitle);
   alternativeTextNodes.push(cmsImage);
+  metadataNodes.push(cmsDescription);
   windowListeners.get("lonma:content-updated")?.();
 
   assert.equal(cmsTitle.textContent, "新的中文标题");
   assert.equal(cmsImage.getAttribute("alt"), "新的中文替代文字");
+  assert.equal(cmsDescription.getAttribute("content"), "新的中文描述");
   assert.equal(sessionStorage.get("lonma-language"), "zh", "refreshing content should not change the stored language");
 });

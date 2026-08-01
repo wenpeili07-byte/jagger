@@ -102,6 +102,24 @@ test('case schema accepts its own draft and published slug and display order val
   assert.equal(await orderValidator(1, context), true)
 })
 
+test('case schema limits the public collection to Case 01 through Case 06', async () => {
+  const casePage = await loadSchema(schemaPath)
+  const slugField = findField(casePage, 'slug')
+  const orderField = findField(casePage, 'order')
+  const slugValidator = customValidator(slugField)
+  const {calls, rule} = createRule()
+  orderField.validation(rule)
+
+  assert.deepEqual(calls.find((call) => call.name === 'max'), {name: 'max', value: 6})
+  assert.equal(
+    await slugValidator(
+      {current: 'case-07'},
+      {getClient: () => ({fetch: async () => assert.fail('invalid slugs must not query Sanity')})},
+    ),
+    'Slug must be case-01 through case-06',
+  )
+})
+
 test('case schema requires exactly one usable cover source', async () => {
   const casePage = await loadSchema(schemaPath)
   const coverValidator = customValidator(findField(casePage, 'cover'))

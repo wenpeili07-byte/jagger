@@ -129,6 +129,10 @@ function snapshot({slots, media}) {
   })
 }
 
+function descendants(node) {
+  return [node, ...(node?.children || []).flatMap(descendants)]
+}
+
 const document = {
   createDocumentFragment: () => new FakeElement('#fragment'),
   createElement: (tagName) => new FakeElement(tagName),
@@ -257,11 +261,45 @@ test('uploaded images apply only normalized object-position values', () => {
   assert.equal(image.style.objectPosition, '64.29% 43.75%')
 })
 
-test('Case 02 replaces its existing story with normalized CMS media sections', () => {
+test('Case 02 keeps its approved story hierarchy when CMS media sections replace static content', () => {
   const fixture = createCase02DetailFixture()
-  assert.equal(applyDetailCase({...record, slug: 'case-02'}, fixture.root, document), true)
-  assert.equal(fixture.media.children.length, 1)
-  assert.equal(fixture.media.children[0].className, 'detail-media-section detail-media-section-textLeft')
+  const mediaSections = [
+    record.mediaSections[0],
+    {...record.mediaSections[0], layout: 'textRight', heading: {en: 'TEST, ADJUST, REPEAT', zh: '测试、调整、再测试'}},
+    {...record.mediaSections[0], layout: 'full', heading: {en: '', zh: ''}, body: {en: '', zh: ''}},
+  ]
+  assert.equal(applyDetailCase({...record, slug: 'case-02', mediaSections}, fixture.root, document), true)
+  assert.equal(fixture.media.children.length, 3)
+  assert.equal(fixture.media.children[0].className, 'case02-story-beat case02-story-beat-direction')
+  assert.equal(fixture.media.children[0].children[0].className, 'case02-story-copy')
+  assert.equal(fixture.media.children[0].children[0].children[1].tagName, 'h2')
+  assert.equal(fixture.media.children[1].className, 'case02-story-beat case02-story-beat-test')
+  assert.equal(fixture.media.children[1].children[0].className, 'case02-story-media')
+  assert.equal(fixture.media.children[2].className, 'case02-story-media case02-story-wide')
+})
+
+test('a failed CMS story image restores the complete static Case 02 story', () => {
+  const fixture = createCase02DetailFixture()
+  const staticStory = fixture.media.children[0]
+  const cmsRecord = {
+    ...record,
+    slug: 'case-02',
+    mediaSections: [{
+      ...record.mediaSections[0],
+      image: {
+        src: 'https://cdn.sanity.io/images/project/production/story.jpg',
+        width: 1600,
+        height: 900,
+        alt: {en: 'CMS story', zh: 'CMS 故事'},
+      },
+    }],
+  }
+
+  assert.equal(applyDetailCase(cmsRecord, fixture.root, document), true)
+  const cmsImage = descendants(fixture.media.children[0]).find((node) => node.tagName === 'img')
+  assert.ok(cmsImage)
+  cmsImage.dispatch('error')
+  assert.deepEqual(fixture.media.children, [staticStory])
 })
 
 test('Case 02 keeps its poster-only DOM byte-for-byte without a safe CMS video source', () => {
@@ -293,6 +331,73 @@ test('Case 02 accepts a safe CMS poster without an MP4 and remains paused and po
   assert.equal(fixture.stage.dataset.videoState, 'poster-only')
   assert.equal(fixture.video.getAttribute('controls'), null)
   assert.equal(fixture.video.getAttribute('aria-disabled'), 'true')
+  assert.equal(fixture.loads(), 0)
+  assert.equal(fixture.pauses(), 1)
+})
+
+test('Case 02 preloads a Sanity poster and preserves the static poster if loading fails', () => {
+  const fixture = createCase02Fixture()
+  let preload
+  class FakeImage {
+    constructor() {
+      preload = this
+      this.listeners = new Map()
+    }
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener)
+    }
+    set src(value) {
+      this.source = value
+    }
+    dispatch(name) {
+      this.listeners.get(name)?.()
+    }
+  }
+  const poster = {
+    src: 'https://cdn.sanity.io/images/project/production/poster.jpg',
+    width: 1600,
+    height: 900,
+    objectPosition: '70% 35%',
+    alt: {en: 'CMS poster', zh: 'CMS 海报'},
+  }
+
+  assert.equal(applyCaseVideo({video: {poster}}, fixture.root, {ImageCtor: FakeImage}), true)
+  assert.equal(fixture.video.getAttribute('poster'), '/assets/images/static-poster.jpg')
+  preload.dispatch('error')
+  assert.equal(fixture.video.getAttribute('poster'), '/assets/images/static-poster.jpg')
+  assert.equal(fixture.video.style.objectPosition || '', '')
+})
+
+test('Case 02 applies a loaded Sanity poster hotspot without autoplay', () => {
+  const fixture = createCase02Fixture()
+  let preload
+  class FakeImage {
+    constructor() {
+      preload = this
+      this.listeners = new Map()
+    }
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener)
+    }
+    set src(value) {
+      this.source = value
+    }
+    dispatch(name) {
+      this.listeners.get(name)?.()
+    }
+  }
+  const poster = {
+    src: 'https://cdn.sanity.io/images/project/production/poster.jpg',
+    width: 1600,
+    height: 900,
+    objectPosition: '70% 35%',
+    alt: {en: 'CMS poster', zh: 'CMS 海报'},
+  }
+
+  assert.equal(applyCaseVideo({video: {poster}}, fixture.root, {ImageCtor: FakeImage}), true)
+  preload.dispatch('load')
+  assert.equal(fixture.video.getAttribute('poster'), poster.src)
+  assert.equal(fixture.video.style.objectPosition, '70% 35%')
   assert.equal(fixture.loads(), 0)
   assert.equal(fixture.pauses(), 1)
 })
@@ -399,6 +504,34 @@ test('detail SEO updates safe editable metadata while preserving the canonical U
   assert.equal(meta['meta[name="twitter:description"]'].getAttribute('content'), 'CMS DESCRIPTION')
   assert.equal(meta['meta[name="twitter:image"]'].getAttribute('content'), 'https://cdn.sanity.io/images/project/production/social.jpg')
   assert.equal(meta['link[rel="canonical"]'].getAttribute('href'), 'https://jagger-sage.vercel.app/pages/cases/case-01')
+})
+
+test('detail SEO uses the current Chinese language when the page is switched before hydration', () => {
+  const fixture = createFixture()
+  const description = new FakeElement('meta')
+  const titleNode = new FakeElement('title')
+  const seoDocument = {
+    ...document,
+    body: {dataset: {lang: 'zh'}},
+    title: 'STATIC TITLE',
+    querySelector(selector) {
+      if (selector === 'title') return titleNode
+      if (selector === 'meta[name="description"]') return description
+      return null
+    },
+  }
+
+  assert.equal(applyDetailCase({...record, seo: {
+    title: {en: 'ENGLISH TITLE', zh: '中文标题'},
+    description: {en: 'English description', zh: '中文描述'},
+    socialImage: null,
+  }}, fixture.root, seoDocument), true)
+  assert.equal(seoDocument.title, '中文标题')
+  assert.equal(titleNode.dataset.en, 'ENGLISH TITLE')
+  assert.equal(titleNode.dataset.zh, '中文标题')
+  assert.equal(description.getAttribute('content'), '中文描述')
+  assert.equal(description.dataset.enContent, 'English description')
+  assert.equal(description.dataset.zhContent, '中文描述')
 })
 
 test('missing or invalid detail SEO values preserve every static metadata value', () => {

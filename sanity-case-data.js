@@ -1,6 +1,6 @@
 import {sanityPublicConfig} from './sanity-content-config.js'
 
-const CASE_SLUG = /^case-(?:0[1-9]|[12][0-9]|3[0-6])$/
+const CASE_SLUG = /^case-0[1-6]$/
 const CASE_BRANDS = new Set(['bmw', 'audi', 'mercedes-benz'])
 const IMAGE_WIDTHS = [640, 960, 1600, 2400]
 const SANITY_IMAGE_PATH = /^\/images\/([^/]+)\/([^/]+)\/([^/]+)$/
@@ -251,7 +251,7 @@ export function normalizeCaseRecord(record) {
   const order = record.order
   const title = normalizeLocalized(record.title)
   const cover = buildResponsiveSanityImage(record.cover)
-  if (!isCaseSlug(slug) || !Number.isInteger(order) || order < 1 || order > 36 ||
+  if (!isCaseSlug(slug) || !Number.isInteger(order) || order < 1 || order > 6 ||
     !CASE_BRANDS.has(record.brand) || !title.en || !cover) return null
 
   return {
@@ -299,7 +299,7 @@ function ensureUniqueCases(cases) {
 
 export function buildCaseQueryUrl(slug) {
   if (slug !== undefined && !isCaseSlug(slug)) {
-    throw new TypeError('Sanity case slug must be case-01 through case-36')
+    throw new TypeError('Sanity case slug must be case-01 through case-06')
   }
 
   const query = `*[_type == "casePage" && !(_id in path("drafts.*"))] | order(order asc) ${caseProjection}`

@@ -156,7 +156,7 @@ defineField({
 })
 ```
 
-Replace `casePage.js` fields with the approved model: `caseNumber`, `slug`, `order`, `brand`, `featured`, `vehicle`, `title`, `subtitle`, `lede`, `story`, `cover`, `video`, `mediaSections`, and `seo`. Use `Rule.required().integer().min(1).max(36)` for `order`; use list values `bmw`, `audi`, and `mercedes-benz` for `brand`; accept only HTTPS in `video.externalUrl`; and define an uploaded file field with `options: {accept: 'video/mp4'}`.
+Replace `casePage.js` fields with the approved model: `caseNumber`, `slug`, `order`, `brand`, `featured`, `vehicle`, `title`, `subtitle`, `lede`, `story`, `cover`, `video`, `mediaSections`, and `seo`. Use `Rule.required().integer().min(1).max(6)` for `order`; use list values `bmw`, `audi`, and `mercedes-benz` for `brand`; accept only HTTPS in `video.externalUrl`; and define an uploaded file field with `options: {accept: 'video/mp4'}`.
 
 - [ ] **Step 5: Register types and case-first Studio navigation**
 
@@ -299,7 +299,7 @@ export function buildCaseQueryUrl(slug) {
 }
 ```
 
-Normalize only records with a `case-01` through `case-36` slug, integer order 1 through 36, approved brand, non-empty English title, and valid cover source. Accept image CDN URLs only over HTTPS and local paths only below `/assets/images/` or `/assets/videos/`.
+Normalize only records with a `case-01` through `case-06` slug, integer order 1 through 6, approved brand, non-empty English title, and valid cover source. Accept image CDN URLs only over HTTPS and local paths only below `/assets/images/` or `/assets/videos/`.
 
 - [ ] **Step 5: Implement abortable reads without swallowing errors**
 

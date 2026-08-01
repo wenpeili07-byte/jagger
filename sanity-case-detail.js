@@ -4,7 +4,7 @@ const warnedRoots = new WeakSet()
 const notifiedRoots = new WeakSet()
 const pendingRoots = new WeakMap()
 const fallbackImages = new WeakSet()
-const CASE_SLUG = /^case-(?:0[1-9]|[12][0-9]|3[0-6])$/
+const CASE_SLUG = /^case-0[1-6]$/
 const OBJECT_POSITION = /^(?:100|\d{1,2})(?:\.\d{1,2})?% (?:100|\d{1,2})(?:\.\d{1,2})?%$/
 
 function isLocalized(value) {
@@ -94,7 +94,7 @@ export function applyResponsiveImage(image, source, sizes = '100vw') {
   return true
 }
 
-function applyCaseVideoPoster(video, poster) {
+function commitCaseVideoPoster(video, poster) {
   if (!video || !isSafeCaseImage(poster)) return false
   video.setAttribute('poster', poster.src)
   if (poster.src.startsWith('/assets/images/')) {
@@ -105,6 +105,24 @@ function applyCaseVideoPoster(video, poster) {
     video.setAttribute('data-en-alt', poster.alt.en)
     video.setAttribute('data-zh-alt', poster.alt.zh)
   }
+  if (video.style) {
+    video.style.objectPosition = poster.src.startsWith('https://cdn.sanity.io/images/') &&
+      OBJECT_POSITION.test(poster.objectPosition) ? poster.objectPosition : ''
+  }
+  return true
+}
+
+function applyCaseVideoPoster(video, poster, {ImageCtor = globalThis.Image} = {}) {
+  if (!video || !isSafeCaseImage(poster)) return false
+  if (!poster.src.startsWith('https://cdn.sanity.io/images/')) {
+    return commitCaseVideoPoster(video, poster)
+  }
+  if (typeof ImageCtor !== 'function') return false
+
+  const preload = new ImageCtor()
+  preload.addEventListener('load', () => commitCaseVideoPoster(video, poster), {once: true})
+  preload.addEventListener('error', () => {}, {once: true})
+  preload.src = poster.src
   return true
 }
 
@@ -114,13 +132,13 @@ function caseVideoSource(video) {
     isSafeCaseVideoUrl(video.externalUrl) ? video.externalUrl : ''
 }
 
-export function applyCaseVideo(record, root) {
+export function applyCaseVideo(record, root, options) {
   const stage = root?.querySelector('.case02-video-stage')
   const video = root?.querySelector('[data-case-video]')
   if (!stage || !video) return false
 
   const source = caseVideoSource(record?.video)
-  const posterChanged = applyCaseVideoPoster(video, record?.video?.poster)
+  const posterChanged = applyCaseVideoPoster(video, record?.video?.poster, options)
   if (!source) {
     if (!posterChanged) return false
     stage.dataset.videoState = 'poster-only'
@@ -144,19 +162,73 @@ function hasMediaItem(item) {
     isSafeCaseImage(item.image)
 }
 
-export function renderMediaSections(items, document) {
+function createMediaImage(item, document, sizes, onImageError) {
+  const image = document.createElement('img')
+  image.loading = 'lazy'
+  image.decoding = 'async'
+  applyResponsiveImage(image, item.image, sizes)
+  if (typeof onImageError === 'function' && typeof image.addEventListener === 'function') {
+    image.addEventListener('error', onImageError, {once: true})
+  }
+  return image
+}
+
+function renderCase02MediaSections(items, document, onImageError) {
+  const fragment = document.createDocumentFragment()
+  let beat = 0
+
+  for (const item of items) {
+    if (!hasMediaItem(item)) continue
+    const figure = document.createElement('figure')
+    figure.className = item.layout === 'full'
+      ? 'case02-story-media case02-story-wide'
+      : 'case02-story-media'
+    figure.append(createMediaImage(item, document, '(max-width: 768px) 100vw, 70vw', onImageError))
+
+    if (item.layout === 'full') {
+      fragment.append(figure)
+      continue
+    }
+
+    beat += 1
+    const section = document.createElement('section')
+    section.className = item.layout === 'textRight'
+      ? 'case02-story-beat case02-story-beat-test'
+      : 'case02-story-beat case02-story-beat-direction'
+    const copy = document.createElement('div')
+    copy.className = 'case02-story-copy'
+    const number = document.createElement('p')
+    number.textContent = String(beat).padStart(2, '0')
+    copy.append(number)
+    if (isLocalized(item.heading) && (item.heading.en || item.heading.zh)) {
+      const heading = document.createElement('h2')
+      applyLocalizedNode(heading, item.heading)
+      copy.append(heading)
+    }
+    if (isLocalized(item.body) && (item.body.en || item.body.zh)) {
+      const body = document.createElement('p')
+      applyLocalizedNode(body, item.body)
+      copy.append(body)
+    }
+
+    if (item.layout === 'textRight') section.append(figure, copy)
+    else section.append(copy, figure)
+    fragment.append(section)
+  }
+  return fragment
+}
+
+export function renderMediaSections(items, document, {case02 = false, onImageError} = {}) {
   const fragment = document.createDocumentFragment()
   if (!Array.isArray(items)) return fragment
+  if (case02) return renderCase02MediaSections(items, document, onImageError)
 
   for (const item of items) {
     if (!hasMediaItem(item)) continue
     const section = document.createElement('section')
     section.className = `detail-media-section detail-media-section-${item.layout}`
     const figure = document.createElement('figure')
-    const image = document.createElement('img')
-    image.loading = 'lazy'
-    image.decoding = 'async'
-    applyResponsiveImage(image, item.image)
+    const image = createMediaImage(item, document, '100vw', onImageError)
     figure.append(image)
     section.append(figure)
 
@@ -187,22 +259,36 @@ function isDetailRecord(record) {
     record.title.en && isSafeCaseImage(record.cover)
 }
 
+function applyLocalizedMetadata(node, value, language) {
+  if (!node || !isLocalized(value) || !value.en) return false
+  node.dataset.enContent = value.en
+  node.dataset.zhContent = value.zh || value.en
+  node.setAttribute('content', node.dataset[`${language}Content`])
+  return true
+}
+
 function applySeo(seo, document) {
   if (!seo || !document || typeof document.querySelector !== 'function') return
-  const title = isLocalized(seo.title) ? seo.title.en : ''
-  const description = isLocalized(seo.description) ? seo.description.en : ''
-  if (title) {
+  const language = document.body?.dataset?.lang === 'zh' ? 'zh' : 'en'
+  if (isLocalized(seo.title) && seo.title.en) {
+    const title = seo.title[language] || seo.title.en
     document.title = title
+    const titleNode = document.querySelector('title')
+    if (titleNode) {
+      titleNode.dataset.en = seo.title.en
+      titleNode.dataset.zh = seo.title.zh || seo.title.en
+      titleNode.textContent = title
+    }
     for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
-      document.querySelector(selector)?.setAttribute('content', title)
+      applyLocalizedMetadata(document.querySelector(selector), seo.title, language)
     }
   }
-  if (description) {
+  if (isLocalized(seo.description) && seo.description.en) {
     for (const selector of [
       'meta[name="description"]',
       'meta[property="og:description"]',
       'meta[name="twitter:description"]',
-    ]) document.querySelector(selector)?.setAttribute('content', description)
+    ]) applyLocalizedMetadata(document.querySelector(selector), seo.description, language)
   }
   if (isSafeCaseImage(seo.socialImage)) {
     let socialImage = seo.socialImage.src
@@ -263,7 +349,8 @@ export function applyDetailCase(record, root, document = globalThis.document, co
     previous: root.querySelector('[data-cms-pagination="previous"]'),
     next: root.querySelector('[data-cms-pagination="next"]'),
   }
-  if (!fields.title || !fields.media || (!fields.cover && !root.querySelector('.case02-video-stage'))) return false
+  const case02Stage = root.querySelector('.case02-video-stage')
+  if (!fields.title || !fields.media || (!fields.cover && !case02Stage)) return false
 
   if (record.caseNumber && fields.caseNumber) fields.caseNumber.textContent = record.caseNumber
   applyLocalizedNode(fields.title, record.title)
@@ -274,7 +361,12 @@ export function applyDetailCase(record, root, document = globalThis.document, co
   }
   if (fields.cover) applyResponsiveImage(fields.cover, record.cover, '(max-width: 768px) 100vw, 50vw')
 
-  const sections = renderMediaSections(record.mediaSections, document)
+  const staticMediaChildren = Array.from(fields.media.children || [])
+  const restoreStaticMedia = () => fields.media.replaceChildren(...staticMediaChildren)
+  const sections = renderMediaSections(record.mediaSections, document, {
+    case02: Boolean(case02Stage),
+    onImageError: restoreStaticMedia,
+  })
   if (sections.children.length) fields.media.replaceChildren(sections)
   applySeo(record.seo, document)
   applyPagination(collection, record, fields.previous, fields.next)

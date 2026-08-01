@@ -98,10 +98,14 @@ test("Case 02 poster-only controller never attempts playback", () => {
       return [];
     },
   };
+  const windowListeners = new Map();
 
   vm.runInNewContext(caseController, {
     document,
-    window: { matchMedia: () => ({ matches: false }) },
+    window: {
+      addEventListener: (name, listener) => windowListeners.set(name, listener),
+      matchMedia: () => ({ matches: false }),
+    },
   });
 
   assert.equal(stage.dataset.videoState, "poster-only");
@@ -109,6 +113,11 @@ test("Case 02 poster-only controller never attempts playback", () => {
   assert.ok(removedAttributes.has("controls"));
   assert.equal(videoAttributes.get("aria-disabled"), "true");
   assert.deepEqual(motionNodes.map((node) => node.dataset.motion), ["fade", "fade", "fade"]);
+
+  const hydratedNodes = [{ dataset: {} }, { dataset: {} }, { dataset: {} }];
+  document.querySelectorAll = () => hydratedNodes;
+  windowListeners.get("lonma:content-updated")?.();
+  assert.deepEqual(hydratedNodes.map((node) => node.dataset.motion), ["fade", "fade", "fade"]);
 });
 
 test("other cases retain the generic template", () => {

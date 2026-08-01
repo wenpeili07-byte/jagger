@@ -16,8 +16,13 @@
   window.lonmaRefreshCaseVideoState = refreshCaseVideoState;
   refreshCaseVideoState();
 
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  document.querySelectorAll(".case02-story-beat, .case02-story-wide").forEach((node) => {
-    node.dataset.motion = reducedMotion ? "none" : "fade";
-  });
+  const refreshStoryMotion = () => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.querySelectorAll(".case02-story-beat, .case02-story-wide").forEach((node) => {
+      node.dataset.motion = reducedMotion ? "none" : "fade";
+    });
+  };
+
+  refreshStoryMotion();
+  window.addEventListener?.("lonma:content-updated", refreshStoryMotion);
 })();

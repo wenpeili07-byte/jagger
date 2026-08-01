@@ -20,6 +20,7 @@ export default defineType({
       options: {source: 'caseNumber'},
       validation: (Rule) => Rule.required().custom(async (value, context) => {
         if (!value?.current) return true
+        if (!/^case-0[1-6]$/.test(value.current)) return 'Slug must be case-01 through case-06'
 
         const id = context.document?._id?.replace(/^drafts\./, '')
         const count = await context.getClient({apiVersion: '2026-08-01'}).fetch(
@@ -35,7 +36,7 @@ export default defineType({
       name: 'order',
       title: 'Display Order',
       type: 'number',
-      validation: (Rule) => Rule.required().integer().min(1).max(36).custom(async (value, context) => {
+      validation: (Rule) => Rule.required().integer().min(1).max(6).custom(async (value, context) => {
         if (!Number.isInteger(value)) return true
 
         const id = context.document?._id?.replace(/^drafts\./, '')

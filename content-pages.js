@@ -68,6 +68,7 @@
     const placeholderNodes = [...document.querySelectorAll("[data-zh-placeholder][data-en-placeholder]")];
     const ariaLabelNodes = [...document.querySelectorAll("[data-zh-aria-label][data-en-aria-label]")];
     const alternativeTextNodes = [...document.querySelectorAll("[data-zh-alt][data-en-alt]")];
+    const metadataNodes = [...document.querySelectorAll("[data-zh-content][data-en-content]")];
 
     document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
     document.body.dataset.lang = language;
@@ -86,6 +87,10 @@
 
     alternativeTextNodes.forEach((node) => {
       node.setAttribute("alt", node.dataset[`${language}Alt`]);
+    });
+
+    metadataNodes.forEach((node) => {
+      node.setAttribute("content", node.dataset[`${language}Content`]);
     });
 
     updateNavigation(language);

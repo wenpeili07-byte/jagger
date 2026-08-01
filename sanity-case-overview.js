@@ -4,6 +4,7 @@ const warnedRoots = new WeakSet()
 const notifiedRoots = new WeakSet()
 const imageFallbacks = new WeakMap()
 const IMAGE_ATTRIBUTES = ['src', 'srcset', 'sizes', 'width', 'height', 'alt']
+const OBJECT_POSITION = /^(?:100|\d{1,2})(?:\.\d{1,2})?% (?:100|\d{1,2})(?:\.\d{1,2})?%$/
 
 function applyLocalizedNode(node, value) {
   if (!node || !value?.en) return
@@ -66,6 +67,7 @@ function getImageFallback(image, sceneNode) {
     attributes: new Map(IMAGE_ATTRIBUTES.map((name) => [name, snapshotAttribute(image, name)])),
     enAlt: snapshotDatasetValue(image, 'enAlt'),
     zhAlt: snapshotDatasetValue(image, 'zhAlt'),
+    objectPosition: image.style?.objectPosition || '',
     sceneNode,
     scene: sceneNode ? snapshotDatasetValue(sceneNode, 'scene') : null,
   }
@@ -76,6 +78,7 @@ function getImageFallback(image, sceneNode) {
     for (const [name, snapshot] of fallback.attributes) restoreAttribute(image, name, snapshot)
     restoreDatasetValue(image, 'enAlt', fallback.enAlt)
     restoreDatasetValue(image, 'zhAlt', fallback.zhAlt)
+    if (image.style) image.style.objectPosition = fallback.objectPosition
     if (fallback.sceneNode && fallback.scene) {
       restoreDatasetValue(fallback.sceneNode, 'scene', fallback.scene)
     }
@@ -100,6 +103,9 @@ function applyResponsiveImage(image, cover, sceneNode) {
     }
     if (Number.isFinite(cover.width)) image.setAttribute('width', String(cover.width))
     if (Number.isFinite(cover.height)) image.setAttribute('height', String(cover.height))
+    if (image.style) {
+      image.style.objectPosition = OBJECT_POSITION.test(cover.objectPosition) ? cover.objectPosition : ''
+    }
     if (sceneNode) sceneNode.dataset.scene = cover.src
   }
 

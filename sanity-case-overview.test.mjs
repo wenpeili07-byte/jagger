@@ -46,6 +46,7 @@ class FakeNode {
     this.textContent = ''
     this.attributes = new Map()
     this.listeners = new Map()
+    this.style = {objectPosition: ''}
     this.classList = {contains: (name) => spacer && name === 'spacer'}
   }
 
@@ -231,4 +232,28 @@ test('restores static cover attributes and rail scene when a CMS replacement fai
   assert.equal(cover.dataset.enAlt, 'Static cover')
   assert.equal(cover.dataset.zhAlt, '静态封面')
   assert.equal(railCard.dataset.scene, '../assets/images/generated/case-01/case-01-1600w.webp')
+})
+
+test('overview covers apply and restore safe Sanity hotspot positions', () => {
+  const card = caseNode('case-01')
+  const cover = card.slots['[data-cms-cover]']
+  cover.setAttribute('src', '../assets/images/static.jpg')
+  cover.style.objectPosition = '50% 50%'
+  const root = {querySelectorAll: () => [card], querySelector: () => null}
+  const replacement = {
+    ...records[0],
+    cover: {
+      src: 'https://cdn.sanity.io/images/project/production/replacement.jpg',
+      srcset: 'https://cdn.sanity.io/images/project/production/replacement.jpg?w=640 640w',
+      width: 1600,
+      height: 900,
+      objectPosition: '72% 38%',
+      alt: {en: 'CMS cover', zh: 'CMS 封面'},
+    },
+  }
+
+  assert.equal(applyCasesOverview([replacement], root), 1)
+  assert.equal(cover.style.objectPosition, '72% 38%')
+  cover.dispatch('error')
+  assert.equal(cover.style.objectPosition, '50% 50%')
 })

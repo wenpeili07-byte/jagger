@@ -58,7 +58,7 @@ Sanity draft and published document states provide the publishing workflow. No s
 
 The Studio list is ordered by `order`, then `caseNumber`. Its document preview shows the case number, English title, brand, and cover image. Fields are grouped into Overview, Vehicle, Media, SEO, and Publishing sections so the editor does not face one long undifferentiated form.
 
-Validation prevents duplicate slugs and display orders, requires English title and cover data, limits the order to 1 through 36, and accepts only HTTPS external media URLs or known site-local asset paths. Media section previews show their image and heading.
+Validation prevents duplicate slugs and display orders, requires English title and cover data, limits the active collection to Case 01 through Case 06, and accepts only HTTPS external media URLs or known site-local asset paths. Media section previews show their image and heading.
 
 The first release seeds six editable documents from the current site. Existing images remain in the repository and are referenced by path; newly uploaded images and optional video files are served by Sanity's CDN. This avoids duplicating the current library while allowing future uploads from the Studio.
 

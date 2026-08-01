@@ -179,7 +179,9 @@ test('invalid records never replace static content', () => {
 })
 
 test('invalid detail slugs are rejected before query construction', () => {
-  assert.throws(() => buildCaseQueryUrl('case-01" || defined(_id)'))
+  for (const slug of ['case-00', 'case-07', 'case-37', '../case-01', 'CASE-01', 'case-01" || defined(_id)']) {
+    assert.throws(() => buildCaseQueryUrl(slug), TypeError)
+  }
 })
 
 test('fetchPublishedCases aborts on timeout and propagates the abort error', async () => {
@@ -248,17 +250,17 @@ test('fetchPublishedCases returns valid records in normalized CMS order', async 
     fetchImpl: async () => ({
       ok: true,
       json: async () => ({result: [
-        validCase({slug: 'case-03', order: 30}),
-        validCase({slug: 'case-01', order: 10}),
-        validCase({slug: 'case-02', order: 20}),
+        validCase({slug: 'case-03', order: 3}),
+        validCase({slug: 'case-01', order: 1}),
+        validCase({slug: 'case-02', order: 2}),
       ]}),
     }),
   })
 
   assert.deepEqual(cases.map(({slug, order}) => ({slug, order})), [
-    {slug: 'case-01', order: 10},
-    {slug: 'case-02', order: 20},
-    {slug: 'case-03', order: 30},
+    {slug: 'case-01', order: 1},
+    {slug: 'case-02', order: 2},
+    {slug: 'case-03', order: 3},
   ])
 })
 
