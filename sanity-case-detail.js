@@ -114,9 +114,6 @@ function commitCaseVideoPoster(video, poster) {
 
 function applyCaseVideoPoster(video, poster, {ImageCtor = globalThis.Image} = {}) {
   if (!video || !isSafeCaseImage(poster)) return false
-  if (!poster.src.startsWith('https://cdn.sanity.io/images/')) {
-    return commitCaseVideoPoster(video, poster)
-  }
   if (typeof ImageCtor !== 'function') return false
 
   const preload = new ImageCtor()

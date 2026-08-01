@@ -7,7 +7,7 @@ const serviceCss = read("./service-detail.css");
 
 for (const id of ["01", "03", "04", "05", "06"]) {
   const html = read(`./pages/cases/case-${id}.html`);
-  assert.match(html, /case-detail\.css\?v=mobile-spacing-20260722/);
+  assert.match(html, /case-detail\.css\?v=sanity-case-cms-20260801/);
   assert.match(html, /class="detail-hero"/);
   assert.match(html, /class="detail-story"/);
   assert.match(html, /class="detail-contact"/);
@@ -25,7 +25,7 @@ for (const id of ["01", "03", "04", "05", "06"]) {
 }
 
 const case02 = read("./pages/cases/case-02.html");
-assert.match(case02, /case-detail\.css\?v=mobile-spacing-20260722/);
+assert.match(case02, /case-detail\.css\?v=sanity-case-cms-20260801/);
 assert.match(case02, /class="case02-video-stage"/);
 assert.match(case02, /class="case02-story"/);
 assert.match(case02, /class="detail-contact"/);

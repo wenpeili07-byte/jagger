@@ -46,6 +46,7 @@ class FakeNode {
     this.textContent = ''
     this.attributes = new Map()
     this.listeners = new Map()
+    this.dispatchedEvents = []
     this.style = {objectPosition: ''}
     this.classList = {contains: (name) => spacer && name === 'spacer'}
   }
@@ -56,6 +57,11 @@ class FakeNode {
 
   dispatch(name) {
     this.listeners.get(name)?.()
+  }
+
+  dispatchEvent(event) {
+    this.dispatchedEvents.push(event.type)
+    return true
   }
 
   querySelector(selector) {
@@ -232,6 +238,7 @@ test('restores static cover attributes and rail scene when a CMS replacement fai
   assert.equal(cover.dataset.enAlt, 'Static cover')
   assert.equal(cover.dataset.zhAlt, '静态封面')
   assert.equal(railCard.dataset.scene, '../assets/images/generated/case-01/case-01-1600w.webp')
+  assert.deepEqual(railCard.dispatchedEvents, ['lonma:case-scene-restored'])
 })
 
 test('overview covers apply and restore safe Sanity hotspot positions', () => {

@@ -83,6 +83,9 @@ function getImageFallback(image, sceneNode) {
     if (fallback.sceneNode && fallback.scene) {
       restoreDatasetValue(fallback.sceneNode, 'scene', fallback.scene)
       restoreDatasetValue(fallback.sceneNode, 'scenePosition', fallback.scenePosition)
+      if (typeof Event === 'function') {
+        fallback.sceneNode.dispatchEvent?.(new Event('lonma:case-scene-restored', {bubbles: true}))
+      }
     }
   })
   return fallback

@@ -326,18 +326,65 @@ test('Case 02 keeps its poster-only DOM byte-for-byte without a safe CMS video s
 test('Case 02 accepts a safe CMS poster without an MP4 and remains paused and poster-only', () => {
   const fixture = createCase02Fixture()
   fixture.video.play = () => assert.fail('poster-only CMS updates must not autoplay')
+  let preload
+  class FakeImage {
+    constructor() {
+      preload = this
+      this.listeners = new Map()
+    }
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener)
+    }
+    set src(value) {
+      this.source = value
+    }
+    dispatch(name) {
+      this.listeners.get(name)?.()
+    }
+  }
 
   assert.equal(applyCaseVideo({video: {
     poster: {src: '/assets/images/case-02-poster.jpg', alt: {en: 'Poster EN', zh: '海报'}},
     fileUrl: '',
     externalUrl: '',
-  }}, fixture.root), true)
+  }}, fixture.root, {ImageCtor: FakeImage}), true)
+  assert.equal(fixture.video.getAttribute('poster'), '/assets/images/static-poster.jpg')
+  assert.equal(preload.source, '/assets/images/case-02-poster.jpg')
+  preload.dispatch('load')
   assert.equal(fixture.video.getAttribute('poster'), '/assets/images/case-02-poster.jpg')
   assert.equal(fixture.stage.dataset.videoState, 'poster-only')
   assert.equal(fixture.video.getAttribute('controls'), null)
   assert.equal(fixture.video.getAttribute('aria-disabled'), 'true')
   assert.equal(fixture.loads(), 0)
   assert.equal(fixture.pauses(), 1)
+})
+
+test('Case 02 preserves its static poster when a safe local CMS poster cannot load', () => {
+  const fixture = createCase02Fixture()
+  let preload
+  class FakeImage {
+    constructor() {
+      preload = this
+      this.listeners = new Map()
+    }
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener)
+    }
+    set src(value) {
+      this.source = value
+    }
+    dispatch(name) {
+      this.listeners.get(name)?.()
+    }
+  }
+
+  assert.equal(applyCaseVideo({video: {
+    poster: {src: '/assets/images/missing-poster.jpg', alt: {en: 'Missing poster', zh: '缺失海报'}},
+    fileUrl: '',
+    externalUrl: '',
+  }}, fixture.root, {ImageCtor: FakeImage}), true)
+  preload.dispatch('error')
+  assert.equal(fixture.video.getAttribute('poster'), '/assets/images/static-poster.jpg')
 })
 
 test('Case 02 preloads a Sanity poster and preserves the static poster if loading fails', () => {
@@ -440,6 +487,18 @@ test('Case 02 rejects unsafe video URLs without DOM writes', () => {
 
 test('Case 02 replaces a safe CMS poster with localized alt text and clears local responsive attributes', () => {
   const fixture = createCase02Fixture()
+  class ImmediateImage {
+    constructor() {
+      this.listeners = new Map()
+    }
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener)
+    }
+    set src(value) {
+      this.source = value
+      this.listeners.get('load')?.()
+    }
+  }
   fixture.video.setAttribute('poster', '/assets/images/static-poster.jpg')
   fixture.video.setAttribute('srcset', '/assets/images/static-640.jpg 640w')
   fixture.video.setAttribute('sizes', '100vw')
@@ -447,7 +506,7 @@ test('Case 02 replaces a safe CMS poster with localized alt text and clears loca
   assert.equal(applyCaseVideo({video: {
     poster: {src: '/assets/images/case-02-poster.jpg', alt: {en: 'Poster EN', zh: '海报'}} ,
     externalUrl: 'https://video.example.com/film.mp4',
-  }}, fixture.root), true)
+  }}, fixture.root, {ImageCtor: ImmediateImage}), true)
   assert.equal(fixture.video.getAttribute('poster'), '/assets/images/case-02-poster.jpg')
   assert.equal(fixture.video.getAttribute('data-en-alt'), 'Poster EN')
   assert.equal(fixture.video.getAttribute('data-zh-alt'), '海报')

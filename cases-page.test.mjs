@@ -34,12 +34,12 @@ assert.match(html, /layout-canvas\.css\?v=sanity-case-cms-20260801/, "cases page
 assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
-assert.match(html, /<script src="\.\/cases\.js\?v=mobile-option3-20260728"><\/script>/, "cases page should load the current accessible archive filter script");
+assert.match(html, new RegExp(`<script src="\\.\\/cases\\.js\\?v=${sharedAssetVersion}"><\\/script>`), "cases page should load the current accessible archive filter script");
 assert.match(html, /<body data-section="cases">/, "cases page should expose its navigation section to the shared language controller");
 assert.match(html, new RegExp(`<script src="\\.\\.\\/content-pages\\.js\\?v=${sharedAssetVersion}"><\\/script>`), "cases page should load the current shared language controller");
 assert.equal((html.match(/class="slide[^\"]*"[^>]*data-case-slug="case-0[1-6]"/g) || []).length, 6, "all six existing rail slides should expose stable case slugs");
 assert.equal((html.match(/class="archive-card"[^>]*data-case-slug="case-0[1-6]"/g) || []).length, 6, "all six existing archive cards should expose stable case slugs");
-assert.match(html, /content-pages\.js[^<]*<\/script>\s*<script type="module" src="\.\.\/sanity-case-overview\.js/, "the overview CMS module should load after language support");
+assert.match(html, new RegExp(`content-pages\\.js[^<]*<\\/script>\\s*<script type="module" src="\\.\\.\\/sanity-case-overview\\.js\\?v=${sharedAssetVersion}`), "the overview CMS module should load after language support");
 assert.match(html, /data-lang-option="zh"/, "cases page should identify the Chinese language option");
 assert.match(html, /data-lang-option="en"/, "cases page should identify the English language option");
 assert.match(
@@ -75,6 +75,9 @@ assert.doesNotMatch(html, /pointerenter/, "case background should not bind both 
 assert.match(html, /activeScene === scene/, "case background should not restart the fade when the active scene is unchanged");
 assert.match(html, /card\.dataset\.scenePosition/, "case background should read the hydrated scene hotspot");
 assert.match(html, /--cases-active-position/, "case background should apply the hydrated scene hotspot");
+assert.match(html, /function syncActiveScene\(\)/, "case background should synchronize the initially active CMS scene");
+assert.match(html, /addEventListener\("lonma:content-updated", syncActiveScene\)/, "case background should resynchronize after CMS hydration");
+assert.match(html, /addEventListener\("lonma:case-scene-restored", syncActiveScene\)/, "case background should restore its static scene after a CMS image failure");
 
 assert.match(css, /\.cover,\s*\.cases-hero\s*\{[^}]*min-height:\s*min\(calc\(100vh - var\(--site-header-height\)\),\s*var\(--site-first-screen-max\)\)/s, "PLAN A hero should use the shared 1900x1050 first-screen variables without stretching on taller displays");
 assert.match(css, /\.cases-page\s*\{[^}]*background:\s*transparent/s, "case page shell should stay transparent so the fixed background scene is visible");

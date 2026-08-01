@@ -232,9 +232,9 @@
       </footer>
     </main>
 
-    <script src="./cases.js?v=mobile-option3-20260728"></script>
+    <script src="./cases.js?v=sanity-case-cms-20260801"></script>
     <script src="../content-pages.js?v=sanity-case-cms-20260801"></script>
-    <script type="module" src="../sanity-case-overview.js"></script>
+    <script type="module" src="../sanity-case-overview.js?v=sanity-case-cms-20260801"></script>
     <script>
       (() => {
         const casesPage = document.querySelector(".cases-page");
@@ -256,22 +256,34 @@
           casesPage.classList.add("scene-is-fading");
         }
 
+        function applyCardScene(card) {
+          if (!card) return;
+          const scene = card.dataset.scene || getComputedStyle(card).getPropertyValue("--scene").trim();
+          const position = card.dataset.scenePosition || "center center";
+          const sceneValue = scene.startsWith("url(") || scene.startsWith("linear-gradient(") ? scene : `url("${scene}")`;
+          fadeToScene(sceneValue, position);
+        }
+
+        function syncActiveScene() {
+          applyCardScene(document.querySelector(".mwg_effect060 .slide.is-active[data-scene]"));
+        }
+
         document.querySelectorAll(".mwg_effect060 .slide[data-scene]").forEach((card) => {
           const update = (event) => {
             event.stopImmediatePropagation();
-            const scene = card.dataset.scene || getComputedStyle(card).getPropertyValue("--scene").trim();
-            const position = card.dataset.scenePosition || "center center";
-            const sceneValue = scene.startsWith("url(") || scene.startsWith("linear-gradient(") ? scene : `url("${scene}")`;
             document.querySelectorAll(".mwg_effect060 .slide[data-scene]").forEach((item) => {
               item.classList.toggle("is-active", item === card);
             });
-            fadeToScene(sceneValue, position);
+            applyCardScene(card);
           };
 
           ["mouseenter", "focus", "click"].forEach((eventName) => {
             card.addEventListener(eventName, update, true);
           });
         });
+        window.addEventListener("lonma:content-updated", syncActiveScene);
+        window.addEventListener("lonma:case-scene-restored", syncActiveScene);
+        syncActiveScene();
       })();
     </script>
   </body>

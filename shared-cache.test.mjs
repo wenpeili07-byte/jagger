@@ -110,3 +110,18 @@ test("three-page expansion assets use the integration cache version", () => {
     }
   }
 });
+
+test("Case CMS feature assets use the integration cache version", () => {
+  const overview = read("./pages/cases.html");
+  for (const asset of ["cases.js", "sanity-case-overview.js"]) {
+    assert.equal(assetReference(overview, asset, "Cases overview").version, sharedAssetVersion);
+  }
+
+  for (const id of ["01", "02", "03", "04", "05", "06"]) {
+    const path = `./pages/cases/case-${id}.html`;
+    const detail = read(path);
+    for (const asset of ["case-detail.css", "sanity-case-detail.js"]) {
+      assert.equal(assetReference(detail, asset, path).version, sharedAssetVersion);
+    }
+  }
+});
