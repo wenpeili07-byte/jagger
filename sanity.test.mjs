@@ -68,7 +68,7 @@ assert.match(caseSchema, /name:\s*'vehicle'/);
 assert.match(caseSchema, /name:\s*'seo'/);
 assert.match(structure, /order\(\[\{field:\s*'order',\s*direction:\s*'asc'\}\]\)/);
 
-assert.match(readme, /npm install[\s\S]*npm run dev[\s\S]*npx sanity login[\s\S]*npx sanity dataset import seed\/case-pages\.ndjson production --replace/i, "Sanity README should document the versioned local editor and import workflow");
+assert.match(readme, /npm ci[\s\S]*npm run dev[\s\S]*npx sanity login[\s\S]*npx sanity dataset import seed\/case-pages\.ndjson production --replace/i, "Sanity README should document the lockfile-based local editor and import workflow");
 assert.match(readme, /https:\/\/lonma-sanity-studio\.vercel\.app\/?/, "Sanity README should link the public Studio");
 assert.match(readme, /https:\/\/jagger-sage\.vercel\.app\/?/, "Sanity README should link the temporary website");
 assert.match(readme, /published documents only/i, "Sanity README should describe public query behavior");
