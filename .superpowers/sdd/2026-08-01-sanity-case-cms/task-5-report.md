@@ -58,3 +58,34 @@ Result: 236 passed, 0 failed.
 - `git diff --check` completed without whitespace errors.
 - Regeneration changed only `pages/cases/case-02.html`; `pages/services`, `pages/cases.html`, homepage files, source images, and `audit/` have no diff.
 - The existing shared detail loader's completed-root and in-flight promise behavior remains covered by its regression tests.
+
+## Review Fix Round: Direct MP4 Video Sources
+
+### RED
+
+Expanded `sanity-case-data.test.mjs` before changing production code. The new table covers normal local, external HTTPS, and canonical Sanity-uploaded MP4 sources, plus local and remote type tricks, protocol-relative URLs, percent-encoded paths, duplicate separators, credentials, query strings, fragments, C0/C1/DEL controls, Unicode bidi controls, and Unicode format characters.
+
+Command run with bundled Node:
+
+```text
+node --test sanity-case-data.test.mjs
+```
+
+Observed expected failure:
+
+```text
+/assets/videos/cover.jpg
+true !== false
+```
+
+### GREEN
+
+Replaced the permissive video URL check with canonical ASCII path validation. Every accepted source now ends in a direct `.mp4` asset, case-insensitively, with no query, fragment, percent encoding, backslash, duplicate separator, credentials, control/format character, or unsafe path segment. Local paths are rooted under `/assets/videos/`; Sanity uploads are restricted to the production project file CDN path; external hosts remain allowed only through absolute HTTPS direct-MP4 URLs.
+
+Focused verification with bundled Node:
+
+```text
+node --test sanity-case-data.test.mjs case-02.test.mjs sanity-case-detail.test.mjs case-detail.test.mjs image-performance.test.mjs
+```
+
+Result: 49 passed, 0 failed.

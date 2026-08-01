@@ -35,16 +35,32 @@ test('unsafe media schemes are rejected', () => {
   assert.equal(isSafeMediaUrl('/assets/images/网页/optimized/case-01.jpg'), true)
 })
 
-test('Case 02 video URLs allow only canonical local video paths, HTTPS remotes, and canonical uploaded Sanity files', () => {
-  assert.equal(isSafeCaseVideoUrl('/assets/videos/case-02.mp4'), true)
-  assert.equal(isSafeCaseVideoUrl('https://video.example.com/film.mp4'), true)
-  assert.equal(isSafeCaseVideoUrl('https://cdn.sanity.io/files/v54qppoy/production/film.mp4'), true)
+test('Case 02 video URLs allow only canonical direct MP4 assets', () => {
   for (const value of [
-    '/assets/images/case-02.mp4', '/assets/videos/../private.mp4', 'javascript:alert(1)',
+    '/assets/videos/case-02.mp4', '/assets/videos/film/CASE-02.MP4',
+    'https://video.example.com/film.mp4', 'https://video.example.com/film/CASE-02.MP4',
+    'https://cdn.sanity.io/files/v54qppoy/production/film.mp4',
+    'https://cdn.sanity.io/files/v54qppoy/production/CASE-02.MP4',
+  ]) assert.equal(isSafeCaseVideoUrl(value), true, value)
+
+  for (const value of [
+    '/assets/images/case-02.mp4', '/assets/videos/cover.jpg', '/assets/videos/film.html',
+    '/assets/videos/film.mp4.exe', '/assets/videos/film', '/assets/videos/../private.mp4',
+    '/assets/videos//film.mp4', '/assets/videos\\film.mp4', '/assets/videos/%66ilm.mp4',
+    'javascript:alert(1)',
     'data:video/mp4;base64,AA==', 'blob:https://video.example.com/film', 'http://video.example.com/film.mp4',
+    '//video.example.com/film.mp4', 'https://video.example.com/not-a-video.html',
+    'https://video.example.com/film.mp4.exe', 'https://video.example.com/film',
+    'https://video.example.com/%66ilm.mp4', 'https://video.example.com/film%2Emp4',
+    'https://video.example.com/film%2Fother.mp4', 'https://video.example.com//film.mp4',
     'https://user:pass@video.example.com/film.mp4', 'https://video.example.com/film.mp4#fragment',
     'https://video.example.com/film.mp4?token=secret', 'https://cdn.sanity.io/files/other/production/film.mp4',
+    'https://cdn.sanity.io/files/v54qppoy/production/film.jpg',
+    'https://cdn.sanity.io/files/v54qppoy/production/film.mp4?download=1',
+    'https://cdn.sanity.io/files/v54qppoy/production/film%2Emp4',
     'https://cdn.sanity.io/files/v54qppoy/production/film.mp4\u0000',
+    'https://video.example.com/film.mp4\u0085', 'https://video.example.com/fi\u202Elm.mp4',
+    'https://video.example.com/fi\u200Blm.mp4', '/assets/videos/fi\uFEFFlm.mp4',
   ]) assert.equal(isSafeCaseVideoUrl(value), false, value)
 })
 

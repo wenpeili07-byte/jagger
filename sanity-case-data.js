@@ -4,8 +4,11 @@ const CASE_SLUG = /^case-(?:0[1-9]|[12][0-9]|3[0-6])$/
 const CASE_BRANDS = new Set(['bmw', 'audi', 'mercedes-benz'])
 const IMAGE_WIDTHS = [640, 960, 1600, 2400]
 const SANITY_IMAGE_PATH = /^\/images\/([^/]+)\/([^/]+)\/([^/]+)$/
-const SANITY_VIDEO_PATH = /^\/files\/v54qppoy\/production\/([^/]+)$/
+const LOCAL_VIDEO_PATH = /^\/assets\/videos\/(?:[A-Za-z0-9][A-Za-z0-9._-]*\/)*[A-Za-z0-9][A-Za-z0-9._-]*\.mp4$/i
+const REMOTE_VIDEO_PATH = /^\/(?:[A-Za-z0-9][A-Za-z0-9._-]*\/)*[A-Za-z0-9][A-Za-z0-9._-]*\.mp4$/i
+const SANITY_VIDEO_PATH = /^\/files\/v54qppoy\/production\/[A-Za-z0-9][A-Za-z0-9._-]*\.mp4$/i
 const UNSAFE_URL_CHARACTERS = /[,\\\u0000-\u001f\u007f]/
+const UNSAFE_VIDEO_URL_CHARACTERS = /[%\\\u0000-\u001f\u007f-\u009f\p{Cf}]/u
 const caseProjection = `{
   _id, caseNumber, "slug": slug.current, order, brand, featured,
   vehicle, title, subtitle, lede, story,
@@ -88,16 +91,15 @@ export function isSafeMediaUrl(value) {
 }
 
 export function isSafeCaseVideoUrl(value) {
-  if (typeof value !== 'string' || !value || value !== value.trim() || UNSAFE_URL_CHARACTERS.test(value)) return false
-  if (isCanonicalLocalAssetPath(value, '/assets/videos/')) return true
+  if (typeof value !== 'string' || !value || value !== value.trim() || UNSAFE_VIDEO_URL_CHARACTERS.test(value)) return false
+  if (LOCAL_VIDEO_PATH.test(value)) return true
+  if (!value.startsWith('https://')) return false
 
   try {
     const url = new URL(value)
-    if (url.protocol !== 'https:' || !url.hostname || url.username || url.password || url.hash ||
-      url.search || url.pathname.includes('%')) return false
-    const segments = url.pathname.split('/').slice(1)
-    if (!segments.length || segments.some((segment) => !segment || segment === '.' || segment === '..')) return false
-    return url.hostname !== 'cdn.sanity.io' || Boolean(url.pathname.match(SANITY_VIDEO_PATH))
+    if (url.protocol !== 'https:' || !url.hostname || url.username || url.password || url.hash || url.search ||
+      !REMOTE_VIDEO_PATH.test(url.pathname)) return false
+    return url.hostname !== 'cdn.sanity.io' || SANITY_VIDEO_PATH.test(url.pathname)
   } catch {
     return false
   }
