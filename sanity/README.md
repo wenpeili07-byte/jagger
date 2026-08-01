@@ -9,15 +9,13 @@ complete fallback whenever CMS data is unavailable or invalid.
 
 ## What It Edits
 
-- Case slug and case number
-- English title and Chinese title
-- Hero description
-- Meta tags
-- Video poster and MP4 path
-- Overview copy
-- Photo/text sections
-- Build scope
-- CTA copy and link
+- Case number, route slug, display order, brand, and featured state
+- Vehicle make, model, year, chassis, and specification
+- English and Chinese title, subtitle, hero description, and opening narrative
+- Cover image source and bilingual alt text
+- Optional video poster, uploaded MP4, or external HTTPS MP4 URL
+- Ordered photo-story sections with image, bilingual copy, and layout
+- Localized SEO page title, description, and social image
 
 ## Edit And Import
 

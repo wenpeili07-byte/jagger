@@ -48,3 +48,37 @@ env PATH="/Users/wenpeili/.cache/codex-runtimes/codex-primary-runtime/dependenci
 ```
 
 Results: requested group passed 7/7 tests; full suite passed 240/240 tests.
+
+## Review Fix Round
+
+### RED Evidence
+
+Added semantic assertions for every named Sanity object in the seed, Case 02
+media item keys/types, derived cover and social-image alts, normalizer output,
+and unsupported Studio capability claims. Before implementation, the focused
+test command failed because `slug._type` and `mediaSection._type` were missing,
+and `sanity.test.mjs` still found `Build scope` and `CTA copy and link` in the
+Studio README.
+
+### GREEN Evidence
+
+The generator now emits `_type: 'slug'`, `localizedString`, `localizedText`,
+`caseImage`, and `mediaSection` exactly where the current schema defines named
+object types. Inline `vehicle` and `seo` containers remain inline objects.
+Every cover and social image now has the current generated-page bilingual alt:
+`LONMA DYNAMIC` followed by the existing localized case title. Case 02 retains
+all three existing story sections with deterministic `_key` and `_type` values.
+The Studio capability list now reflects only fields in `casePage`.
+
+No production Sanity import was run in this review-fix round.
+
+### Review Fix Verification
+
+```sh
+env PATH="/Users/wenpeili/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH" node scripts/build-sanity-seed.mjs
+env PATH="/Users/wenpeili/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH" node --test sanity.test.mjs sanity-seed.test.mjs sanity-schema.test.mjs sanity-case-data.test.mjs contact-readme.test.mjs
+env PATH="/Users/wenpeili/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin:$PATH" node --test
+```
+
+Results: requested documentation, seed, schema, and normalizer tests passed
+27/27; the full Node suite passed 240/240.

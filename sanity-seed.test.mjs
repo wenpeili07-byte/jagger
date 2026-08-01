@@ -3,6 +3,7 @@ import {execFileSync} from 'node:child_process'
 import {readFileSync} from 'node:fs'
 import test from 'node:test'
 import {caseDetails} from './detail-pages-data.mjs'
+import {normalizeCaseRecord} from './sanity-case-data.js'
 import {buildSanitySeed} from './scripts/build-sanity-seed.mjs'
 
 test('seed contains six deterministic schema-shaped bilingual Case documents', () => {
@@ -21,26 +22,46 @@ test('seed contains six deterministic schema-shaped bilingual Case documents', (
     assert.equal(record._type, 'casePage')
     assert.equal(record._id.startsWith('drafts.'), false)
     assert.equal(record.caseNumber, `CASE 0${index + 1}`)
+    assert.equal(record.slug._type, 'slug')
     assert.equal(record.slug.current, `case-0${index + 1}`)
     assert.equal(record.order, index + 1)
     assert.equal(record.featured, false)
     assert.deepEqual(Object.keys(record.vehicle), ['make', 'model', 'year', 'chassis', 'specification'])
-    assert.deepEqual(record.title, caseDetails[index].title)
-    assert.deepEqual(record.subtitle, caseDetails[index].subtitle)
-    assert.deepEqual(record.lede, caseDetails[index].intro)
-    assert.deepEqual(record.story, caseDetails[index].story)
+    assert.deepEqual({en: record.title.en, zh: record.title.zh}, caseDetails[index].title)
+    assert.deepEqual({en: record.subtitle.en, zh: record.subtitle.zh}, caseDetails[index].subtitle)
+    assert.deepEqual({en: record.lede.en, zh: record.lede.zh}, caseDetails[index].intro)
+    assert.deepEqual({en: record.story.en, zh: record.story.zh}, caseDetails[index].story)
+    assert.equal(record.title._type, 'localizedString')
+    assert.equal(record.subtitle._type, 'localizedString')
+    assert.equal(record.lede._type, 'localizedText')
+    assert.equal(record.story._type, 'localizedText')
     assert.ok(record.title.en && record.title.zh)
     assert.ok(record.subtitle.en && record.subtitle.zh)
     assert.ok(record.lede.en && record.lede.zh)
     assert.ok(record.story.en && record.story.zh)
     assert.match(record.cover.imagePath, /^\/assets\/images\/网页\/optimized\/case-0[1-6]\.jpg$/)
+    assert.equal(record.cover._type, 'caseImage')
+    assert.deepEqual(record.cover.alt, {
+      _type: 'localizedString',
+      en: `LONMA DYNAMIC ${caseDetails[index].title.en}`,
+      zh: `LONMA DYNAMIC ${caseDetails[index].title.zh}`,
+    })
+    assert.equal(record.seo.title._type, 'localizedString')
+    assert.equal(record.seo.description._type, 'localizedText')
     assert.equal(record.seo.title.en, `Case 0${index + 1} | LONMA DYNAMIC`)
     assert.equal(record.seo.description.en, caseDetails[index].meta)
     assert.equal(record.seo.socialImage.imagePath, record.cover.imagePath)
+    assert.equal(record.seo.socialImage._type, 'caseImage')
+    assert.deepEqual(record.seo.socialImage.alt, record.cover.alt)
+    const normalized = normalizeCaseRecord({...record, slug: record.slug.current})
+    assert.deepEqual(normalized?.cover.alt, {
+      en: `LONMA DYNAMIC ${caseDetails[index].title.en}`,
+      zh: `LONMA DYNAMIC ${caseDetails[index].title.zh}`,
+    })
   }
 })
 
-test('Case 02 is the only seeded vehicle and photo story', () => {
+test('Case 02 is the only seeded vehicle and typed photo story', () => {
   const records = buildSanitySeed()
   const [case01, case02, ...remainingCases] = records
 
@@ -53,42 +74,23 @@ test('Case 02 is the only seeded vehicle and photo story', () => {
   }))
   assert.deepEqual(case01.mediaSections, [])
   assert.deepEqual(remainingCases.map((record) => record.mediaSections), [[], [], [], []])
-  assert.deepEqual(case02.mediaSections, [
-    {
-      _key: 'case-02-direction',
-      layout: 'textLeft',
-      heading: {en: 'THE DIRECTION', zh: '改装方向'},
-      body: {
-        en: 'Sharper response without turning the car into a single-purpose machine. Braking, chassis feedback, and wheel fitment are considered as one system.',
-        zh: '提升响应，同时保留车辆在真实道路中的完整性。刹车、底盘反馈与轮毂数据作为一个系统共同调整。',
-      },
-      image: {
-        imagePath: '/assets/images/shop/brake-kit.webp',
-        alt: {en: 'Category reference image: brake system', zh: '分类参考图片：刹车系统'},
-      },
-    },
-    {
-      _key: 'case-02-test-adjust-repeat',
-      layout: 'textRight',
-      heading: {en: 'TEST, ADJUST, REPEAT', zh: '测试、调整、再测试'},
-      body: {
-        en: 'Each change is judged through real driving, tire condition, and driver feedback. The setup evolves until the car responds as one complete package.',
-        zh: '每一次变化都通过真实驾驶、轮胎状态与驾驶反馈判断。持续调整，直到整车形成统一响应。',
-      },
-      image: {
-        imagePath: '/assets/images/shop/coilover-kit.webp',
-        alt: {en: 'Category reference image: chassis setup', zh: '分类参考图片：底盘设定'},
-      },
-    },
-    {
-      _key: 'case-02-forged-wheel',
-      layout: 'full',
-      image: {
-        imagePath: '/assets/images/shop/forged-wheel.webp',
-        alt: {en: 'Category reference image: forged wheel', zh: '分类参考图片：锻造轮毂'},
-      },
-    },
+  assert.deepEqual(case02.mediaSections.map((section) => ({_key: section._key, layout: section.layout})), [
+    {_key: 'case-02-direction', layout: 'textLeft'},
+    {_key: 'case-02-test-adjust-repeat', layout: 'textRight'},
+    {_key: 'case-02-forged-wheel', layout: 'full'},
   ])
+  for (const section of case02.mediaSections) {
+    assert.equal(section._type, 'mediaSection')
+    assert.ok(section._key)
+    assert.equal(section.image._type, 'caseImage')
+    assert.equal(section.image.alt._type, 'localizedString')
+  }
+  assert.deepEqual(case02.mediaSections[0].heading, {_type: 'localizedString', en: 'THE DIRECTION', zh: '改装方向'})
+  assert.equal(case02.mediaSections[0].body._type, 'localizedText')
+  assert.deepEqual(case02.mediaSections[1].heading, {_type: 'localizedString', en: 'TEST, ADJUST, REPEAT', zh: '测试、调整、再测试'})
+  assert.equal(case02.mediaSections[1].body._type, 'localizedText')
+  assert.equal('heading' in case02.mediaSections[2], false)
+  assert.equal('body' in case02.mediaSections[2], false)
 })
 
 test('checked-in NDJSON matches the generator with a final newline', () => {

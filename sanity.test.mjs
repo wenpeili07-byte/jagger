@@ -54,6 +54,7 @@ assert.match(readme, /published documents only/i, "Sanity README should describe
 assert.match(readme, /static HTML[\s\S]*fallback/i, "Sanity README should describe the static fallback");
 assert.match(readme, /same deterministic IDs/i, "Sanity README should describe repeatable imports");
 assert.match(readme, /never.*commit.*secrets/i, "Sanity README should prohibit committed secrets");
+assert.doesNotMatch(readme, /Build scope|CTA copy and link/i, "Sanity README should list only fields the current case schema supports");
 
 assert.ok(existsSync(vercelConfigUrl), "Sanity Studio should include a Vercel SPA fallback");
 const vercelConfig = JSON.parse(readFileSync(vercelConfigUrl, "utf8"));
