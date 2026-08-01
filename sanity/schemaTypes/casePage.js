@@ -1,143 +1,98 @@
-export default {
+import {defineArrayMember, defineField, defineType} from 'sanity'
+
+export default defineType({
   name: 'casePage',
   title: 'Case Page',
   type: 'document',
+  groups: [
+    {name: 'overview', title: 'Overview', default: true},
+    {name: 'vehicle', title: 'Vehicle'},
+    {name: 'media', title: 'Media'},
+    {name: 'seo', title: 'SEO'},
+    {name: 'publishing', title: 'Publishing'},
+  ],
   fields: [
-    {
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {source: 'title'},
-      validation: (Rule) => Rule.required(),
-    },
-    {
-      name: 'caseNumber',
-      title: 'Case Number',
+    defineField({name: 'caseNumber', title: 'Case Number', type: 'string', validation: (Rule) => Rule.required(), group: 'overview'}),
+    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'caseNumber'}, validation: (Rule) => Rule.required(), group: 'publishing'}),
+    defineField({
+      name: 'order',
+      title: 'Display Order',
+      type: 'number',
+      validation: (Rule) => Rule.required().integer().min(1).max(36),
+      group: 'publishing',
+    }),
+    defineField({
+      name: 'brand',
+      title: 'Brand',
       type: 'string',
-      initialValue: 'CASE 01',
+      options: {
+        list: [
+          {title: 'BMW', value: 'bmw'},
+          {title: 'Audi', value: 'audi'},
+          {title: 'Mercedes-Benz', value: 'mercedes-benz'},
+        ],
+      },
       validation: (Rule) => Rule.required(),
-    },
-    {
-      name: 'title',
-      title: 'Page Title',
-      type: 'string',
-      validation: (Rule) => Rule.required(),
-    },
-    {
-      name: 'shortTitle',
-      title: 'Short Chinese Title',
-      type: 'string',
-      validation: (Rule) => Rule.required(),
-    },
-    {
-      name: 'lede',
-      title: 'Hero Description',
-      type: 'text',
-      rows: 3,
-    },
-    {
-      name: 'meta',
-      title: 'Meta Tags',
-      type: 'array',
-      of: [{type: 'string'}],
-    },
-    {
+      group: 'vehicle',
+    }),
+    defineField({name: 'featured', title: 'Featured', type: 'boolean', initialValue: false, group: 'publishing'}),
+    defineField({
+      name: 'vehicle',
+      title: 'Vehicle',
+      type: 'object',
+      fields: [
+        defineField({name: 'make', title: 'Make', type: 'string'}),
+        defineField({name: 'model', title: 'Model', type: 'string'}),
+        defineField({name: 'year', title: 'Year', type: 'string'}),
+        defineField({name: 'chassis', title: 'Chassis', type: 'string'}),
+        defineField({name: 'specification', title: 'Specification', type: 'string'}),
+      ],
+      group: 'vehicle',
+    }),
+    defineField({name: 'title', title: 'Title', type: 'localizedString', validation: (Rule) => Rule.required(), group: 'overview'}),
+    defineField({name: 'subtitle', title: 'Subtitle', type: 'localizedString', group: 'overview'}),
+    defineField({name: 'lede', title: 'Hero Description', type: 'localizedText', group: 'overview'}),
+    defineField({name: 'story', title: 'Opening Narrative', type: 'localizedText', group: 'overview'}),
+    defineField({name: 'cover', title: 'Cover Image', type: 'caseImage', validation: (Rule) => Rule.required(), group: 'media'}),
+    defineField({
       name: 'video',
       title: 'Video',
       type: 'object',
       fields: [
-        {
-          name: 'poster',
-          title: 'Poster Image',
-          type: 'image',
-          options: {hotspot: true},
-        },
-        {
-          name: 'src',
-          title: 'MP4 Path',
-          type: 'string',
-          description: 'Keep external or site-local video paths here, such as /assets/videos/case-01.mp4.',
-        },
+        defineField({name: 'poster', title: 'Poster Image', type: 'caseImage'}),
+        defineField({name: 'file', title: 'Upload MP4', type: 'file', options: {accept: 'video/mp4'}}),
+        defineField({
+          name: 'externalUrl',
+          title: 'External MP4 URL',
+          type: 'url',
+          validation: (Rule) => Rule.uri({scheme: ['https'], allowRelative: false}),
+        }),
       ],
-    },
-    {
-      name: 'overview',
-      title: 'Overview',
-      type: 'object',
-      fields: [
-        {name: 'heading', title: 'Heading', type: 'string'},
-        {name: 'body', title: 'Body', type: 'text', rows: 4},
-      ],
-    },
-    {
+      group: 'media',
+    }),
+    defineField({
       name: 'mediaSections',
-      title: 'Photo And Text Sections',
+      title: 'Media Sections',
       type: 'array',
-      of: [
-        {
-          name: 'mediaSection',
-          title: 'Photo And Text Section',
-          type: 'object',
-          fields: [
-            {
-              name: 'image',
-              title: 'Image',
-              type: 'image',
-              options: {hotspot: true},
-            },
-            {
-              name: 'imagePath',
-              title: 'Existing Site Image Path',
-              type: 'string',
-              description: 'Use this while comparing CMS options, for example /assets/images/网页/optimized/case-01.jpg.',
-            },
-            {name: 'alt', title: 'Image Alt Text', type: 'string'},
-            {name: 'heading', title: 'Heading', type: 'string'},
-            {name: 'body', title: 'Body', type: 'text', rows: 3},
-            {name: 'reversed', title: 'Reverse Layout', type: 'boolean', initialValue: false},
-            {name: 'actionText', title: 'Action Text', type: 'string'},
-            {name: 'actionHref', title: 'Action Link', type: 'string'},
-          ],
-          preview: {
-            select: {
-              title: 'heading',
-              subtitle: 'body',
-              media: 'image',
-            },
-          },
-        },
-      ],
-      validation: (Rule) => Rule.min(1),
-    },
-    {
-      name: 'scope',
-      title: 'Build Scope',
-      type: 'array',
-      of: [{type: 'string'}],
-    },
-    {
-      name: 'cta',
-      title: 'CTA',
+      of: [defineArrayMember({type: 'mediaSection'})],
+      group: 'media',
+    }),
+    defineField({
+      name: 'seo',
+      title: 'SEO',
       type: 'object',
       fields: [
-        {name: 'heading', title: 'Heading', type: 'string'},
-        {name: 'buttonText', title: 'Button Text', type: 'string'},
-        {name: 'buttonHref', title: 'Button Link', type: 'string'},
+        defineField({name: 'title', title: 'Page Title', type: 'localizedString'}),
+        defineField({name: 'description', title: 'Description', type: 'localizedText'}),
+        defineField({name: 'socialImage', title: 'Social Image', type: 'caseImage'}),
       ],
-    },
+      group: 'seo',
+    }),
   ],
   preview: {
-    select: {
-      title: 'title',
-      subtitle: 'caseNumber',
-      media: 'video.poster',
-    },
-    prepare(selection) {
-      const {title, subtitle, media} = selection
-      return {
-        title: subtitle ? `${subtitle} · ${title}` : title,
-        media,
-      }
+    select: {caseNumber: 'caseNumber', title: 'title.en', brand: 'brand', media: 'cover.asset'},
+    prepare({caseNumber, title, brand, media}) {
+      return {title: caseNumber ? `${caseNumber} - ${title || ''}` : title, subtitle: brand, media}
     },
   },
-}
+})
