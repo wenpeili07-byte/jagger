@@ -4,6 +4,7 @@ const CASE_SLUG = /^case-(?:0[1-9]|[12][0-9]|3[0-6])$/
 const CASE_BRANDS = new Set(['bmw', 'audi', 'mercedes-benz'])
 const IMAGE_WIDTHS = [640, 960, 1600, 2400]
 const SANITY_IMAGE_PATH = /^\/images\/([^/]+)\/([^/]+)\/([^/]+)$/
+const SANITY_VIDEO_PATH = /^\/files\/v54qppoy\/production\/([^/]+)$/
 const UNSAFE_URL_CHARACTERS = /[,\\\u0000-\u001f\u007f]/
 const caseProjection = `{
   _id, caseNumber, "slug": slug.current, order, brand, featured,
@@ -86,6 +87,22 @@ export function isSafeMediaUrl(value) {
   }
 }
 
+export function isSafeCaseVideoUrl(value) {
+  if (typeof value !== 'string' || !value || value !== value.trim() || UNSAFE_URL_CHARACTERS.test(value)) return false
+  if (isCanonicalLocalAssetPath(value, '/assets/videos/')) return true
+
+  try {
+    const url = new URL(value)
+    if (url.protocol !== 'https:' || !url.hostname || url.username || url.password || url.hash ||
+      url.search || url.pathname.includes('%')) return false
+    const segments = url.pathname.split('/').slice(1)
+    if (!segments.length || segments.some((segment) => !segment || segment === '.' || segment === '..')) return false
+    return url.hostname !== 'cdn.sanity.io' || Boolean(url.pathname.match(SANITY_VIDEO_PATH))
+  } catch {
+    return false
+  }
+}
+
 function imageDimensions(image) {
   const dimensions = image?.asset?.metadata?.dimensions
   const width = dimensions?.width
@@ -160,11 +177,16 @@ function normalizeMediaSection(section) {
 
 function normalizeVideo(video) {
   if (!video || typeof video !== 'object') return null
-  const src = text(video.fileUrl) || text(video.externalUrl)
+  const fileUrl = video.fileUrl
+  const externalUrl = video.externalUrl
   const poster = buildResponsiveSanityImage(video.poster)
-  if (!isSafeMediaUrl(src) && !poster) return null
+  const safeFileUrl = isSafeCaseVideoUrl(fileUrl) ? fileUrl : ''
+  const safeExternalUrl = typeof externalUrl === 'string' && externalUrl.startsWith('https://') &&
+    isSafeCaseVideoUrl(externalUrl) ? externalUrl : ''
+  if (!safeFileUrl && !safeExternalUrl && !poster) return null
   return {
-    ...(isSafeMediaUrl(src) ? {src} : {}),
+    ...(safeFileUrl ? {fileUrl: safeFileUrl} : {}),
+    ...(safeExternalUrl ? {externalUrl: safeExternalUrl} : {}),
     ...(poster ? {poster} : {}),
   }
 }

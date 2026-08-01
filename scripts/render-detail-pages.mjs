@@ -130,11 +130,11 @@ export const renderCase02Page = (record) => `<!doctype html>
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="cases">
-    <main class="site-shell case-detail-page case02-page" data-detail-page>
+    <main class="site-shell case-detail-page case02-page" data-detail-page data-case-slug="case-02">
       ${header("cases")}
       <section class="case02-video-stage" data-video-state="poster-only" aria-labelledby="case02-title">
         <video
-          data-case-video
+          data-case-video data-cms="poster"
           poster="../../assets/images/generated/case-02/case-02-960w.webp"
           controls
           preload="metadata"
@@ -144,16 +144,16 @@ export const renderCase02Page = (record) => `<!doctype html>
         ></video>
         <div class="case02-video-copy">
           ${i18n("a", { zh: "← 返回案例", en: "← BACK TO CASES" }, ' href="../cases.html"')}
-          <p>CASE ${record.id}</p>
-          ${i18n("h1", record.title, ' id="case02-title"')}
+          <p data-cms="caseNumber">CASE ${record.id}</p>
+          ${i18n("h1", record.title, ' id="case02-title" data-cms="title"')}
           <dl>
-            <div>${i18n("dt", { zh: "车辆", en: "VEHICLE" })}<dd>BMW G80 M3</dd></div>
-            <div>${i18n("dt", { zh: "年份", en: "YEAR" })}<dd>2024</dd></div>
+            <div>${i18n("dt", { zh: "车辆", en: "VEHICLE" })}<dd data-cms="vehicleModel">BMW G80 M3</dd></div>
+            <div>${i18n("dt", { zh: "年份", en: "YEAR" })}<dd data-cms="vehicleYear">2024</dd></div>
           </dl>
         </div>
         ${i18n("button", { zh: "完整影片即将上线", en: "FINAL FILM COMING SOON" }, ' type="button" class="case02-video-status" disabled')}
       </section>
-      <div class="case02-story">
+      <div class="case02-story" data-cms-media-sections>
         <section class="case02-story-beat case02-story-beat-direction">
           <div class="case02-story-copy">
             <p>01</p>
@@ -190,6 +190,7 @@ export const renderCase02Page = (record) => `<!doctype html>
     </main>
     <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
     <script src="../../case-02.js?v=project-planner-redesign-20260726"></script>
+    <script type="module" src="../../sanity-case-detail.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
 `;

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import {readFileSync} from 'node:fs'
 import test from 'node:test'
-import {applyDetailCase, applyResponsiveImage, loadDetailCase, renderMediaSections} from './sanity-case-detail.js'
+import {applyCaseVideo, applyDetailCase, applyResponsiveImage, loadDetailCase, renderMediaSections} from './sanity-case-detail.js'
 
 class FakeElement {
   constructor(tagName = 'div') {
@@ -54,6 +54,25 @@ function createFixture() {
     },
   }
   return {root, slots, media}
+}
+
+function createCase02Fixture() {
+  const stage = new FakeElement('section')
+  stage.dataset.videoState = 'poster-only'
+  const video = new FakeElement('video')
+  video.setAttribute('poster', '/assets/images/static-poster.jpg')
+  video.setAttribute('controls', '')
+  video.setAttribute('aria-disabled', 'true')
+  let loads = 0
+  video.load = () => { loads += 1 }
+  const root = {
+    querySelector(selector) {
+      if (selector === '.case02-video-stage') return stage
+      if (selector === '[data-case-video]') return video
+      return null
+    },
+  }
+  return {root, stage, video, loads: () => loads}
 }
 
 function snapshot({slots, media}) {
@@ -142,6 +161,69 @@ test('local CMS images clear stale responsive and dimension attributes', () => {
   assert.equal(image.getAttribute('sizes'), null)
   assert.equal(image.getAttribute('width'), null)
   assert.equal(image.getAttribute('height'), null)
+})
+
+test('Case 02 keeps its poster-only DOM byte-for-byte without a safe CMS video source', () => {
+  const fixture = createCase02Fixture()
+  const before = JSON.stringify({
+    stage: fixture.stage.dataset,
+    video: [...fixture.video.attributes],
+  })
+
+  assert.equal(applyCaseVideo({video: {poster: null, fileUrl: '', externalUrl: ''}}, fixture.root), false)
+  assert.equal(JSON.stringify({
+    stage: fixture.stage.dataset,
+    video: [...fixture.video.attributes],
+  }), before)
+  assert.equal(fixture.loads(), 0)
+})
+
+test('Case 02 uses a canonical uploaded MP4 before an external URL without autoplay', () => {
+  const fixture = createCase02Fixture()
+  fixture.video.play = () => assert.fail('CMS video activation must not autoplay')
+
+  assert.equal(applyCaseVideo({video: {
+    fileUrl: 'https://cdn.sanity.io/files/v54qppoy/production/film.mp4',
+    externalUrl: 'https://video.example.com/other.mp4',
+  }}, fixture.root), true)
+  assert.equal(fixture.video.getAttribute('src'), 'https://cdn.sanity.io/files/v54qppoy/production/film.mp4')
+  assert.equal(fixture.stage.dataset.videoState, 'ready')
+  assert.equal(fixture.video.getAttribute('aria-disabled'), null)
+  assert.equal(fixture.video.getAttribute('controls'), '')
+  assert.equal(fixture.loads(), 1)
+})
+
+test('Case 02 rejects unsafe video URLs without DOM writes', () => {
+  const unsafeUrls = [
+    'javascript:alert(1)', 'data:video/mp4;base64,AA==', 'blob:https://example.com/film',
+    'http://video.example.com/film.mp4', 'https://user:pass@video.example.com/film.mp4',
+    'https://video.example.com/film.mp4#fragment', '/assets/videos/../private.mp4',
+    '/assets/images/case-02.mp4', 'https://cdn.sanity.io/files/other/production/film.mp4',
+    'https://cdn.sanity.io/files/v54qppoy/production/film.mp4\u0000',
+  ]
+  for (const url of unsafeUrls) {
+    const fixture = createCase02Fixture()
+    const before = JSON.stringify({stage: fixture.stage.dataset, video: [...fixture.video.attributes]})
+    assert.equal(applyCaseVideo({video: {fileUrl: url}}, fixture.root), false, url)
+    assert.equal(JSON.stringify({stage: fixture.stage.dataset, video: [...fixture.video.attributes]}), before, url)
+  }
+})
+
+test('Case 02 replaces a safe CMS poster with localized alt text and clears local responsive attributes', () => {
+  const fixture = createCase02Fixture()
+  fixture.video.setAttribute('poster', '/assets/images/static-poster.jpg')
+  fixture.video.setAttribute('srcset', '/assets/images/static-640.jpg 640w')
+  fixture.video.setAttribute('sizes', '100vw')
+
+  assert.equal(applyCaseVideo({video: {
+    poster: {src: '/assets/images/case-02-poster.jpg', alt: {en: 'Poster EN', zh: '海报'}} ,
+    externalUrl: 'https://video.example.com/film.mp4',
+  }}, fixture.root), true)
+  assert.equal(fixture.video.getAttribute('poster'), '/assets/images/case-02-poster.jpg')
+  assert.equal(fixture.video.getAttribute('data-en-alt'), 'Poster EN')
+  assert.equal(fixture.video.getAttribute('data-zh-alt'), '海报')
+  assert.equal(fixture.video.getAttribute('srcset'), null)
+  assert.equal(fixture.video.getAttribute('sizes'), null)
 })
 
 test('Sanity images replace a supplied unsafe srcset with derived candidates', () => {

@@ -30,7 +30,7 @@ assert.match(case02, /class="detail-contact"/);
 assert.match(case02, /class="detail-pagination"/);
 assert.equal((case02.match(/class="detail-contact"/g) || []).length, 1);
 assert.doesNotMatch(case02, /<figcaption|case-spec-grid|case-section-kicker|case-detail-meta/);
-assert.doesNotMatch(case02, /sanity-case-detail\.js/);
+assert.match(case02, /<script type="module" src="\.\.\/\.\.\/sanity-case-detail\.js/);
 
 assert.match(css, /\.detail-hero\s*\{[^}]*grid-template-columns:/s);
 assert.match(css, /\.detail-hero-media img\s*\{[^}]*object-fit:\s*cover/s);

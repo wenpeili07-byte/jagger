@@ -1,4 +1,4 @@
-import {buildResponsiveSanitySrcset, fetchPublishedCases, isSafeCaseImage} from './sanity-case-data.js'
+import {buildResponsiveSanitySrcset, fetchPublishedCases, isSafeCaseImage, isSafeCaseVideoUrl} from './sanity-case-data.js'
 
 const warnedRoots = new WeakSet()
 const notifiedRoots = new WeakSet()
@@ -42,6 +42,42 @@ export function applyResponsiveImage(image, source, sizes = '100vw') {
     image.dataset.zhAlt = source.alt.zh
     image.setAttribute('alt', source.alt.en)
   }
+  return true
+}
+
+function applyCaseVideoPoster(video, poster) {
+  if (!video || !isSafeCaseImage(poster)) return false
+  video.setAttribute('poster', poster.src)
+  if (poster.src.startsWith('/assets/images/')) {
+    video.removeAttribute('srcset')
+    video.removeAttribute('sizes')
+  }
+  if (isLocalized(poster.alt)) {
+    video.setAttribute('data-en-alt', poster.alt.en)
+    video.setAttribute('data-zh-alt', poster.alt.zh)
+  }
+  return true
+}
+
+function caseVideoSource(video) {
+  if (isSafeCaseVideoUrl(video?.fileUrl)) return video.fileUrl
+  return typeof video?.externalUrl === 'string' && video.externalUrl.startsWith('https://') &&
+    isSafeCaseVideoUrl(video.externalUrl) ? video.externalUrl : ''
+}
+
+export function applyCaseVideo(record, root) {
+  const source = caseVideoSource(record?.video)
+  const stage = root?.querySelector('.case02-video-stage')
+  const video = root?.querySelector('[data-case-video]')
+  if (!source || !stage || !video) return false
+
+  video.setAttribute('src', source)
+  globalThis.window?.lonmaRefreshCaseVideoState?.()
+  applyCaseVideoPoster(video, record.video.poster)
+  stage.dataset.videoState = 'ready'
+  video.setAttribute('controls', '')
+  video.removeAttribute('aria-disabled')
+  video.load()
   return true
 }
 
@@ -103,19 +139,23 @@ export function applyDetailCase(record, root, document = globalThis.document) {
     lede: root.querySelector('[data-cms="lede"]'),
     story: root.querySelector('[data-cms="story"]'),
     cover: root.querySelector('[data-cms="cover"]'),
+    vehicleModel: root.querySelector('[data-cms="vehicleModel"]'),
+    vehicleYear: root.querySelector('[data-cms="vehicleYear"]'),
     media: root.querySelector('[data-cms-media-sections]'),
   }
-  if (!fields.title || !fields.cover || !fields.media) return false
+  if (!fields.title || !fields.media || (!fields.cover && !root.querySelector('.case02-video-stage'))) return false
 
   if (record.caseNumber && fields.caseNumber) fields.caseNumber.textContent = record.caseNumber
   applyLocalizedNode(fields.title, record.title)
+  if (record.vehicle?.model && fields.vehicleModel) fields.vehicleModel.textContent = record.vehicle.model
+  if (record.vehicle?.year && fields.vehicleYear) fields.vehicleYear.textContent = record.vehicle.year
   for (const name of ['subtitle', 'lede', 'story']) {
     if (isLocalized(record[name]) && record[name].en) applyLocalizedNode(fields[name], record[name])
   }
-  applyResponsiveImage(fields.cover, record.cover, '(max-width: 768px) 100vw, 50vw')
+  if (fields.cover) applyResponsiveImage(fields.cover, record.cover, '(max-width: 768px) 100vw, 50vw')
 
   const sections = renderMediaSections(record.mediaSections, document)
-  if (sections.children.length) fields.media.replaceChildren(sections)
+  if (sections.children.length && !root.querySelector('.case02-video-stage')) fields.media.replaceChildren(sections)
   return true
 }
 
@@ -136,6 +176,7 @@ export function loadDetailCase({
     try {
       const [record] = await fetchCases({slug})
       if (!applyDetailCase(record, root, document)) return false
+      applyCaseVideo(record, root)
       notifiedRoots.add(root)
       eventTarget.dispatchEvent(new Event('lonma:content-updated'))
       return true

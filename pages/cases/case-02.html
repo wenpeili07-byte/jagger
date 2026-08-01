@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="cases">
-    <main class="site-shell case-detail-page case02-page" data-detail-page>
+    <main class="site-shell case-detail-page case02-page" data-detail-page data-case-slug="case-02">
       <header class="topbar">
     <a class="brand" href="../../index.html" aria-label="Back to home" data-zh-aria-label="回到首页" data-en-aria-label="Back to home">LONMA DYNAMIC</a>
     <nav class="nav" aria-label="Main navigation" data-zh-aria-label="主导航" data-en-aria-label="Main navigation">
@@ -50,7 +50,7 @@
   </header>
       <section class="case02-video-stage" data-video-state="poster-only" aria-labelledby="case02-title">
         <video
-          data-case-video
+          data-case-video data-cms="poster"
           poster="../../assets/images/generated/case-02/case-02-960w.webp"
           controls
           preload="metadata"
@@ -60,16 +60,16 @@
         ></video>
         <div class="case02-video-copy">
           <a href="../cases.html" data-zh="← 返回案例" data-en="← BACK TO CASES">← BACK TO CASES</a>
-          <p>CASE 02</p>
-          <h1 id="case02-title" data-zh="赛道化升级" data-en="ROAD &amp; TRACK SETUP">ROAD &amp; TRACK SETUP</h1>
+          <p data-cms="caseNumber">CASE 02</p>
+          <h1 id="case02-title" data-cms="title" data-zh="赛道化升级" data-en="ROAD &amp; TRACK SETUP">ROAD &amp; TRACK SETUP</h1>
           <dl>
-            <div><dt data-zh="车辆" data-en="VEHICLE">VEHICLE</dt><dd>BMW G80 M3</dd></div>
-            <div><dt data-zh="年份" data-en="YEAR">YEAR</dt><dd>2024</dd></div>
+            <div><dt data-zh="车辆" data-en="VEHICLE">VEHICLE</dt><dd data-cms="vehicleModel">BMW G80 M3</dd></div>
+            <div><dt data-zh="年份" data-en="YEAR">YEAR</dt><dd data-cms="vehicleYear">2024</dd></div>
           </dl>
         </div>
         <button type="button" class="case02-video-status" disabled data-zh="完整影片即将上线" data-en="FINAL FILM COMING SOON">FINAL FILM COMING SOON</button>
       </section>
-      <div class="case02-story">
+      <div class="case02-story" data-cms-media-sections>
         <section class="case02-story-beat case02-story-beat-direction">
           <div class="case02-story-copy">
             <p>01</p>
@@ -104,5 +104,6 @@
     </main>
     <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
     <script src="../../case-02.js?v=project-planner-redesign-20260726"></script>
+    <script type="module" src="../../sanity-case-detail.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
