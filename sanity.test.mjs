@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 const packageJson = JSON.parse(readFileSync(new URL("./sanity/package.json", import.meta.url), "utf8"));
 const config = readFileSync(new URL("./sanity/sanity.config.js", import.meta.url), "utf8");
@@ -12,7 +14,8 @@ const mediaSection = readFileSync(new URL("./sanity/schemaTypes/mediaSection.js"
 const structure = readFileSync(new URL("./sanity/structure.js", import.meta.url), "utf8");
 const readme = readFileSync(new URL("./sanity/README.md", import.meta.url), "utf8");
 const vercelConfigUrl = new URL("./sanity/vercel.json", import.meta.url);
-const cliConfigUrl = new URL("./sanity/sanity.cli.js", import.meta.url);
+const cliConfigUrl = new URL("./sanity/sanity.cli.ts", import.meta.url);
+const sanityDirectory = fileURLToPath(new URL("./sanity/", import.meta.url));
 
 assert.equal(packageJson.name, "lonma-dynamic-sanity-studio", "Sanity Studio should have a dedicated package");
 assert.equal(packageJson.type, "module", "Sanity Studio should use ESM config files");
@@ -28,6 +31,17 @@ assert.match(config, /schema:\s*\{\s*types:\s*schemaTypes/s, "Sanity config shou
 
 assert.ok(existsSync(cliConfigUrl), "Sanity CLI config should bind project and dataset commands");
 const cliConfig = readFileSync(cliConfigUrl, "utf8");
+const evaluatedCliConfig = JSON.parse(execFileSync(
+  process.execPath,
+  ["-e", "require('esbuild-register/dist/node').register({supported: {'dynamic-import': true}}); process.stdout.write(JSON.stringify(require('./sanity.cli.ts').default));"],
+  { cwd: sanityDirectory, encoding: "utf8" },
+));
+assert.deepEqual(evaluatedCliConfig, {
+  api: {
+    projectId: "v54qppoy",
+    dataset: "production",
+  },
+}, "Sanity CLI config should evaluate to the exact production project and dataset");
 assert.match(cliConfig, /import\s+\{defineCliConfig\}\s+from\s+['"]sanity\/cli['"]/);
 assert.match(cliConfig, /api:\s*\{\s*projectId:\s*['"]v54qppoy['"],?\s*dataset:\s*['"]production['"],?\s*\}/s);
 assert.doesNotMatch(cliConfig, /token|secret/i, "Sanity CLI config must not contain credentials");
@@ -61,7 +75,7 @@ assert.match(readme, /published documents only/i, "Sanity README should describe
 assert.match(readme, /static HTML[\s\S]*fallback/i, "Sanity README should describe the static fallback");
 assert.match(readme, /same deterministic IDs/i, "Sanity README should describe repeatable imports");
 assert.match(readme, /never.*commit.*secrets/i, "Sanity README should prohibit committed secrets");
-assert.match(readme, /sanity\.cli\.js[\s\S]*project[\s\S]*dataset/i, "Sanity README should document the checked-in CLI project and dataset config");
+assert.match(readme, /sanity\.cli\.ts[\s\S]*project[\s\S]*dataset/i, "Sanity README should document the checked-in CLI project and dataset config");
 assert.doesNotMatch(readme, /Build scope|CTA copy and link/i, "Sanity README should list only fields the current case schema supports");
 
 assert.ok(existsSync(vercelConfigUrl), "Sanity Studio should include a Vercel SPA fallback");
