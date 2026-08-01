@@ -125,11 +125,53 @@ test('invalid image cover sources reject the full record', () => {
   assert.equal(normalizeCaseRecord(validCase({cover: {asset: {url: 'https://cdn.sanity.io/images/x/y/car.jpg'}}})), null)
 })
 
-test('detail query is restricted to a published slug', () => {
+test('detail query requests the published collection in CMS order with image editing metadata', () => {
   const url = buildCaseQueryUrl('case-01')
   assert.equal(url.hostname, 'v54qppoy.api.sanity.io')
-  assert.equal(url.searchParams.get('$slug'), '"case-01"')
+  assert.equal(url.searchParams.get('$slug'), null)
   assert.match(url.searchParams.get('query'), /!\(_id in path\("drafts\.\*"\)\)/)
+  assert.match(url.searchParams.get('query'), /order\(order asc\)/)
+  assert.doesNotMatch(url.searchParams.get('query'), /slug\.current == \$slug/)
+  assert.match(url.searchParams.get('query'), /"crop":\s*asset\.crop/)
+  assert.match(url.searchParams.get('query'), /"hotspot":\s*asset\.hotspot/)
+  assert.match(url.searchParams.get('query'), /socialImage\{imagePath, alt,/)
+})
+
+test('uploaded images normalize Sanity crop and hotspot into a cropped source and safe object position', () => {
+  assert.deepEqual(
+    buildResponsiveSanityImage({
+      asset: {
+        url: 'https://cdn.sanity.io/images/v54qppoy/production/car-2000x1000-jpg.jpg',
+        metadata: {dimensions: {width: 2000, height: 1000}},
+      },
+      crop: {left: 0.1, right: 0.2, top: 0.1, bottom: 0.1},
+      hotspot: {x: 0.55, y: 0.45, width: 0.2, height: 0.2},
+    }),
+    {
+      src: 'https://cdn.sanity.io/images/v54qppoy/production/car-2000x1000-jpg.jpg?rect=200%2C100%2C1400%2C800',
+      alt: {en: '', zh: ''},
+      width: 1400,
+      height: 800,
+      srcset: 'https://cdn.sanity.io/images/v54qppoy/production/car-2000x1000-jpg.jpg?rect=200%2C100%2C1400%2C800&w=640&auto=format 640w, https://cdn.sanity.io/images/v54qppoy/production/car-2000x1000-jpg.jpg?rect=200%2C100%2C1400%2C800&w=960&auto=format 960w',
+      objectPosition: '64.29% 43.75%',
+    },
+  )
+})
+
+test('invalid crop and hotspot values are ignored without affecting a valid uploaded image', () => {
+  const image = buildResponsiveSanityImage({
+    asset: {
+      url: 'https://cdn.sanity.io/images/v54qppoy/production/car-1600x900-jpg.jpg',
+      metadata: {dimensions: {width: 1600, height: 900}},
+    },
+    crop: {left: 0.8, right: 0.4, top: 0, bottom: 0},
+    hotspot: {x: 2, y: -1, width: 0.2, height: 0.2},
+  })
+
+  assert.equal(image.src, 'https://cdn.sanity.io/images/v54qppoy/production/car-1600x900-jpg.jpg')
+  assert.equal(image.width, 1600)
+  assert.equal(image.height, 900)
+  assert.equal('objectPosition' in image, false)
 })
 
 test('invalid records never replace static content', () => {
@@ -198,6 +240,26 @@ test('fetchPublishedCases rejects the full collection when normalized slugs or o
     }),
     /duplicate.*order/i,
   )
+})
+
+test('fetchPublishedCases returns valid records in normalized CMS order', async () => {
+  const cases = await fetchPublishedCases({
+    slug: 'case-02',
+    fetchImpl: async () => ({
+      ok: true,
+      json: async () => ({result: [
+        validCase({slug: 'case-03', order: 30}),
+        validCase({slug: 'case-01', order: 10}),
+        validCase({slug: 'case-02', order: 20}),
+      ]}),
+    }),
+  })
+
+  assert.deepEqual(cases.map(({slug, order}) => ({slug, order})), [
+    {slug: 'case-01', order: 10},
+    {slug: 'case-02', order: 20},
+    {slug: 'case-03', order: 30},
+  ])
 })
 
 test('fetchPublishedCases propagates HTTP response errors', async () => {

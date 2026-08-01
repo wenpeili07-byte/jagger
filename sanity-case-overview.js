@@ -2,6 +2,8 @@ import {fetchPublishedCases} from './sanity-case-data.js'
 
 const warnedRoots = new WeakSet()
 const notifiedRoots = new WeakSet()
+const imageFallbacks = new WeakMap()
+const IMAGE_ATTRIBUTES = ['src', 'srcset', 'sizes', 'width', 'height', 'alt']
 
 function applyLocalizedNode(node, value) {
   if (!node || !value?.en) return
@@ -24,19 +26,86 @@ function vehicleLabel(vehicle) {
     .join(' · ')
 }
 
-function applyResponsiveImage(image, cover) {
+function localAssetPath(source) {
+  if (typeof source !== 'string') return ''
+  try {
+    const url = new URL(source, 'https://lonma.local/pages/cases.html')
+    return url.origin === 'https://lonma.local' && url.pathname.startsWith('/assets/images/')
+      ? url.pathname
+      : ''
+  } catch {
+    return ''
+  }
+}
+
+function snapshotAttribute(node, name) {
+  const value = node.getAttribute(name)
+  return {present: value !== null, value}
+}
+
+function restoreAttribute(node, name, snapshot) {
+  if (snapshot.present) node.setAttribute(name, snapshot.value)
+  else node.removeAttribute(name)
+}
+
+function snapshotDatasetValue(node, name) {
+  return {present: Object.hasOwn(node.dataset, name), value: node.dataset[name]}
+}
+
+function restoreDatasetValue(node, name, snapshot) {
+  if (snapshot.present) node.dataset[name] = snapshot.value
+  else delete node.dataset[name]
+}
+
+function getImageFallback(image, sceneNode) {
+  let fallback = imageFallbacks.get(image)
+  if (fallback) return fallback
+
+  fallback = {
+    active: false,
+    attributes: new Map(IMAGE_ATTRIBUTES.map((name) => [name, snapshotAttribute(image, name)])),
+    enAlt: snapshotDatasetValue(image, 'enAlt'),
+    zhAlt: snapshotDatasetValue(image, 'zhAlt'),
+    sceneNode,
+    scene: sceneNode ? snapshotDatasetValue(sceneNode, 'scene') : null,
+  }
+  imageFallbacks.set(image, fallback)
+  image.addEventListener('error', () => {
+    if (!fallback.active) return
+    fallback.active = false
+    for (const [name, snapshot] of fallback.attributes) restoreAttribute(image, name, snapshot)
+    restoreDatasetValue(image, 'enAlt', fallback.enAlt)
+    restoreDatasetValue(image, 'zhAlt', fallback.zhAlt)
+    if (fallback.sceneNode && fallback.scene) {
+      restoreDatasetValue(fallback.sceneNode, 'scene', fallback.scene)
+    }
+  })
+  return fallback
+}
+
+function applyResponsiveImage(image, cover, sceneNode) {
   if (!image || !cover?.src) return
-  image.setAttribute('src', cover.src)
+
+  const currentLocalPath = localAssetPath(image.getAttribute('src'))
+  const nextLocalPath = localAssetPath(cover.src)
+  const matchesStaticLocalImage = currentLocalPath && currentLocalPath === nextLocalPath
+  if (!matchesStaticLocalImage) {
+    const fallback = getImageFallback(image, sceneNode)
+    fallback.active = true
+    image.setAttribute('src', cover.src)
+    if (cover.srcset) image.setAttribute('srcset', cover.srcset)
+    else {
+      image.removeAttribute('srcset')
+      image.removeAttribute('sizes')
+    }
+    if (Number.isFinite(cover.width)) image.setAttribute('width', String(cover.width))
+    if (Number.isFinite(cover.height)) image.setAttribute('height', String(cover.height))
+    if (sceneNode) sceneNode.dataset.scene = cover.src
+  }
+
   image.dataset.enAlt = cover.alt?.en || ''
   image.dataset.zhAlt = cover.alt?.zh || cover.alt?.en || ''
   image.setAttribute('alt', image.dataset.enAlt)
-  if (cover.srcset) image.setAttribute('srcset', cover.srcset)
-  else {
-    image.removeAttribute('srcset')
-    image.removeAttribute('sizes')
-  }
-  if (Number.isFinite(cover.width)) image.setAttribute('width', String(cover.width))
-  if (Number.isFinite(cover.height)) image.setAttribute('height', String(cover.height))
 }
 
 function filterBrand(brand) {
@@ -70,7 +139,8 @@ export function applyCasesOverview(records, root = document) {
     })
     applyTextNode(node.querySelector('[data-cms-brand]'), record.brand.toUpperCase())
     applyTextNode(node.querySelector('[data-cms-vehicle]'), vehicleLabel(record.vehicle))
-    applyResponsiveImage(node.querySelector('[data-cms-cover]'), record.cover)
+    const sceneNode = node.dataset.scene === undefined ? null : node
+    applyResponsiveImage(node.querySelector('[data-cms-cover]'), record.cover, sceneNode)
   }
 
   const ordered = [...bySlug.values()].filter((record) => matched.some((node) => node.dataset.caseSlug === record.slug))

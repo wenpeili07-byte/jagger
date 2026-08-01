@@ -13,6 +13,8 @@ class FakeElement {
     this.className = ''
     this.loading = ''
     this.decoding = ''
+    this.style = {}
+    this.listeners = new Map()
   }
 
   append(...nodes) {
@@ -34,6 +36,17 @@ class FakeElement {
   setAttribute(name, value) {
     this.attributes.set(name, String(value))
   }
+
+  addEventListener(name, listener, options = {}) {
+    this.listeners.set(name, {listener, once: options.once === true})
+  }
+
+  dispatch(name) {
+    const entry = this.listeners.get(name)
+    if (!entry) return
+    entry.listener({type: name, target: this})
+    if (entry.once) this.listeners.delete(name)
+  }
 }
 
 function createFixture() {
@@ -47,13 +60,29 @@ function createFixture() {
   slots['[data-cms="cover"]'].setAttribute('alt', 'Static alt')
   const media = new FakeElement()
   media.append(new FakeElement('section'))
+  const previous = new FakeElement('a')
+  previous.setAttribute('href', './case-06.html')
+  previous.dataset.en = 'STATIC PREVIOUS'
+  previous.dataset.zh = '静态上一案例'
+  previous.textContent = 'STATIC PREVIOUS'
+  const next = new FakeElement('a')
+  next.setAttribute('href', './case-02.html')
+  next.dataset.en = 'STATIC NEXT'
+  next.dataset.zh = '静态下一案例'
+  next.textContent = 'STATIC NEXT'
   const root = {
     dataset: {caseSlug: 'case-01'},
     querySelector(selector) {
       return selector === '[data-cms-media-sections]' ? media : slots[selector] ?? null
     },
   }
-  return {root, slots, media}
+  const originalQuerySelector = root.querySelector.bind(root)
+  root.querySelector = (selector) => {
+    if (selector === '[data-cms-pagination="previous"]') return previous
+    if (selector === '[data-cms-pagination="next"]') return next
+    return originalQuerySelector(selector)
+  }
+  return {root, slots, media, previous, next}
 }
 
 function createCase02Fixture() {
@@ -64,7 +93,9 @@ function createCase02Fixture() {
   video.setAttribute('controls', '')
   video.setAttribute('aria-disabled', 'true')
   let loads = 0
+  let pauses = 0
   video.load = () => { loads += 1 }
+  video.pause = () => { pauses += 1 }
   const root = {
     querySelector(selector) {
       if (selector === '.case02-video-stage') return stage
@@ -72,7 +103,21 @@ function createCase02Fixture() {
       return null
     },
   }
-  return {root, stage, video, loads: () => loads}
+  return {root, stage, video, loads: () => loads, pauses: () => pauses}
+}
+
+function createCase02DetailFixture() {
+  const fixture = createFixture()
+  const videoFixture = createCase02Fixture()
+  fixture.root.dataset.caseSlug = 'case-02'
+  const querySelector = fixture.root.querySelector.bind(fixture.root)
+  fixture.root.querySelector = (selector) => {
+    if (selector === '.case02-video-stage' || selector === '[data-case-video]') {
+      return videoFixture.root.querySelector(selector)
+    }
+    return querySelector(selector)
+  }
+  return {...fixture, ...videoFixture, root: fixture.root}
 }
 
 function snapshot({slots, media}) {
@@ -90,6 +135,8 @@ const document = {
 }
 
 const record = {
+  slug: 'case-01',
+  order: 1,
   caseNumber: 'CASE 01',
   title: {en: 'CMS TITLE', zh: 'CMS 标题'},
   subtitle: {en: 'CMS SUBTITLE', zh: 'CMS 副标题'},
@@ -145,22 +192,76 @@ test('empty media does not replace the static media section', () => {
   assert.equal(fixture.media.children[0], originalChild)
 })
 
-test('local CMS images clear stale responsive and dimension attributes', () => {
+test('matching local CMS images preserve the static responsive source attributes and dimensions', () => {
   const image = new FakeElement('img')
+  image.baseURI = 'https://jagger-sage.vercel.app/pages/cases/case-01.html'
+  image.setAttribute('src', '../../assets/images/网页/optimized/case-01.jpg')
   image.setAttribute('srcset', '/assets/images/static-640.jpg 640w')
   image.setAttribute('sizes', '50vw')
   image.setAttribute('width', '1920')
   image.setAttribute('height', '1282')
 
   assert.equal(applyResponsiveImage(image, {
+    src: '/assets/images/网页/optimized/case-01.jpg',
+    alt: {en: 'Updated alt', zh: '更新图片'},
+  }), true)
+  assert.equal(image.getAttribute('src'), '../../assets/images/网页/optimized/case-01.jpg')
+  assert.equal(image.getAttribute('srcset'), '/assets/images/static-640.jpg 640w')
+  assert.equal(image.getAttribute('sizes'), '50vw')
+  assert.equal(image.getAttribute('width'), '1920')
+  assert.equal(image.getAttribute('height'), '1282')
+  assert.equal(image.getAttribute('alt'), 'Updated alt')
+})
+
+test('changed images restore the complete static responsive source snapshot on error', () => {
+  const image = new FakeElement('img')
+  image.setAttribute('src', '../../assets/images/static.jpg')
+  image.setAttribute('srcset', '../../assets/images/static-640.webp 640w')
+  image.setAttribute('sizes', '50vw')
+  image.setAttribute('width', '1920')
+  image.setAttribute('height', '1282')
+  image.setAttribute('alt', 'Static alt')
+  image.setAttribute('data-en-alt', 'Static alt')
+  image.setAttribute('data-zh-alt', '静态图片')
+  const before = [...image.attributes]
+
+  assert.equal(applyResponsiveImage(image, {
     src: '/assets/images/replacement.jpg',
     alt: {en: 'Replacement', zh: '替换图'},
-    srcset: '/assets/images/replacement-640.jpg 640w',
   }), true)
+  assert.equal(image.getAttribute('src'), '/assets/images/replacement.jpg')
   assert.equal(image.getAttribute('srcset'), null)
-  assert.equal(image.getAttribute('sizes'), null)
-  assert.equal(image.getAttribute('width'), null)
-  assert.equal(image.getAttribute('height'), null)
+
+  image.dispatch('error')
+  assert.deepEqual([...image.attributes], before)
+})
+
+test('uploaded images apply only normalized object-position values', () => {
+  const image = new FakeElement('img')
+  image.style.objectPosition = '20% 80%'
+
+  assert.equal(applyResponsiveImage(image, {
+    src: 'https://cdn.sanity.io/images/project/production/cover.jpg',
+    alt: {en: 'Cover', zh: '封面'},
+    width: 960,
+    height: 540,
+    objectPosition: '64.29% 43.75%',
+  }), true)
+  assert.equal(image.style.objectPosition, '64.29% 43.75%')
+
+  assert.equal(applyResponsiveImage(image, {
+    src: '/assets/images/local.jpg',
+    alt: {en: 'Local', zh: '本地图片'},
+    objectPosition: '0% 0%',
+  }), true)
+  assert.equal(image.style.objectPosition, '64.29% 43.75%')
+})
+
+test('Case 02 replaces its existing story with normalized CMS media sections', () => {
+  const fixture = createCase02DetailFixture()
+  assert.equal(applyDetailCase({...record, slug: 'case-02'}, fixture.root, document), true)
+  assert.equal(fixture.media.children.length, 1)
+  assert.equal(fixture.media.children[0].className, 'detail-media-section detail-media-section-textLeft')
 })
 
 test('Case 02 keeps its poster-only DOM byte-for-byte without a safe CMS video source', () => {
@@ -176,6 +277,24 @@ test('Case 02 keeps its poster-only DOM byte-for-byte without a safe CMS video s
     video: [...fixture.video.attributes],
   }), before)
   assert.equal(fixture.loads(), 0)
+  assert.equal(fixture.pauses(), 0)
+})
+
+test('Case 02 accepts a safe CMS poster without an MP4 and remains paused and poster-only', () => {
+  const fixture = createCase02Fixture()
+  fixture.video.play = () => assert.fail('poster-only CMS updates must not autoplay')
+
+  assert.equal(applyCaseVideo({video: {
+    poster: {src: '/assets/images/case-02-poster.jpg', alt: {en: 'Poster EN', zh: '海报'}},
+    fileUrl: '',
+    externalUrl: '',
+  }}, fixture.root), true)
+  assert.equal(fixture.video.getAttribute('poster'), '/assets/images/case-02-poster.jpg')
+  assert.equal(fixture.stage.dataset.videoState, 'poster-only')
+  assert.equal(fixture.video.getAttribute('controls'), null)
+  assert.equal(fixture.video.getAttribute('aria-disabled'), 'true')
+  assert.equal(fixture.loads(), 0)
+  assert.equal(fixture.pauses(), 1)
 })
 
 test('Case 02 uses a canonical uploaded MP4 before an external URL without autoplay', () => {
@@ -239,6 +358,111 @@ test('Sanity images replace a supplied unsafe srcset with derived candidates', (
   assert.equal(image.getAttribute('sizes'), '100vw')
 })
 
+test('detail SEO updates safe editable metadata while preserving the canonical URL', () => {
+  const fixture = createFixture()
+  const meta = {
+    'meta[name="description"]': new FakeElement('meta'),
+    'link[rel="canonical"]': new FakeElement('link'),
+    'meta[property="og:title"]': new FakeElement('meta'),
+    'meta[property="og:description"]': new FakeElement('meta'),
+    'meta[property="og:image"]': new FakeElement('meta'),
+    'meta[name="twitter:title"]': new FakeElement('meta'),
+    'meta[name="twitter:description"]': new FakeElement('meta'),
+    'meta[name="twitter:image"]': new FakeElement('meta'),
+  }
+  for (const node of Object.values(meta)) node.setAttribute('content', 'STATIC')
+  meta['link[rel="canonical"]'].removeAttribute('content')
+  meta['link[rel="canonical"]'].setAttribute('href', 'https://jagger-sage.vercel.app/pages/cases/case-01')
+  const seoDocument = {
+    ...document,
+    title: 'STATIC TITLE',
+    querySelector: (selector) => meta[selector] ?? null,
+  }
+
+  assert.equal(applyDetailCase({...record, seo: {
+    title: {en: 'CMS PAGE TITLE', zh: 'CMS 页面标题'},
+    description: {en: 'CMS DESCRIPTION', zh: 'CMS 页面描述'},
+    socialImage: {
+      src: 'https://cdn.sanity.io/images/project/production/social.jpg',
+      width: 1600,
+      height: 900,
+      alt: {en: '', zh: ''},
+    },
+  }}, fixture.root, seoDocument), true)
+
+  assert.equal(seoDocument.title, 'CMS PAGE TITLE')
+  assert.equal(meta['meta[name="description"]'].getAttribute('content'), 'CMS DESCRIPTION')
+  assert.equal(meta['meta[property="og:title"]'].getAttribute('content'), 'CMS PAGE TITLE')
+  assert.equal(meta['meta[property="og:description"]'].getAttribute('content'), 'CMS DESCRIPTION')
+  assert.equal(meta['meta[property="og:image"]'].getAttribute('content'), 'https://cdn.sanity.io/images/project/production/social.jpg')
+  assert.equal(meta['meta[name="twitter:title"]'].getAttribute('content'), 'CMS PAGE TITLE')
+  assert.equal(meta['meta[name="twitter:description"]'].getAttribute('content'), 'CMS DESCRIPTION')
+  assert.equal(meta['meta[name="twitter:image"]'].getAttribute('content'), 'https://cdn.sanity.io/images/project/production/social.jpg')
+  assert.equal(meta['link[rel="canonical"]'].getAttribute('href'), 'https://jagger-sage.vercel.app/pages/cases/case-01')
+})
+
+test('missing or invalid detail SEO values preserve every static metadata value', () => {
+  for (const seo of [null, {
+    title: {en: '', zh: ''},
+    description: {en: '', zh: ''},
+    socialImage: {src: 'javascript:alert(1)', alt: {en: '', zh: ''}},
+  }]) {
+    const fixture = createFixture()
+    const description = new FakeElement('meta')
+    const social = new FakeElement('meta')
+    description.setAttribute('content', 'STATIC DESCRIPTION')
+    social.setAttribute('content', 'https://jagger-sage.vercel.app/static.jpg')
+    const seoDocument = {
+      ...document,
+      title: 'STATIC TITLE',
+      querySelector(selector) {
+        if (selector === 'meta[name="description"]') return description
+        if (selector === 'meta[property="og:image"]' || selector === 'meta[name="twitter:image"]') return social
+        return null
+      },
+    }
+
+    assert.equal(applyDetailCase({...record, seo}, fixture.root, seoDocument), true)
+    assert.equal(seoDocument.title, 'STATIC TITLE')
+    assert.equal(description.getAttribute('content'), 'STATIC DESCRIPTION')
+    assert.equal(social.getAttribute('content'), 'https://jagger-sage.vercel.app/static.jpg')
+  }
+})
+
+test('CMS order controls safe bilingual previous and next Case links', () => {
+  const fixture = createFixture()
+  const collection = [
+    {...record, slug: 'case-01', order: 10},
+    {...record, slug: 'case-02', order: 20},
+    {...record, slug: 'case-03', order: 30},
+  ]
+
+  assert.equal(applyDetailCase(collection[0], fixture.root, document, collection), true)
+  assert.equal(fixture.previous.getAttribute('href'), './case-03.html')
+  assert.deepEqual(fixture.previous.dataset, {en: '← CASE 03', zh: '← 上一案例 03'})
+  assert.equal(fixture.previous.textContent, '← CASE 03')
+  assert.equal(fixture.next.getAttribute('href'), './case-02.html')
+  assert.deepEqual(fixture.next.dataset, {en: 'CASE 02 →', zh: '下一案例 02 →'})
+  assert.equal(fixture.next.textContent, 'CASE 02 →')
+})
+
+test('invalid pagination slugs never replace known static local links', () => {
+  const fixture = createFixture()
+  const before = JSON.stringify({
+    previous: {attributes: [...fixture.previous.attributes], dataset: fixture.previous.dataset, text: fixture.previous.textContent},
+    next: {attributes: [...fixture.next.attributes], dataset: fixture.next.dataset, text: fixture.next.textContent},
+  })
+
+  assert.equal(applyDetailCase(record, fixture.root, document, [
+    record,
+    {...record, slug: '../contact', order: 2},
+  ]), true)
+  assert.equal(JSON.stringify({
+    previous: {attributes: [...fixture.previous.attributes], dataset: fixture.previous.dataset, text: fixture.previous.textContent},
+    next: {attributes: [...fixture.next.attributes], dataset: fixture.next.dataset, text: fixture.next.textContent},
+  }), before)
+})
+
 test('unsafe media sections are skipped without replacing static media', () => {
   const unsafeSources = [
     'javascript:alert(1)',
@@ -275,6 +499,26 @@ test('detail loader fetches, patches, and emits once per successful root', async
   assert.equal(await loadDetailCase(options), true)
   assert.equal(fetches, 1)
   assert.equal(events, 1)
+})
+
+test('detail loader selects the current slug and derives pagination from CMS order', async () => {
+  const fixture = createFixture()
+  const collection = [
+    {...record, slug: 'case-03', order: 30, title: {en: 'CASE THREE', zh: '案例三'}},
+    {...record, slug: 'case-01', order: 10, title: {en: 'CASE ONE', zh: '案例一'}},
+    {...record, slug: 'case-02', order: 20, title: {en: 'CASE TWO', zh: '案例二'}},
+  ]
+
+  assert.equal(await loadDetailCase({
+    root: fixture.root,
+    document,
+    fetchCases: async () => collection,
+    eventTarget: {dispatchEvent: () => {}},
+    warn: () => {},
+  }), true)
+  assert.equal(fixture.slots['[data-cms="title"]'].textContent, 'CASE ONE')
+  assert.equal(fixture.previous.getAttribute('href'), './case-03.html')
+  assert.equal(fixture.next.getAttribute('href'), './case-02.html')
 })
 
 test('detail loader returns a Promise without side effects when no root exists', async () => {

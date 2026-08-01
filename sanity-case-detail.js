@@ -3,6 +3,9 @@ import {buildResponsiveSanitySrcset, fetchPublishedCases, isSafeCaseImage, isSaf
 const warnedRoots = new WeakSet()
 const notifiedRoots = new WeakSet()
 const pendingRoots = new WeakMap()
+const fallbackImages = new WeakSet()
+const CASE_SLUG = /^case-(?:0[1-9]|[12][0-9]|3[0-6])$/
+const OBJECT_POSITION = /^(?:100|\d{1,2})(?:\.\d{1,2})?% (?:100|\d{1,2})(?:\.\d{1,2})?%$/
 
 function isLocalized(value) {
   return value && typeof value.en === 'string' && typeof value.zh === 'string'
@@ -16,9 +19,55 @@ function applyLocalizedNode(node, value) {
   return true
 }
 
+function applyLocalizedAlt(image, value) {
+  if (!image || !isLocalized(value)) return
+  image.dataset.enAlt = value.en
+  image.dataset.zhAlt = value.zh
+  image.setAttribute('alt', value.en)
+}
+
+function localImagePath(value, baseURI) {
+  if (typeof value !== 'string' || !value) return ''
+  if (/^[a-z][a-z\d+.-]*:|^\/\//i.test(value)) return ''
+  try {
+    const url = new URL(value, baseURI || 'https://lonma.invalid/pages/cases/case.html')
+    return url.pathname.startsWith('/assets/images/')
+      ? decodeURIComponent(url.pathname)
+      : ''
+  } catch {
+    return ''
+  }
+}
+
+function attributeEntries(element) {
+  return Array.from(element?.attributes || [], (attribute) => Array.isArray(attribute)
+    ? [String(attribute[0]), String(attribute[1])]
+    : [attribute.name, attribute.value])
+}
+
+function preserveStaticImageOnError(image) {
+  if (fallbackImages.has(image) || typeof image?.addEventListener !== 'function' || !image.getAttribute('src')) return
+  const attributes = attributeEntries(image)
+  const objectPosition = image.style?.objectPosition || ''
+  fallbackImages.add(image)
+  image.addEventListener('error', () => {
+    for (const [name] of attributeEntries(image)) image.removeAttribute(name)
+    for (const [name, value] of attributes) image.setAttribute(name, value)
+    if (image.style) image.style.objectPosition = objectPosition
+  }, {once: true})
+}
+
 export function applyResponsiveImage(image, source, sizes = '100vw') {
   if (!image || !isSafeCaseImage(source)) return false
 
+  const currentLocalPath = localImagePath(image.getAttribute('src'), image.baseURI)
+  const sourceLocalPath = localImagePath(source.src, image.baseURI)
+  if (currentLocalPath && currentLocalPath === sourceLocalPath) {
+    applyLocalizedAlt(image, source.alt)
+    return true
+  }
+
+  preserveStaticImageOnError(image)
   image.setAttribute('src', source.src)
   const hasDimensions = Number.isFinite(source.width) && source.width > 0 &&
     Number.isFinite(source.height) && source.height > 0
@@ -37,10 +86,10 @@ export function applyResponsiveImage(image, source, sizes = '100vw') {
     image.removeAttribute('width')
     image.removeAttribute('height')
   }
-  if (isLocalized(source.alt)) {
-    image.dataset.enAlt = source.alt.en
-    image.dataset.zhAlt = source.alt.zh
-    image.setAttribute('alt', source.alt.en)
+  applyLocalizedAlt(image, source.alt)
+  if (source.src.startsWith('https://cdn.sanity.io/images/') &&
+    OBJECT_POSITION.test(source.objectPosition) && image.style) {
+    image.style.objectPosition = source.objectPosition
   }
   return true
 }
@@ -66,14 +115,23 @@ function caseVideoSource(video) {
 }
 
 export function applyCaseVideo(record, root) {
-  const source = caseVideoSource(record?.video)
   const stage = root?.querySelector('.case02-video-stage')
   const video = root?.querySelector('[data-case-video]')
-  if (!source || !stage || !video) return false
+  if (!stage || !video) return false
+
+  const source = caseVideoSource(record?.video)
+  const posterChanged = applyCaseVideoPoster(video, record?.video?.poster)
+  if (!source) {
+    if (!posterChanged) return false
+    stage.dataset.videoState = 'poster-only'
+    video.removeAttribute('controls')
+    video.setAttribute('aria-disabled', 'true')
+    video.pause?.()
+    return true
+  }
 
   video.setAttribute('src', source)
   globalThis.window?.lonmaRefreshCaseVideoState?.()
-  applyCaseVideoPoster(video, record.video.poster)
   stage.dataset.videoState = 'ready'
   video.setAttribute('controls', '')
   video.removeAttribute('aria-disabled')
@@ -129,7 +187,67 @@ function isDetailRecord(record) {
     record.title.en && isSafeCaseImage(record.cover)
 }
 
-export function applyDetailCase(record, root, document = globalThis.document) {
+function applySeo(seo, document) {
+  if (!seo || !document || typeof document.querySelector !== 'function') return
+  const title = isLocalized(seo.title) ? seo.title.en : ''
+  const description = isLocalized(seo.description) ? seo.description.en : ''
+  if (title) {
+    document.title = title
+    for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
+      document.querySelector(selector)?.setAttribute('content', title)
+    }
+  }
+  if (description) {
+    for (const selector of [
+      'meta[name="description"]',
+      'meta[property="og:description"]',
+      'meta[name="twitter:description"]',
+    ]) document.querySelector(selector)?.setAttribute('content', description)
+  }
+  if (isSafeCaseImage(seo.socialImage)) {
+    let socialImage = seo.socialImage.src
+    if (socialImage.startsWith('/assets/images/')) {
+      const base = document.querySelector('link[rel="canonical"]')?.getAttribute('href') || document.baseURI
+      try {
+        socialImage = String(new URL(socialImage, base))
+      } catch {
+        return
+      }
+    }
+    for (const selector of ['meta[property="og:image"]', 'meta[name="twitter:image"]']) {
+      document.querySelector(selector)?.setAttribute('content', socialImage)
+    }
+  }
+}
+
+function orderedPagination(collection, slug) {
+  if (!Array.isArray(collection) || collection.length < 2) return null
+  const records = collection.map((record) => ({slug: record?.slug, order: record?.order}))
+  if (records.some((record) => !CASE_SLUG.test(record.slug) || !Number.isInteger(record.order))) return null
+  const slugs = new Set(records.map((record) => record.slug))
+  const orders = new Set(records.map((record) => record.order))
+  if (slugs.size !== records.length || orders.size !== records.length) return null
+  records.sort((left, right) => left.order - right.order)
+  const index = records.findIndex((record) => record.slug === slug)
+  if (index < 0) return null
+  return {
+    previous: records[(index - 1 + records.length) % records.length],
+    next: records[(index + 1) % records.length],
+  }
+}
+
+function applyPagination(collection, record, previous, next) {
+  const pagination = orderedPagination(collection, record.slug)
+  if (!pagination || !previous || !next) return
+  const previousNumber = pagination.previous.slug.slice(5)
+  const nextNumber = pagination.next.slug.slice(5)
+  previous.setAttribute('href', `./${pagination.previous.slug}.html`)
+  applyLocalizedNode(previous, {en: `← CASE ${previousNumber}`, zh: `← 上一案例 ${previousNumber}`})
+  next.setAttribute('href', `./${pagination.next.slug}.html`)
+  applyLocalizedNode(next, {en: `CASE ${nextNumber} →`, zh: `下一案例 ${nextNumber} →`})
+}
+
+export function applyDetailCase(record, root, document = globalThis.document, collection = []) {
   if (!isDetailRecord(record) || !root || !document) return false
 
   const fields = {
@@ -142,6 +260,8 @@ export function applyDetailCase(record, root, document = globalThis.document) {
     vehicleModel: root.querySelector('[data-cms="vehicleModel"]'),
     vehicleYear: root.querySelector('[data-cms="vehicleYear"]'),
     media: root.querySelector('[data-cms-media-sections]'),
+    previous: root.querySelector('[data-cms-pagination="previous"]'),
+    next: root.querySelector('[data-cms-pagination="next"]'),
   }
   if (!fields.title || !fields.media || (!fields.cover && !root.querySelector('.case02-video-stage'))) return false
 
@@ -155,7 +275,9 @@ export function applyDetailCase(record, root, document = globalThis.document) {
   if (fields.cover) applyResponsiveImage(fields.cover, record.cover, '(max-width: 768px) 100vw, 50vw')
 
   const sections = renderMediaSections(record.mediaSections, document)
-  if (sections.children.length && !root.querySelector('.case02-video-stage')) fields.media.replaceChildren(sections)
+  if (sections.children.length) fields.media.replaceChildren(sections)
+  applySeo(record.seo, document)
+  applyPagination(collection, record, fields.previous, fields.next)
   return true
 }
 
@@ -174,8 +296,11 @@ export function loadDetailCase({
 
   const load = (async () => {
     try {
-      const [record] = await fetchCases({slug})
-      if (!applyDetailCase(record, root, document)) return false
+      const collection = await fetchCases({slug})
+      const record = Array.isArray(collection)
+        ? collection.find((candidate) => candidate?.slug === slug)
+        : null
+      if (!applyDetailCase(record, root, document, collection)) return false
       applyCaseVideo(record, root)
       notifiedRoots.add(root)
       eventTarget.dispatchEvent(new Event('lonma:content-updated'))

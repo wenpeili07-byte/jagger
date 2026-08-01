@@ -211,3 +211,83 @@ test("selected make survives a shared language switch", () => {
     langToggle.dispatch("click");
   }
 });
+
+test("active make and bilingual counts refresh after CMS brand hydration", () => {
+  class FakeElement {
+    constructor({ dataset = {}, child = null } = {}) {
+      this.dataset = dataset;
+      this.child = child;
+      this.hidden = false;
+      this.listeners = new Map();
+      this.textContent = "";
+      this.attributes = new Map();
+      this.classList = { toggle: () => {} };
+    }
+
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener);
+    }
+
+    dispatch(name) {
+      this.listeners.get(name)?.();
+    }
+
+    querySelector(selector) {
+      return selector === "small" ? this.child : null;
+    }
+
+    setAttribute(name, value) {
+      this.attributes.set(name, value);
+    }
+
+    getAttribute(name) {
+      return this.attributes.get(name) ?? null;
+    }
+  }
+
+  const countNodes = new Map(["benz", "bmw", "audi"].map((brand) => [brand, new FakeElement()]));
+  const filters = ["all", "benz", "bmw", "audi"].map((filter) => new FakeElement({
+    dataset: { filter },
+    child: countNodes.get(filter),
+  }));
+  const cards = ["bmw", "bmw", "bmw", "bmw", "benz", "audi"].map((brand) => new FakeElement({ dataset: { brand } }));
+  const activeFilterLabel = new FakeElement({ dataset: { zh: "全部品牌", en: "ALL MAKES" } });
+  const windowListeners = new Map();
+  const nodesBySelector = new Map([
+    ["[data-filter]", filters],
+    ["[data-brand]", cards],
+    ["[data-active-filter]", [activeFilterLabel]],
+    [".mwg_effect060 .slides", []],
+  ]);
+  const document = {
+    body: { dataset: { lang: "en" } },
+    querySelector: (selector) => nodesBySelector.get(selector)?.[0] ?? null,
+    querySelectorAll: (selector) => nodesBySelector.get(selector) ?? [],
+  };
+  const window = {
+    addEventListener: (name, listener) => windowListeners.set(name, listener),
+    matchMedia: () => ({ matches: false }),
+  };
+
+  vm.runInNewContext(js, { document, window });
+  filters.find((button) => button.dataset.filter === "bmw").dispatch("click");
+
+  ["audi", "audi", "bmw", "benz", "benz", "benz"].forEach((brand, index) => {
+    cards[index].dataset.brand = brand;
+  });
+  windowListeners.get("lonma:content-updated")?.();
+
+  assert.equal(activeFilterLabel.textContent, "BMW");
+  assert.equal(cards.filter((card) => !card.hidden).length, 1, "the selected make should be reapplied to hydrated brands");
+  assert.equal(countNodes.get("bmw").textContent, "01 CASE");
+  assert.deepEqual(
+    {...countNodes.get("bmw").dataset},
+    {en: "01 CASE", zh: "01 案例"},
+  );
+  assert.equal(countNodes.get("audi").textContent, "02 CASES");
+  assert.deepEqual(
+    {...countNodes.get("benz").dataset},
+    {en: "03 CASES", zh: "03 案例"},
+  );
+  assert.equal(cards.length, 6, "hydration should keep the existing six archive cards");
+});

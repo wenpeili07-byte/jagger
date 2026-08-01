@@ -106,13 +106,16 @@
   gap: clamp(24px, 4vw, 64px);
 }
 
-.detail-media-section-textLeft,
-.detail-media-section-textRight {
+.detail-media-section-textLeft {
   grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
 }
 
-.detail-media-section-textRight .detail-media-copy {
-  order: 2;
+.detail-media-section-textRight {
+  grid-template-columns: minmax(0, 0.58fr) minmax(0, 0.42fr);
+}
+
+.detail-media-section-textLeft .detail-media-copy {
+  order: -1;
 }
 
 .detail-media-section figure {
@@ -246,6 +249,7 @@
     grid-template-columns: 1fr;
   }
 
+  .detail-media-section-textLeft .detail-media-copy,
   .detail-media-section-textRight .detail-media-copy {
     order: initial;
   }

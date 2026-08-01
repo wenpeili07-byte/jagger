@@ -1,6 +1,7 @@
 const filterButtons = [...document.querySelectorAll("[data-filter]")];
 const archiveCards = [...document.querySelectorAll("[data-brand]")];
 const activeFilterLabel = document.querySelector("[data-active-filter]");
+let activeFilter = "all";
 
 function getFilterLabel(filter) {
   if (filter !== "all") {
@@ -20,6 +21,7 @@ function getFilterLanguageValues(filter) {
 }
 
 function setArchiveFilter(filter) {
+  activeFilter = filter;
   const label = getFilterLabel(filter);
   const languageValues = getFilterLanguageValues(filter);
 
@@ -41,11 +43,33 @@ function setArchiveFilter(filter) {
   }
 }
 
+function updateFilterCounts() {
+  filterButtons.forEach((button) => {
+    const filter = button.dataset.filter;
+    if (filter === "all") return;
+
+    const countNode = button.querySelector("small");
+    if (!countNode) return;
+    const count = archiveCards.filter((card) => card.dataset.brand === filter).length;
+    const number = String(count).padStart(2, "0");
+    countNode.dataset.en = `${number} ${count === 1 ? "CASE" : "CASES"}`;
+    countNode.dataset.zh = `${number} 案例`;
+    countNode.textContent = countNode.dataset[document.body.dataset.lang === "zh" ? "zh" : "en"];
+  });
+}
+
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => setArchiveFilter(button.dataset.filter));
 });
 
 setArchiveFilter("all");
+
+if (typeof window.addEventListener === "function") {
+  window.addEventListener("lonma:content-updated", () => {
+    updateFilterCounts();
+    setArchiveFilter(activeFilter);
+  });
+}
 
 function initIndependentRailScroll() {
   const rail = document.querySelector(".mwg_effect060 .slides");

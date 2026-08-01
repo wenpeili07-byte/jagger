@@ -28,6 +28,8 @@ test("Case 02 exposes CMS slots and preserves controller order", () => {
   assert.match(html, /data-cms="vehicleYear"/);
   assert.match(html, /data-cms="poster"/);
   assert.match(html, /data-cms-media-sections/);
+  assert.match(html, /data-cms-pagination="previous"/);
+  assert.match(html, /data-cms-pagination="next"/);
   assert.match(
     html,
     /<script src="\.\.\/\.\.\/content-pages\.js[^>]*><\/script>\s*<script src="\.\.\/\.\.\/case-02\.js[^>]*><\/script>\s*<script type="module" src="\.\.\/\.\.\/sanity-case-detail\.js/s,

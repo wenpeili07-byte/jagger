@@ -12,12 +12,17 @@ const UNSAFE_VIDEO_URL_CHARACTERS = /[%\\\u0000-\u001f\u007f-\u009f\p{Cf}]/u
 const caseProjection = `{
   _id, caseNumber, "slug": slug.current, order, brand, featured,
   vehicle, title, subtitle, lede, story,
-  cover{imagePath, alt, "asset": asset.asset->{url, metadata{dimensions}}},
+  cover{imagePath, alt, "crop": asset.crop, "hotspot": asset.hotspot,
+    "asset": asset.asset->{url, metadata{dimensions}}},
   video{externalUrl, "fileUrl": file.asset->url,
-    poster{imagePath, alt, "asset": asset.asset->{url, metadata{dimensions}}}},
+    poster{imagePath, alt, "crop": asset.crop, "hotspot": asset.hotspot,
+      "asset": asset.asset->{url, metadata{dimensions}}}},
   mediaSections[]{_key, layout, heading, body,
-    image{imagePath, alt, "asset": asset.asset->{url, metadata{dimensions}}}},
-  seo
+    image{imagePath, alt, "crop": asset.crop, "hotspot": asset.hotspot,
+      "asset": asset.asset->{url, metadata{dimensions}}}},
+  seo{title, description,
+    socialImage{imagePath, alt, "crop": asset.crop, "hotspot": asset.hotspot,
+      "asset": asset.asset->{url, metadata{dimensions}}}}
 }`
 
 function text(value) {
@@ -114,6 +119,29 @@ function imageDimensions(image) {
     : null
 }
 
+function normalizeCrop(value) {
+  const crop = {
+    left: value?.left,
+    right: value?.right,
+    top: value?.top,
+    bottom: value?.bottom,
+  }
+  if (!Object.values(crop).every((part) => Number.isFinite(part) && part >= 0 && part < 1) ||
+    crop.left + crop.right >= 1 || crop.top + crop.bottom >= 1) return null
+  return crop
+}
+
+function normalizeHotspot(value) {
+  return Number.isFinite(value?.x) && value.x >= 0 && value.x <= 1 &&
+    Number.isFinite(value?.y) && value.y >= 0 && value.y <= 1
+    ? {x: value.x, y: value.y}
+    : null
+}
+
+function percent(value) {
+  return `${Number((Math.min(1, Math.max(0, value)) * 100).toFixed(2))}%`
+}
+
 export function buildResponsiveSanitySrcset(src, width) {
   if (!isSanityImageUrl(src) || !Number.isFinite(width) || width <= 0) return ''
   const url = new URL(src)
@@ -135,14 +163,37 @@ export function buildResponsiveSanityImage(image) {
     return {src: imagePath, alt}
   }
 
-  const dimensions = imageDimensions(image)
-  if (!isSanityImageUrl(assetUrl) || !dimensions) return null
+  const sourceDimensions = imageDimensions(image)
+  if (!isSanityImageUrl(assetUrl) || !sourceDimensions) return null
+
+  const crop = normalizeCrop(image?.crop)
+  const hotspot = normalizeHotspot(image?.hotspot)
+  const url = new URL(assetUrl)
+  let dimensions = sourceDimensions
+  if (crop) {
+    const left = Math.round(sourceDimensions.width * crop.left)
+    const top = Math.round(sourceDimensions.height * crop.top)
+    const width = Math.round(sourceDimensions.width * (1 - crop.left - crop.right))
+    const height = Math.round(sourceDimensions.height * (1 - crop.top - crop.bottom))
+    url.searchParams.set('rect', `${left},${top},${width},${height}`)
+    dimensions = {width, height}
+  }
+
+  let objectPosition = ''
+  if (hotspot) {
+    const x = crop ? (hotspot.x - crop.left) / (1 - crop.left - crop.right) : hotspot.x
+    const y = crop ? (hotspot.y - crop.top) / (1 - crop.top - crop.bottom) : hotspot.y
+    objectPosition = `${percent(x)} ${percent(y)}`
+  }
+
+  const src = String(url)
 
   return {
-    src: assetUrl,
+    src,
     alt,
     ...dimensions,
-    srcset: buildResponsiveSanitySrcset(assetUrl, dimensions.width),
+    srcset: buildResponsiveSanitySrcset(src, dimensions.width),
+    ...(objectPosition ? {objectPosition} : {}),
   }
 }
 
@@ -251,12 +302,9 @@ export function buildCaseQueryUrl(slug) {
     throw new TypeError('Sanity case slug must be case-01 through case-36')
   }
 
-  const query = slug
-    ? `*[_type == "casePage" && !(_id in path("drafts.*")) && slug.current == $slug][0]${caseProjection}`
-    : `*[_type == "casePage" && !(_id in path("drafts.*"))] | order(order asc) ${caseProjection}`
+  const query = `*[_type == "casePage" && !(_id in path("drafts.*"))] | order(order asc) ${caseProjection}`
   const url = new URL(`https://${sanityPublicConfig.projectId}.api.sanity.io/v${sanityPublicConfig.apiVersion}/data/query/${sanityPublicConfig.dataset}`)
   url.searchParams.set('query', query)
-  if (slug) url.searchParams.set('$slug', JSON.stringify(slug))
   return url
 }
 
@@ -272,6 +320,7 @@ export async function fetchPublishedCases({slug, fetchImpl = fetch, timeoutMs = 
     const payload = await response.json()
     const records = Array.isArray(payload.result) ? payload.result : [payload.result]
     return ensureUniqueCases(records.map(normalizeCaseRecord).filter(Boolean))
+      .sort((left, right) => left.order - right.order)
   } finally {
     clearTimeout(timeout)
   }

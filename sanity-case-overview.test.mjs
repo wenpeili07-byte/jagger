@@ -45,7 +45,16 @@ class FakeNode {
     this.slots = slots
     this.textContent = ''
     this.attributes = new Map()
+    this.listeners = new Map()
     this.classList = {contains: (name) => spacer && name === 'spacer'}
+  }
+
+  addEventListener(name, listener) {
+    this.listeners.set(name, listener)
+  }
+
+  dispatch(name) {
+    this.listeners.get(name)?.()
   }
 
   querySelector(selector) {
@@ -156,21 +165,70 @@ test('notifies and warns once per overview root lifecycle', async () => {
   assert.equal(dispatched, 1, 'a repeated successful update should notify only once for its root')
 })
 
-test('replaces local CMS cover attributes without retaining stale responsive sources', () => {
+test('preserves seeded responsive cover attributes when the CMS local path matches', () => {
   const card = caseNode('case-01')
   const cover = card.slots['[data-cms-cover]']
-  cover.setAttribute('srcset', '../assets/images/generated/old-cover.webp 960w')
-  cover.setAttribute('sizes', '25vw')
+  cover.setAttribute('src', '../assets/images/case-01.jpg')
+  cover.setAttribute('srcset', '../assets/images/generated/case-01-640w.webp 640w, ../assets/images/generated/case-01-960w.webp 960w')
+  cover.setAttribute('sizes', '(max-width: 768px) 50vw, 25vw')
+  cover.setAttribute('width', '1920')
+  cover.setAttribute('height', '1282')
   const root = {
     querySelectorAll: () => [card],
     querySelector: () => null,
   }
 
   assert.equal(applyCasesOverview([records[0]], root), 1)
-  assert.equal(cover.getAttribute('src'), '/assets/images/case-01.jpg')
-  assert.equal(cover.getAttribute('srcset'), null)
-  assert.equal(cover.getAttribute('sizes'), null)
+  assert.equal(cover.getAttribute('src'), '../assets/images/case-01.jpg')
+  assert.equal(cover.getAttribute('srcset'), '../assets/images/generated/case-01-640w.webp 640w, ../assets/images/generated/case-01-960w.webp 960w')
+  assert.equal(cover.getAttribute('sizes'), '(max-width: 768px) 50vw, 25vw')
+  assert.equal(cover.getAttribute('width'), '1920')
+  assert.equal(cover.getAttribute('height'), '1282')
   assert.equal(cover.dataset.enAlt, 'Car 1')
   assert.equal(cover.dataset.zhAlt, '车辆 1')
   assert.equal(cover.getAttribute('alt'), 'Car 1')
+})
+
+test('restores static cover attributes and rail scene when a CMS replacement fails', () => {
+  const railCard = caseNode('case-01')
+  railCard.dataset.scene = '../assets/images/generated/case-01/case-01-1600w.webp'
+  const cover = railCard.slots['[data-cms-cover]']
+  const staticAttributes = {
+    src: '../assets/images/网页/optimized/case-01.jpg',
+    srcset: '../assets/images/generated/case-01/case-01-640w.webp 640w, ../assets/images/generated/case-01/case-01-1600w.webp 1600w',
+    sizes: '(max-width: 1180px) 84vw, 50vw',
+    width: '1920',
+    height: '1282',
+    alt: 'Static cover',
+  }
+  for (const [name, value] of Object.entries(staticAttributes)) cover.setAttribute(name, value)
+  cover.dataset.enAlt = 'Static cover'
+  cover.dataset.zhAlt = '静态封面'
+  const replacement = {
+    ...records[0],
+    cover: {
+      src: 'https://cdn.sanity.io/images/project/production/replacement.jpg',
+      srcset: 'https://cdn.sanity.io/images/project/production/replacement.jpg?w=640 640w',
+      width: 1600,
+      height: 900,
+      alt: {en: 'CMS cover', zh: 'CMS 封面'},
+    },
+  }
+  const root = {
+    querySelectorAll: () => [railCard],
+    querySelector: () => null,
+  }
+
+  assert.equal(applyCasesOverview([replacement], root), 1)
+  assert.equal(cover.getAttribute('src'), replacement.cover.src)
+  assert.equal(railCard.dataset.scene, replacement.cover.src)
+
+  cover.dispatch('error')
+
+  for (const [name, value] of Object.entries(staticAttributes)) {
+    assert.equal(cover.getAttribute(name), value, `${name} should return to its static fallback`)
+  }
+  assert.equal(cover.dataset.enAlt, 'Static cover')
+  assert.equal(cover.dataset.zhAlt, '静态封面')
+  assert.equal(railCard.dataset.scene, '../assets/images/generated/case-01/case-01-1600w.webp')
 })
