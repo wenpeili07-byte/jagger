@@ -3,6 +3,8 @@ import {sanityPublicConfig} from './sanity-content-config.js'
 const CASE_SLUG = /^case-(?:0[1-9]|[12][0-9]|3[0-6])$/
 const CASE_BRANDS = new Set(['bmw', 'audi', 'mercedes-benz'])
 const IMAGE_WIDTHS = [640, 960, 1600, 2400]
+const SANITY_IMAGE_PATH = /^\/images\/([^/]+)\/([^/]+)\/([^/]+)$/
+const UNSAFE_URL_CHARACTERS = /[,\\\u0000-\u001f\u007f]/
 const caseProjection = `{
   _id, caseNumber, "slug": slug.current, order, brand, featured,
   vehicle, title, subtitle, lede, story,
@@ -55,10 +57,18 @@ function isCanonicalLocalMediaPath(value) {
 }
 
 function isSanityImageUrl(value) {
+  if (typeof value !== 'string' || UNSAFE_URL_CHARACTERS.test(value)) return false
+
   try {
     const url = new URL(value)
+    const pathSegments = url.pathname.match(SANITY_IMAGE_PATH)?.slice(1)
     return url.protocol === 'https:' && url.hostname === 'cdn.sanity.io' &&
-      url.pathname.startsWith('/images/')
+      !url.username && !url.password && !url.hash && Boolean(pathSegments) &&
+      pathSegments.every((segment) => {
+        const decodedSegment = decodeURIComponent(segment)
+        return decodedSegment && decodedSegment !== '.' && decodedSegment !== '..' &&
+          !UNSAFE_URL_CHARACTERS.test(decodedSegment) && !decodedSegment.includes('/')
+      })
   } catch {
     return false
   }

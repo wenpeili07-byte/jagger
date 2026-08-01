@@ -59,6 +59,22 @@ test('image normalization permits only canonical local image paths or dimensione
   )
 })
 
+test('Sanity image URLs reject srcset candidate injection, credentials, and fragments', () => {
+  const dimensions = {width: 1600, height: 900}
+  assert.equal(
+    buildResponsiveSanityImage({asset: {url: 'https://cdn.sanity.io/images/x/y/a.jpg,https://evil.example/x.jpg', metadata: {dimensions}}}),
+    null,
+  )
+  assert.equal(
+    buildResponsiveSanityImage({asset: {url: 'https://user:password@cdn.sanity.io/images/x/y/a.jpg', metadata: {dimensions}}}),
+    null,
+  )
+  assert.equal(
+    buildResponsiveSanityImage({asset: {url: 'https://cdn.sanity.io/images/x/y/a.jpg#fragment', metadata: {dimensions}}}),
+    null,
+  )
+})
+
 test('invalid image cover sources reject the full record', () => {
   assert.equal(normalizeCaseRecord(validCase({cover: {imagePath: '/assets/videos/case-01.mp4'}})), null)
   assert.equal(normalizeCaseRecord(validCase({cover: {asset: {url: 'https://cdn.sanity.io/images/x/y/car.jpg'}}})), null)
