@@ -10,7 +10,7 @@ const css = [
   readFileSync(new URL("./case-rail.css", import.meta.url), "utf8")
 ].join("\n");
 const js = readFileSync(new URL("./pages/cases.js", import.meta.url), "utf8");
-const sharedAssetVersion = "project-planner-redesign-20260726";
+const sharedAssetVersion = "sanity-case-cms-20260801";
 
 assert.match(html, /<section class="cases-hero"/, "cases page should include the PLAN A hero section");
 assert.match(html, /<section class="case-archive"/, "cases page should include the archive section below the hero");
@@ -30,13 +30,16 @@ assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive shou
 assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should not include the old scrolling masked image rail");
 assert.match(html, /36 PERFORMANCE PROJECTS/, "archive should be framed as 36 performance projects");
 assert.match(html, new RegExp(`styles\\.css\\?v=${sharedAssetVersion}`), "cases page should load the current shared stylesheet cache key");
-assert.match(html, /layout-canvas\.css\?v=project-planner-redesign-20260726/, "cases page should load the current shared canvas cache key");
+assert.match(html, /layout-canvas\.css\?v=sanity-case-cms-20260801/, "cases page should load the current shared canvas cache key");
 assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
 assert.doesNotMatch(html, /assets\/vendor\/motion-core\.js/, "static hero rail should not load GSAP vendor files");
 assert.doesNotMatch(html, /assets\/vendor\/scroll-motion\.js/, "static hero rail should not load ScrollTrigger vendor files");
-assert.match(html, /<script src="\.\/cases\.js\?v=mobile-option3-20260728"><\/script>/, "cases page should load the current accessible archive filter script");
+assert.match(html, new RegExp(`<script src="\\.\\/cases\\.js\\?v=${sharedAssetVersion}"><\\/script>`), "cases page should load the current accessible archive filter script");
 assert.match(html, /<body data-section="cases">/, "cases page should expose its navigation section to the shared language controller");
 assert.match(html, new RegExp(`<script src="\\.\\.\\/content-pages\\.js\\?v=${sharedAssetVersion}"><\\/script>`), "cases page should load the current shared language controller");
+assert.equal((html.match(/class="slide[^\"]*"[^>]*data-case-slug="case-0[1-6]"/g) || []).length, 6, "all six existing rail slides should expose stable case slugs");
+assert.equal((html.match(/class="archive-card"[^>]*data-case-slug="case-0[1-6]"/g) || []).length, 6, "all six existing archive cards should expose stable case slugs");
+assert.match(html, new RegExp(`content-pages\\.js[^<]*<\\/script>\\s*<script type="module" src="\\.\\.\\/sanity-case-overview\\.js\\?v=${sharedAssetVersion}`), "the overview CMS module should load after language support");
 assert.match(html, /data-lang-option="zh"/, "cases page should identify the Chinese language option");
 assert.match(html, /data-lang-option="en"/, "cases page should identify the English language option");
 assert.match(
@@ -45,12 +48,12 @@ assert.match(
   "cases hero should provide both localized headings"
 );
 assert.equal(
-  (html.match(/class="slide[^"]*"[^>]*data-scene=[^>]*>[\s\S]*?<span class="slide-label" data-zh=/g) || []).length,
+  (html.match(/class="slide[^"]*"[^>]*data-scene=[^>]*>[\s\S]*?<span class="slide-label"[^>]*data-zh=/g) || []).length,
   6,
   "all six rail labels should be bilingual"
 );
 assert.equal(
-  (html.match(/<h3 data-zh="[^"]+" data-en="[^"]+">/g) || []).length,
+  (html.match(/<h3[^>]*data-zh="[^"]+" data-en="[^"]+">/g) || []).length,
   7,
   "the vehicle filter and all six archive titles should be bilingual"
 );
@@ -59,7 +62,7 @@ assert.equal(
   6,
   "all six archive actions should be bilingual"
 );
-assert.match(html, /function fadeToScene\(scene\)/, "cases page should keep a single inline scene fade controller");
+assert.match(html, /function fadeToScene\(scene, position\)/, "cases page should keep a single inline scene fade controller");
 assert.doesNotMatch(html, /@keyframes sceneFadeIn/, "cases page should use the shared stylesheet fade animation instead of duplicating it inline");
 assert.equal((css.match(/@keyframes sceneFadeIn/g) || []).length, 1, "shared stylesheet should define the background fade-in animation once");
 assert.match(css, /@keyframes sceneFadeIn\s*\{\s*0%\s*\{\s*opacity:\s*0\.16;\s*\}\s*100%\s*\{\s*opacity:\s*1;\s*\}\s*\}/s, "case background fade should only fade from transparent to solid");
@@ -70,10 +73,16 @@ assert.doesNotMatch(html, /scene-fade-layer/, "cases page should not keep old fa
 assert.match(html, /\["mouseenter",\s*"focus",\s*"click"\]/, "case background should use one stable hover event plus focus and click");
 assert.doesNotMatch(html, /pointerenter/, "case background should not bind both pointerenter and mouseenter");
 assert.match(html, /activeScene === scene/, "case background should not restart the fade when the active scene is unchanged");
+assert.match(html, /card\.dataset\.scenePosition/, "case background should read the hydrated scene hotspot");
+assert.match(html, /--cases-active-position/, "case background should apply the hydrated scene hotspot");
+assert.match(html, /function syncActiveScene\(\)/, "case background should synchronize the initially active CMS scene");
+assert.match(html, /addEventListener\("lonma:content-updated", syncActiveScene\)/, "case background should resynchronize after CMS hydration");
+assert.match(html, /addEventListener\("lonma:case-scene-restored", syncActiveScene\)/, "case background should restore its static scene after a CMS image failure");
 
 assert.match(css, /\.cover,\s*\.cases-hero\s*\{[^}]*min-height:\s*min\(calc\(100vh - var\(--site-header-height\)\),\s*var\(--site-first-screen-max\)\)/s, "PLAN A hero should use the shared 1900x1050 first-screen variables without stretching on taller displays");
 assert.match(css, /\.cases-page\s*\{[^}]*background:\s*transparent/s, "case page shell should stay transparent so the fixed background scene is visible");
-assert.match(css, /\.cases-page::before\s*\{[^}]*background-image:\s*var\(--cases-active-scene\)[^}]*background-position:\s*center center[^}]*background-size:\s*cover/s, "case page background should use one centered full-bleed scene image");
+assert.match(css, /\.cases-page\s*\{[^}]*--cases-active-position:\s*center center/s, "case page should define a safe default scene focus");
+assert.match(css, /\.cases-page::before\s*\{[^}]*background-image:\s*var\(--cases-active-scene\)[^}]*background-position:\s*var\(--cases-active-position\)[^}]*background-size:\s*cover/s, "case page background should use the active CMS scene focus");
 assert.doesNotMatch(css, /\.cases-page::before\s*\{[^}]*background-image:\s*var\(--cases-active-scene\),/s, "case page background should not duplicate the same image in multiple layers");
 assert.match(css, /\.cases-gap\s*\{[^}]*height:\s*100px/s, "hero and archive should be separated by 100px");
 assert.match(css, /\.archive-layout\s*\{[^}]*grid-template-columns:\s*260px\s+minmax\(0,\s*1fr\)/s, "archive should use a left filter sidebar");
@@ -207,4 +216,84 @@ test("selected make survives a shared language switch", () => {
     assert.equal(activeFilterLabel.textContent, label);
     langToggle.dispatch("click");
   }
+});
+
+test("active make and bilingual counts refresh after CMS brand hydration", () => {
+  class FakeElement {
+    constructor({ dataset = {}, child = null } = {}) {
+      this.dataset = dataset;
+      this.child = child;
+      this.hidden = false;
+      this.listeners = new Map();
+      this.textContent = "";
+      this.attributes = new Map();
+      this.classList = { toggle: () => {} };
+    }
+
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener);
+    }
+
+    dispatch(name) {
+      this.listeners.get(name)?.();
+    }
+
+    querySelector(selector) {
+      return selector === "small" ? this.child : null;
+    }
+
+    setAttribute(name, value) {
+      this.attributes.set(name, value);
+    }
+
+    getAttribute(name) {
+      return this.attributes.get(name) ?? null;
+    }
+  }
+
+  const countNodes = new Map(["benz", "bmw", "audi"].map((brand) => [brand, new FakeElement()]));
+  const filters = ["all", "benz", "bmw", "audi"].map((filter) => new FakeElement({
+    dataset: { filter },
+    child: countNodes.get(filter),
+  }));
+  const cards = ["bmw", "bmw", "bmw", "bmw", "benz", "audi"].map((brand) => new FakeElement({ dataset: { brand } }));
+  const activeFilterLabel = new FakeElement({ dataset: { zh: "全部品牌", en: "ALL MAKES" } });
+  const windowListeners = new Map();
+  const nodesBySelector = new Map([
+    ["[data-filter]", filters],
+    ["[data-brand]", cards],
+    ["[data-active-filter]", [activeFilterLabel]],
+    [".mwg_effect060 .slides", []],
+  ]);
+  const document = {
+    body: { dataset: { lang: "en" } },
+    querySelector: (selector) => nodesBySelector.get(selector)?.[0] ?? null,
+    querySelectorAll: (selector) => nodesBySelector.get(selector) ?? [],
+  };
+  const window = {
+    addEventListener: (name, listener) => windowListeners.set(name, listener),
+    matchMedia: () => ({ matches: false }),
+  };
+
+  vm.runInNewContext(js, { document, window });
+  filters.find((button) => button.dataset.filter === "bmw").dispatch("click");
+
+  ["audi", "audi", "bmw", "benz", "benz", "benz"].forEach((brand, index) => {
+    cards[index].dataset.brand = brand;
+  });
+  windowListeners.get("lonma:content-updated")?.();
+
+  assert.equal(activeFilterLabel.textContent, "BMW");
+  assert.equal(cards.filter((card) => !card.hidden).length, 1, "the selected make should be reapplied to hydrated brands");
+  assert.equal(countNodes.get("bmw").textContent, "01 CASE");
+  assert.deepEqual(
+    {...countNodes.get("bmw").dataset},
+    {en: "01 CASE", zh: "01 案例"},
+  );
+  assert.equal(countNodes.get("audi").textContent, "02 CASES");
+  assert.deepEqual(
+    {...countNodes.get("benz").dataset},
+    {en: "03 CASES", zh: "03 案例"},
+  );
+  assert.equal(cards.length, 6, "hydration should keep the existing six archive cards");
 });

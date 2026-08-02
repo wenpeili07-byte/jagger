@@ -7,21 +7,34 @@ const serviceCss = read("./service-detail.css");
 
 for (const id of ["01", "03", "04", "05", "06"]) {
   const html = read(`./pages/cases/case-${id}.html`);
-  assert.match(html, /case-detail\.css\?v=mobile-spacing-20260722/);
+  assert.match(html, /case-detail\.css\?v=sanity-case-cms-20260801/);
   assert.match(html, /class="detail-hero"/);
   assert.match(html, /class="detail-story"/);
   assert.match(html, /class="detail-contact"/);
   assert.doesNotMatch(html, /<figcaption|case-spec-grid|case-section-kicker|case-detail-meta/);
+  assert.match(html, new RegExp(`data-case-slug="case-${id}"`));
+  assert.match(html, /data-cms="title"/);
+  assert.match(html, /data-cms="subtitle"/);
+  assert.match(html, /data-cms="lede"/);
+  assert.match(html, /data-cms="story"/);
+  assert.match(html, /data-cms="cover"/);
+  assert.match(html, /data-cms-media-sections/);
+  assert.match(html, /data-cms-pagination="previous"/);
+  assert.match(html, /data-cms-pagination="next"/);
+  assert.match(html, /<script type="module" src="\.\.\/\.\.\/sanity-case-detail\.js/);
 }
 
 const case02 = read("./pages/cases/case-02.html");
-assert.match(case02, /case-detail\.css\?v=mobile-spacing-20260722/);
+assert.match(case02, /case-detail\.css\?v=sanity-case-cms-20260801/);
 assert.match(case02, /class="case02-video-stage"/);
 assert.match(case02, /class="case02-story"/);
 assert.match(case02, /class="detail-contact"/);
 assert.match(case02, /class="detail-pagination"/);
 assert.equal((case02.match(/class="detail-contact"/g) || []).length, 1);
 assert.doesNotMatch(case02, /<figcaption|case-spec-grid|case-section-kicker|case-detail-meta/);
+assert.match(case02, /<script type="module" src="\.\.\/\.\.\/sanity-case-detail\.js/);
+assert.match(case02, /data-cms-pagination="previous"/);
+assert.match(case02, /data-cms-pagination="next"/);
 
 assert.match(css, /\.detail-hero\s*\{[^}]*grid-template-columns:/s);
 assert.match(css, /\.detail-hero-media img\s*\{[^}]*object-fit:\s*cover/s);
@@ -29,6 +42,21 @@ assert.match(css, /@media \(max-width:\s*899px\)[\s\S]*?\.detail-hero\s*\{[^}]*g
 assert.doesNotMatch(css, /\.detail-hero-media\s*\{[^}]*border:/s);
 assert.doesNotMatch(css, /\.detail-story\s*\{[^}]*border:/s);
 assert.doesNotMatch(css, /figcaption|case-spec-grid|case-detail-meta/);
+assert.match(
+  css,
+  /\.detail-media-section-textLeft\s+\.detail-media-copy\s*\{[^}]*order:\s*-1/s,
+  "textLeft should place copy before the image on desktop"
+);
+assert.match(
+  css,
+  /\.detail-media-section-textRight\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*0\.58fr\)\s+minmax\(0,\s*0\.42fr\)/s,
+  "textRight should keep the image in the wider left column on desktop"
+);
+assert.match(
+  css,
+  /@media \(max-width:\s*768px\)[\s\S]*?\.detail-media-section-textLeft\s+\.detail-media-copy[^}]*order:\s*initial/s,
+  "mobile textLeft should restore image then copy DOM order"
+);
 
 assert.match(
   css,

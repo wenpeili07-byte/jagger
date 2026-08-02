@@ -69,7 +69,7 @@ function contrastRatio(firstColor, secondColor) {
 
 for (const [name, html] of pages) {
   assert.match(html, /class="site-shell content-page/, `${name} should use the content-page shell`);
-  assert.match(html, /href="\.\.\/content-pages\.css\?v=project-planner-redesign-20260726"/, `${name} should load the current isolated content page stylesheet`);
+  assert.match(html, /href="\.\.\/content-pages\.css\?v=sanity-case-cms-20260801"/, `${name} should load the current isolated content page stylesheet`);
   assert.match(html, /src="\.\.\/content-pages\.js\?v=/, `${name} should load shared page interactions`);
   assert.match(html, /<header class="topbar">/, `${name} should keep the shared site header`);
   assert.match(html, /<button class="lang-toggle" type="button" aria-label="切换到中文">/, `${name} should keep the language control`);
@@ -385,4 +385,83 @@ test("detail language controller updates accessible names and image alternatives
   assert.equal(image.getAttribute("alt"), "LONMA DYNAMIC STREET WIDEBODY");
   assert.equal(pagination.getAttribute("aria-label"), "Case pagination");
   assert.equal(translatedNodes[0].textContent, "CASES");
+});
+
+test("content updates reapply the active language to nodes added after startup", () => {
+  class FakeElement {
+    constructor({ attributes = {}, dataset = {} } = {}) {
+      this.attributes = new Map(Object.entries(attributes));
+      this.dataset = dataset;
+      this.listeners = new Map();
+      this.textContent = "";
+      this.classList = { toggle: () => {} };
+    }
+
+    addEventListener(name, listener) {
+      this.listeners.set(name, listener);
+    }
+
+    getAttribute(name) {
+      return this.attributes.get(name) ?? null;
+    }
+
+    setAttribute(name, value) {
+      this.attributes.set(name, value);
+    }
+  }
+
+  const translatedNodes = [new FakeElement({ dataset: { zh: "原始中文", en: "STATIC ENGLISH" } })];
+  const alternativeTextNodes = [];
+  const metadataNodes = [];
+  const windowListeners = new Map();
+  const nodesBySelector = new Map([
+    [".lang-toggle", []],
+    ["[data-lang-option]", []],
+    ["[data-zh][data-en]", translatedNodes],
+    ["[data-zh-placeholder][data-en-placeholder]", []],
+    ["[data-zh-aria-label][data-en-aria-label]", []],
+    ["[data-zh-alt][data-en-alt]", alternativeTextNodes],
+    ["[data-zh-content][data-en-content]", metadataNodes],
+    [".nav a", []],
+    ["[data-service-row]", []],
+  ]);
+  const document = {
+    body: { dataset: { section: "cases" } },
+    documentElement: { lang: "zh-CN" },
+    querySelector: (selector) => nodesBySelector.get(selector)?.[0] ?? null,
+    querySelectorAll: (selector) => nodesBySelector.get(selector) ?? [],
+  };
+  const sessionStorage = new Map([["lonma-language", "zh"]]);
+  const window = {
+    location: { pathname: "/pages/cases.html" },
+    addEventListener: (name, listener) => windowListeners.set(name, listener),
+  };
+
+  vm.runInNewContext(js, {
+    document,
+    sessionStorage: {
+      getItem: (key) => sessionStorage.get(key) ?? null,
+      setItem: (key, value) => sessionStorage.set(key, value),
+    },
+    window,
+  });
+
+  const cmsTitle = new FakeElement({ dataset: { zh: "新的中文标题", en: "NEW ENGLISH TITLE" } });
+  const cmsImage = new FakeElement({
+    attributes: { alt: "NEW ENGLISH ALT" },
+    dataset: { zhAlt: "新的中文替代文字", enAlt: "NEW ENGLISH ALT" },
+  });
+  const cmsDescription = new FakeElement({
+    attributes: { content: "NEW ENGLISH DESCRIPTION" },
+    dataset: { zhContent: "新的中文描述", enContent: "NEW ENGLISH DESCRIPTION" },
+  });
+  translatedNodes.push(cmsTitle);
+  alternativeTextNodes.push(cmsImage);
+  metadataNodes.push(cmsDescription);
+  windowListeners.get("lonma:content-updated")?.();
+
+  assert.equal(cmsTitle.textContent, "新的中文标题");
+  assert.equal(cmsImage.getAttribute("alt"), "新的中文替代文字");
+  assert.equal(cmsDescription.getAttribute("content"), "新的中文描述");
+  assert.equal(sessionStorage.get("lonma-language"), "zh", "refreshing content should not change the stored language");
 });

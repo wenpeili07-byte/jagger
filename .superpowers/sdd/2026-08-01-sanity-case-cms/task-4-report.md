@@ -1,0 +1,135 @@
+# Task 4 Report: Generic Case Detail CMS
+
+## Scope
+
+Implemented generic CMS enhancement for Case 01 and Cases 03 through 06 only. Case 02 remains unchanged. The generator owns all changed case HTML; no generated generic page was edited directly.
+
+## RED
+
+Added failing detail-marker assertions in `case-detail.test.mjs` and new DOM-fixture tests in `sanity-case-detail.test.mjs`.
+
+Command run with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs case-detail.test.mjs content-pages.test.mjs
+```
+
+Observed expected failures before implementation:
+
+- Case 01 lacked `data-case-slug="case-01"`.
+- `sanity-case-detail.js` was absent (`ERR_MODULE_NOT_FOUND`).
+
+## GREEN
+
+Added `sanity-case-detail.js`, generator-owned CMS slots, the generic-case module script, and unframed responsive media-section rules. The renderer uses DOM APIs for CMS data, leaves invalid/missing records untouched, preserves an empty static media container, clears stale local-image responsive attributes, and dispatches one content-update event after a successful patch. The existing Task 3 language refresh listener remains the single listener.
+
+Focused command passed: 14 tests, 0 failures.
+
+## Regression Evidence
+
+Regenerated with:
+
+```text
+node scripts/render-detail-pages.mjs
+```
+
+Required regression command passed with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs case-detail.test.mjs content-pages.test.mjs link-closure.test.mjs image-performance.test.mjs
+```
+
+Result: 23 tests passed, 0 failed.
+
+`git diff -- pages/services` was empty after regeneration, so all regenerated Service detail pages are byte-for-byte unchanged. `pages/cases/case-02.html` has no diff and no `sanity-case-detail.js` reference.
+
+## Review Fix Round
+
+### RED
+
+Added failing regression tests for stale local-image width and height removal, unsafe photo-story sources (`javascript:`, local video paths, arbitrary remote URLs, and dimensionless Sanity URLs), all-invalid media fallback preservation, and repeated detail-loader success/failure lifecycle behavior.
+
+Command run with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs
+```
+
+Observed four expected failures: stale `width`, unsafe media rendering, and incompatible repeated-loader lifecycle calls.
+
+### GREEN
+
+Exported `isSafeCaseImage` from the Task 2 data boundary and reused it in the detail renderer. Local images are restricted to canonical `/assets/images/` paths; remote images require canonical Sanity CDN image URLs and finite positive dimensions. Dimensionless local images now clear `srcset`, `sizes`, `width`, and `height`. Invalid media sections are skipped, preserving the static container when none remain.
+
+The detail loader now accepts testable dependencies and follows the overview lifecycle policy: a successfully patched root fetches, writes, and dispatches only once; repeated failures may retry but warn only once per root.
+
+No generator, generated page, Case 02, Service page, CSS, audit, or image file changed in this review round, so regeneration was not needed.
+
+Verification with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs case-detail.test.mjs content-pages.test.mjs link-closure.test.mjs image-performance.test.mjs
+node --test *.test.mjs
+```
+
+Results: Task 4 suite 27 passed, 0 failed. Full non-audit suite 225 passed, 0 failed.
+
+## Second Review Fix Round
+
+### RED
+
+Added failing tests for an unsafe caller-supplied `srcset`, two simultaneous loads for one root, and synchronous reentry from a `lonma:content-updated` listener.
+
+Command run with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs
+```
+
+Observed expected failures: caller `srcset` was written unchanged, concurrent calls returned distinct in-flight requests, and synchronous event reentry fetched twice.
+
+### GREEN
+
+Exported `buildResponsiveSanitySrcset` from the Task 2 data boundary. The renderer now ignores all caller-provided `srcset` values and derives candidates only from a validated canonical Sanity source URL and its width. Local images continue to clear responsive attributes.
+
+Added a per-root `WeakMap` for in-flight work and retained the completed-root `WeakSet`. Concurrent calls share one promise; successful completion is recorded before dispatching the update event, so synchronous listeners cannot trigger another request, patch, or event. Failed and empty requests clear their in-flight entry and remain retryable, with the existing once-only warning behavior preserved.
+
+No generator, generated page, Case 02, Service page, CSS/layout, audit, or image file changed in this review round.
+
+Verification with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs case-detail.test.mjs content-pages.test.mjs link-closure.test.mjs image-performance.test.mjs
+node --test *.test.mjs
+```
+
+Results: Task 4 suite 30 passed, 0 failed. Full non-audit suite 228 passed, 0 failed.
+
+## Third Review Fix Round
+
+### RED
+
+Added failing Promise-contract tests for a missing root and a root without `data-case-slug`. Both tests assert a thenable resolving `false` without a fetch, DOM write, event, or warning.
+
+Command run with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs
+```
+
+Observed the expected failures: both early exits returned a plain boolean rather than a Promise.
+
+### GREEN
+
+`loadDetailCase` now returns `Promise.resolve(false)` for every missing-root or missing-slug path. Existing completed-root and in-flight paths continue returning promises, including the exact shared in-flight promise for concurrent callers.
+
+No generated pages, Case 02, Services, CSS/layout, generator, audit, or images changed in this review round.
+
+Verification with bundled Node:
+
+```text
+node --test sanity-case-detail.test.mjs case-detail.test.mjs content-pages.test.mjs link-closure.test.mjs image-performance.test.mjs
+node --test *.test.mjs
+```
+
+Results: Task 4 suite 32 passed, 0 failed. Full non-audit suite 230 passed, 0 failed.

@@ -174,9 +174,9 @@ export const renderForgedWheelPage = (
     <!-- SEO:START -->
     ${renderSeoMeta(seoForRoute("/pages/shop/forged-wheel"))}
     <!-- SEO:END -->
-    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../shop-product.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../shop-product.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="shop">
@@ -287,8 +287,8 @@ export const renderForgedWheelPage = (
       </footer>
     </main>
     <script type="application/json" data-product-config>${serializeJson(productConfig)}</script>
-    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
-    <script src="../../shop-product.js?v=project-planner-redesign-20260726"></script>
+    <script src="../../content-pages.js?v=sanity-case-cms-20260801"></script>
+    <script src="../../shop-product.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
 `;
@@ -307,9 +307,9 @@ export const renderShopPage = (products = shopProducts) => {
     <!-- SEO:START -->
     ${renderSeoMeta(seoForRoute("/pages/shop"))}
     <!-- SEO:END -->
-    <link rel="stylesheet" href="../styles.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../layout-canvas.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../shop.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../styles.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../layout-canvas.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../shop.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="shop">
@@ -432,8 +432,8 @@ export const renderShopPage = (products = shopProducts) => {
       ${footer}
     </main>
     <script type="application/json" data-shop-vehicle-data>${serializeJson(shopVehicles.tuples)}</script>
-    <script src="../content-pages.js?v=project-planner-redesign-20260726"></script>
-    <script src="../shop.js?v=project-planner-redesign-20260726"></script>
+    <script src="../content-pages.js?v=sanity-case-cms-20260801"></script>
+    <script src="../shop.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
 `;

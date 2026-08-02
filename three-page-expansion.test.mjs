@@ -29,7 +29,7 @@ test("the contact page exposes a bilingual prefill notice", () => {
 test("the project route loads its planner assets and authentic local image", () => {
   const html = read("./pages/project.html");
 
-  assert.match(html, /href="\.\.\/project\.css\?v=project-planner-redesign-20260726"/);
-  assert.match(html, /src="\.\.\/project\.js\?v=project-planner-redesign-20260726"/);
+  assert.match(html, /href="\.\.\/project\.css\?v=sanity-case-cms-20260801"/);
+  assert.match(html, /src="\.\.\/project\.js\?v=sanity-case-cms-20260801"/);
   assert.match(html, /src="\.\.\/assets\/images\/网页\/optimized\/case-02\.jpg"/);
 });

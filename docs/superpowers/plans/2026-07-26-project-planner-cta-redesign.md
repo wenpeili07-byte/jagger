@@ -276,7 +276,7 @@ Add `.project-entry` to the shared reduced-motion selector so its transitions st
 
 - [ ] **Step 6: Advance the shared asset cache key**
 
-Replace `three-page-expansion-20260726` with `project-planner-redesign-20260726` in public HTML, `scripts/render-detail-pages.mjs`, `header-layout.test.mjs`, and `responsive-layout.test.mjs`. Regenerate detail pages once more after updating the generator.
+Replace `three-page-expansion-20260726` with `sanity-case-cms-20260801` in public HTML, `scripts/render-detail-pages.mjs`, `header-layout.test.mjs`, and `responsive-layout.test.mjs`. Regenerate detail pages once more after updating the generator.
 
 - [ ] **Step 7: Run header tests and verify pass**
 

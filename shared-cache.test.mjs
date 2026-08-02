@@ -5,7 +5,7 @@ import { caseDetails, serviceDetails } from "./detail-pages-data.mjs";
 import { renderCasePage, renderServicePage } from "./scripts/render-detail-pages.mjs";
 import { renderShopPage } from "./scripts/render-shop-page.mjs";
 
-const sharedAssetVersion = "project-planner-redesign-20260726";
+const sharedAssetVersion = "sanity-case-cms-20260801";
 const publicPages = [
   "./index.html",
   "./pages/about.html",
@@ -109,4 +109,34 @@ test("three-page expansion assets use the integration cache version", () => {
       assert.equal(assetReference(html, asset, path).version, sharedAssetVersion);
     }
   }
+});
+
+test("Case CMS feature assets use the integration cache version", () => {
+  const overview = read("./pages/cases.html");
+  for (const asset of ["cases.js", "sanity-case-overview.js"]) {
+    assert.equal(assetReference(overview, asset, "Cases overview").version, sharedAssetVersion);
+  }
+
+  for (const id of ["01", "02", "03", "04", "05", "06"]) {
+    const path = `./pages/cases/case-${id}.html`;
+    const detail = read(path);
+    for (const asset of ["case-detail.css", "sanity-case-detail.js"]) {
+      assert.equal(assetReference(detail, asset, path).version, sharedAssetVersion);
+    }
+  }
+});
+
+test("Case CMS transitive modules use the integration cache version", () => {
+  for (const path of ["./sanity-case-overview.js", "./sanity-case-detail.js"]) {
+    assert.match(
+      read(path),
+      new RegExp(`from ['"]\\.\\/sanity-case-data\\.js\\?v=${sharedAssetVersion}['"]`),
+      `${path} should not load stale Case data logic`,
+    );
+  }
+  assert.match(
+    read("./sanity-case-data.js"),
+    new RegExp(`from ['"]\\.\\/sanity-content-config\\.js\\?v=${sharedAssetVersion}['"]`),
+    "Case data should not load a stale public Sanity configuration",
+  );
 });

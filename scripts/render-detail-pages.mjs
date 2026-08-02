@@ -73,40 +73,42 @@ const renderGenericCasePage = (record) => `<!doctype html>
     <!-- SEO:START -->
     ${renderSeoMeta(seoForRoute(`/pages/cases/case-${record.id}`))}
     <!-- SEO:END -->
-    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
+    <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../case-detail.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="cases">
-    <main class="site-shell case-detail-page" data-detail-page>
+    <main class="site-shell case-detail-page" data-detail-page data-case-slug="case-${record.id}">
       ${header("cases")}
       <section class="detail-hero">
         <div class="detail-copy">
           ${i18n("a", { zh: "← 返回案例", en: "← BACK TO CASES" }, ' class="detail-back" href="../cases.html"')}
-          <p class="detail-index">CASE ${record.id}</p>
-          ${i18n("h1", record.title)}
-          ${i18n("h2", record.subtitle)}
-          ${i18n("p", record.intro, ' class="detail-intro"')}
+          <p class="detail-index" data-cms="caseNumber">CASE ${record.id}</p>
+          ${i18n("h1", record.title, ' data-cms="title"')}
+          ${i18n("h2", record.subtitle, ' data-cms="subtitle"')}
+          ${i18n("p", record.intro, ' class="detail-intro" data-cms="lede"')}
         </div>
         <figure class="detail-hero-media">
-          <img src="../../${record.image}" ${responsiveImageAttributes(record.image, "../../", "(max-width: 768px) 100vw, 50vw", { priority: true })} ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
+          <img data-cms="cover" src="../../${record.image}" ${responsiveImageAttributes(record.image, "../../", "(max-width: 768px) 100vw, 50vw", { priority: true })} ${i18nAttribute("alt", { zh: `LONMA DYNAMIC ${record.title.zh}`, en: `LONMA DYNAMIC ${record.title.en}` })} />
         </figure>
       </section>
       <section class="detail-story">
-        ${i18n("p", record.story)}
+        ${i18n("p", record.story, ' data-cms="story"')}
       </section>
+      <div class="detail-media-sections" data-cms-media-sections></div>
       <section class="detail-contact">
         ${i18n("h2", { zh: "讨论你的下一台车", en: "DISCUSS YOUR NEXT BUILD" })}
         ${i18n("a", { zh: "开始咨询 →", en: "START AN INQUIRY →" }, ' href="../contact.html"')}
       </section>
       <nav class="detail-pagination" ${i18nAttribute("aria-label", { zh: "案例分页", en: "Case pagination" })}>
-        ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html"`)}
-        ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html"`)}
+        ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html" data-cms-pagination="previous"`)}
+        ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html" data-cms-pagination="next"`)}
       </nav>
       ${globalFooter()}
     </main>
-    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
+    <script src="../../content-pages.js?v=sanity-case-cms-20260801"></script>
+    <script type="module" src="../../sanity-case-detail.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
 `;
@@ -121,18 +123,18 @@ export const renderCase02Page = (record) => `<!doctype html>
     <!-- SEO:START -->
     ${renderSeoMeta(seoForRoute(`/pages/cases/case-${record.id}`))}
     <!-- SEO:END -->
-    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
-    <link rel="stylesheet" href="../../case-02.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../case-detail.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../case-02.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="cases">
-    <main class="site-shell case-detail-page case02-page" data-detail-page>
+    <main class="site-shell case-detail-page case02-page" data-detail-page data-case-slug="case-02">
       ${header("cases")}
       <section class="case02-video-stage" data-video-state="poster-only" aria-labelledby="case02-title">
         <video
-          data-case-video
+          data-case-video data-cms="poster"
           poster="../../assets/images/generated/case-02/case-02-960w.webp"
           controls
           preload="metadata"
@@ -142,16 +144,16 @@ export const renderCase02Page = (record) => `<!doctype html>
         ></video>
         <div class="case02-video-copy">
           ${i18n("a", { zh: "← 返回案例", en: "← BACK TO CASES" }, ' href="../cases.html"')}
-          <p>CASE ${record.id}</p>
-          ${i18n("h1", record.title, ' id="case02-title"')}
+          <p data-cms="caseNumber">CASE ${record.id}</p>
+          ${i18n("h1", record.title, ' id="case02-title" data-cms="title"')}
           <dl>
-            <div>${i18n("dt", { zh: "车辆", en: "VEHICLE" })}<dd>BMW G80 M3</dd></div>
-            <div>${i18n("dt", { zh: "年份", en: "YEAR" })}<dd>2024</dd></div>
+            <div>${i18n("dt", { zh: "车辆", en: "VEHICLE" })}<dd data-cms="vehicleModel">BMW G80 M3</dd></div>
+            <div>${i18n("dt", { zh: "年份", en: "YEAR" })}<dd data-cms="vehicleYear">2024</dd></div>
           </dl>
         </div>
         ${i18n("button", { zh: "完整影片即将上线", en: "FINAL FILM COMING SOON" }, ' type="button" class="case02-video-status" disabled')}
       </section>
-      <div class="case02-story">
+      <div class="case02-story" data-cms-media-sections>
         <section class="case02-story-beat case02-story-beat-direction">
           <div class="case02-story-copy">
             <p>01</p>
@@ -181,13 +183,14 @@ export const renderCase02Page = (record) => `<!doctype html>
         ${i18n("a", { zh: "开始咨询 →", en: "START AN INQUIRY →" }, ' href="../contact.html?service=Custom%20Vehicle%20Builds&amp;vehicle=2024%20BMW%20G80%20M3&amp;message=Case%2002%20road%20and%20track%20direction."')}
       </section>
       <nav class="detail-pagination" ${i18nAttribute("aria-label", { zh: "案例分页", en: "Case pagination" })}>
-        ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html"`)}
-        ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html"`)}
+        ${i18n("a", { zh: `← 上一案例 ${record.previous}`, en: `← CASE ${record.previous}` }, ` href="./case-${record.previous}.html" data-cms-pagination="previous"`)}
+        ${i18n("a", { zh: `下一案例 ${record.next} →`, en: `CASE ${record.next} →` }, ` href="./case-${record.next}.html" data-cms-pagination="next"`)}
       </nav>
       ${globalFooter()}
     </main>
-    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
-    <script src="../../case-02.js?v=project-planner-redesign-20260726"></script>
+    <script src="../../content-pages.js?v=sanity-case-cms-20260801"></script>
+    <script src="../../case-02.js?v=sanity-case-cms-20260801"></script>
+    <script type="module" src="../../sanity-case-detail.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
 `;
@@ -210,8 +213,8 @@ export const renderServicePage = (record) => {
     <!-- SEO:START -->
     ${renderSeoMeta(seoForRoute(`/pages/services/${record.id}`))}
     <!-- SEO:END -->
-    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../service-detail.css?v=mobile-spacing-20260722" />
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
@@ -239,7 +242,7 @@ export const renderServicePage = (record) => {
       </section>
       ${globalFooter(projectHref)}
     </main>
-    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
+    <script src="../../content-pages.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>
 `;

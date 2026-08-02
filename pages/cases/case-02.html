@@ -19,14 +19,14 @@
     <meta name="twitter:description" content="LONMA DYNAMIC Case 02 ROAD &amp; TRACK SETUP focuses on braking, chassis feedback, and repeatable performance." />
     <meta name="twitter:image" content="https://jagger-sage.vercel.app/assets/images/%E7%BD%91%E9%A1%B5/optimized/case-02.jpg" />
     <!-- SEO:END -->
-    <link rel="stylesheet" href="../../styles.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../layout-canvas.css?v=project-planner-redesign-20260726" />
-    <link rel="stylesheet" href="../../case-detail.css?v=mobile-spacing-20260722" />
-    <link rel="stylesheet" href="../../case-02.css?v=project-planner-redesign-20260726" />
+    <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../case-detail.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../case-02.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="cases">
-    <main class="site-shell case-detail-page case02-page" data-detail-page>
+    <main class="site-shell case-detail-page case02-page" data-detail-page data-case-slug="case-02">
       <header class="topbar">
     <a class="brand" href="../../index.html" aria-label="Back to home" data-zh-aria-label="回到首页" data-en-aria-label="Back to home">LONMA DYNAMIC</a>
     <nav class="nav" aria-label="Main navigation" data-zh-aria-label="主导航" data-en-aria-label="Main navigation">
@@ -50,7 +50,7 @@
   </header>
       <section class="case02-video-stage" data-video-state="poster-only" aria-labelledby="case02-title">
         <video
-          data-case-video
+          data-case-video data-cms="poster"
           poster="../../assets/images/generated/case-02/case-02-960w.webp"
           controls
           preload="metadata"
@@ -60,16 +60,16 @@
         ></video>
         <div class="case02-video-copy">
           <a href="../cases.html" data-zh="← 返回案例" data-en="← BACK TO CASES">← BACK TO CASES</a>
-          <p>CASE 02</p>
-          <h1 id="case02-title" data-zh="赛道化升级" data-en="ROAD &amp; TRACK SETUP">ROAD &amp; TRACK SETUP</h1>
+          <p data-cms="caseNumber">CASE 02</p>
+          <h1 id="case02-title" data-cms="title" data-zh="赛道化升级" data-en="ROAD &amp; TRACK SETUP">ROAD &amp; TRACK SETUP</h1>
           <dl>
-            <div><dt data-zh="车辆" data-en="VEHICLE">VEHICLE</dt><dd>BMW G80 M3</dd></div>
-            <div><dt data-zh="年份" data-en="YEAR">YEAR</dt><dd>2024</dd></div>
+            <div><dt data-zh="车辆" data-en="VEHICLE">VEHICLE</dt><dd data-cms="vehicleModel">BMW G80 M3</dd></div>
+            <div><dt data-zh="年份" data-en="YEAR">YEAR</dt><dd data-cms="vehicleYear">2024</dd></div>
           </dl>
         </div>
         <button type="button" class="case02-video-status" disabled data-zh="完整影片即将上线" data-en="FINAL FILM COMING SOON">FINAL FILM COMING SOON</button>
       </section>
-      <div class="case02-story">
+      <div class="case02-story" data-cms-media-sections>
         <section class="case02-story-beat case02-story-beat-direction">
           <div class="case02-story-copy">
             <p>01</p>
@@ -93,8 +93,8 @@
         <a href="../contact.html?service=Custom%20Vehicle%20Builds&amp;vehicle=2024%20BMW%20G80%20M3&amp;message=Case%2002%20road%20and%20track%20direction." data-zh="开始咨询 →" data-en="START AN INQUIRY →">START AN INQUIRY →</a>
       </section>
       <nav class="detail-pagination" aria-label="Case pagination" data-zh-aria-label="案例分页" data-en-aria-label="Case pagination">
-        <a href="./case-01.html" data-zh="← 上一案例 01" data-en="← CASE 01">← CASE 01</a>
-        <a href="./case-03.html" data-zh="下一案例 03 →" data-en="CASE 03 →">CASE 03 →</a>
+        <a href="./case-01.html" data-cms-pagination="previous" data-zh="← 上一案例 01" data-en="← CASE 01">← CASE 01</a>
+        <a href="./case-03.html" data-cms-pagination="next" data-zh="下一案例 03 →" data-en="CASE 03 →">CASE 03 →</a>
       </nav>
       <footer class="content-footer">
         <span>LONMA DYNAMIC</span>
@@ -102,7 +102,8 @@
         <a href="../contact.html" data-zh="开始你的项目 →" data-en="START YOUR PROJECT →">START YOUR PROJECT →</a>
       </footer>
     </main>
-    <script src="../../content-pages.js?v=project-planner-redesign-20260726"></script>
-    <script src="../../case-02.js?v=project-planner-redesign-20260726"></script>
+    <script src="../../content-pages.js?v=sanity-case-cms-20260801"></script>
+    <script src="../../case-02.js?v=sanity-case-cms-20260801"></script>
+    <script type="module" src="../../sanity-case-detail.js?v=sanity-case-cms-20260801"></script>
   </body>
 </html>

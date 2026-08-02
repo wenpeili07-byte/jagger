@@ -9,6 +9,7 @@ const html = readFileSync(new URL("./pages/cases/case-02.html", import.meta.url)
 const caseController = readFileSync(new URL("./case-02.js", import.meta.url), "utf8");
 
 test("Case 02 opens with a poster-only native video stage", () => {
+  assert.match(html, /<main[^>]*data-detail-page[^>]*data-case-slug="case-02"/);
   assert.match(html, /class="case02-video-stage"/);
   assert.match(
     html,
@@ -18,6 +19,21 @@ test("Case 02 opens with a poster-only native video stage", () => {
   assert.match(html, /data-en="FINAL FILM COMING SOON"/);
   assert.doesNotMatch(html, /<video[^>]*autoplay/);
   assert.doesNotMatch(html, /<source/);
+});
+
+test("Case 02 exposes CMS slots and preserves controller order", () => {
+  assert.match(html, /data-cms="caseNumber"/);
+  assert.match(html, /data-cms="title"/);
+  assert.match(html, /data-cms="vehicleModel"/);
+  assert.match(html, /data-cms="vehicleYear"/);
+  assert.match(html, /data-cms="poster"/);
+  assert.match(html, /data-cms-media-sections/);
+  assert.match(html, /data-cms-pagination="previous"/);
+  assert.match(html, /data-cms-pagination="next"/);
+  assert.match(
+    html,
+    /<script src="\.\.\/\.\.\/content-pages\.js[^>]*><\/script>\s*<script src="\.\.\/\.\.\/case-02\.js[^>]*><\/script>\s*<script type="module" src="\.\.\/\.\.\/sanity-case-detail\.js/s,
+  );
 });
 
 test("Case 02 is an image-led bilingual story", () => {
@@ -54,6 +70,9 @@ test("Case 02 poster-only controller never attempts playback", () => {
   const stage = { dataset: {} };
   const video = {
     currentSrc: "",
+    getAttribute() {
+      return null;
+    },
     play() {
       playCalls += 1;
     },
@@ -75,14 +94,18 @@ test("Case 02 poster-only controller never attempts playback", () => {
       return null;
     },
     querySelectorAll(selector) {
-      if (selector === ".case02-story-beat, .case02-story-wide") return motionNodes;
+      if (selector === ".case02-story-beat, .case02-story-full, .case02-story > .case02-story-wide") return motionNodes;
       return [];
     },
   };
+  const windowListeners = new Map();
 
   vm.runInNewContext(caseController, {
     document,
-    window: { matchMedia: () => ({ matches: false }) },
+    window: {
+      addEventListener: (name, listener) => windowListeners.set(name, listener),
+      matchMedia: () => ({ matches: false }),
+    },
   });
 
   assert.equal(stage.dataset.videoState, "poster-only");
@@ -90,6 +113,11 @@ test("Case 02 poster-only controller never attempts playback", () => {
   assert.ok(removedAttributes.has("controls"));
   assert.equal(videoAttributes.get("aria-disabled"), "true");
   assert.deepEqual(motionNodes.map((node) => node.dataset.motion), ["fade", "fade", "fade"]);
+
+  const hydratedNodes = [{ dataset: {} }, { dataset: {} }, { dataset: {} }];
+  document.querySelectorAll = () => hydratedNodes;
+  windowListeners.get("lonma:content-updated")?.();
+  assert.deepEqual(hydratedNodes.map((node) => node.dataset.motion), ["fade", "fade", "fade"]);
 });
 
 test("other cases retain the generic template", () => {
