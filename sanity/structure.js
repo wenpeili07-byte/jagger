@@ -5,5 +5,5 @@ export const caseStructure = (S) =>
       S.listItem()
         .title('Case Pages')
         .schemaType('casePage')
-        .child(S.documentTypeList('casePage').title('Case Pages').order([{field: 'order', direction: 'asc'}])),
+        .child(S.documentTypeList('casePage').title('Case Pages').defaultOrdering([{field: 'order', direction: 'asc'}])),
     ])
