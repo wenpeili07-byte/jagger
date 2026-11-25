@@ -2,8 +2,9 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { srcsetFor } from "../image-performance.mjs";
-import { shopProducts, shopVehicles } from "../shop-data.mjs";
-import { renderSeoMeta, seoForRoute } from "../seo-data.mjs";
+import { caseBuildTags } from "../detail-pages-data.mjs";
+import { shopProducts, shopVehicles, shopCategoryDefaults } from "../shop-data.mjs";
+import { renderSeoMeta, seoForRoute, seoForProduct } from "../seo-data.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -26,15 +27,30 @@ const i18n = (tag, values, attributes = "") =>
 const i18nAttribute = (attribute, values) =>
   `${attribute}="${escapeAttribute(values.en)}" data-zh-${attribute}="${escapeAttribute(values.zh)}" data-en-${attribute}="${escapeAttribute(values.en)}"`;
 
-const categoryLabels = {
-  wheels: { en: "WHEELS", zh: "轮毂" },
-  intake: { en: "INTAKE", zh: "进气" },
-  suspension: { en: "SUSPENSION", zh: "悬挂" },
-  brakes: { en: "BRAKES", zh: "刹车" },
-  aero: { en: "AERO", zh: "空气动力" },
-  exhaust: { en: "EXHAUST", zh: "排气" },
-};
+const categoryLabels = Object.fromEntries(Object.entries(shopCategoryDefaults).map(([id, entry]) => [id, entry.label]));
 const managedProductCategories = [...Object.keys(categoryLabels), "ecu"];
+const fitmentUnknown = { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" };
+const inquirySubjectFor = (product) => product.inquirySubject ?? {
+  en: `${product.title.en} INQUIRY`, zh: `${product.title.zh}咨询`,
+};
+const referenceForCategory = (category) => {
+  const existing = shopProducts.find((product) => product.category === category && product.inquiry?.reference)?.inquiry.reference;
+  if (existing) return existing;
+  const caseId = Object.entries(caseBuildTags).find(([, tags]) => tags.some(({ key }) => key === category))?.[0];
+  return caseId ? {
+    caseId,
+    image: `assets/images/generated/case-${caseId}/case-${caseId}-960w.webp`,
+    label: { en: `ON A BUILD · CASE ${caseId} REFERENCE`, zh: `装车参考 · 案例 ${caseId}` },
+    alt: { en: `Category reference from Case ${caseId}`, zh: `案例 ${caseId} 的分类参考照片` },
+  } : null;
+};
+const inquiryFor = (product) => ({
+  kicker: product.inquiry?.kicker ?? categoryLabels[product.category],
+  confirm: product.inquiry?.confirm ?? shopCategoryDefaults[product.category]?.confirm ?? [],
+  reference: product.inquiry?.reference === undefined
+    ? referenceForCategory(product.category)
+    : product.inquiry.reference,
+});
 
 const renderOptions = (values) =>
   values.map((value) => `<option value="${escapeAttribute(value)}">${escapeText(value)}</option>`).join("\n              ");
@@ -52,10 +68,10 @@ const renderProductCard = (product) => {
     en: String(product.category).toUpperCase(),
     zh: String(product.category),
   };
-  const actionCopy = product.id === "forged-wheel"
+  const actionCopy = product.detail
     ? { zh: "查看配置 →", en: "CONFIGURE →" }
     : { zh: "查看详情 →", en: "VIEW DETAILS →" };
-  const accessibleAction = product.id === "forged-wheel"
+  const accessibleAction = product.detail
     ? {
         en: `Configure ${product.title.en}`,
         zh: `配置${product.title.zh}`,
@@ -78,10 +94,11 @@ const renderProductCard = (product) => {
             data-title-zh="${escapeAttribute(product.title.zh)}"
             data-description-en="${escapeAttribute(product.description.en)}"
             data-description-zh="${escapeAttribute(product.description.zh)}"
-            data-compatibility-en="${escapeAttribute(product.compatibility.en)}"
-            data-compatibility-zh="${escapeAttribute(product.compatibility.zh)}"
-            data-inquiry-subject-en="${escapeAttribute(product.inquirySubject.en)}"
-            data-inquiry-subject-zh="${escapeAttribute(product.inquirySubject.zh)}"
+            data-compatibility-en="${escapeAttribute((product.compatibility ?? fitmentUnknown).en)}"
+            data-compatibility-zh="${escapeAttribute((product.compatibility ?? fitmentUnknown).zh)}"
+            data-inquiry-subject-en="${escapeAttribute(inquirySubjectFor(product).en)}"
+            data-inquiry-subject-zh="${escapeAttribute(inquirySubjectFor(product).zh)}"
+            data-configurable="${Boolean(product.detail)}"
             data-shopify-product-id="${escapeAttribute(product.shopifyProductId ?? "")}"
             data-image="../${escapeAttribute(product.image)}"
             data-alt-en="${escapeAttribute(product.alt.en)}"
@@ -137,31 +154,17 @@ const renderProductOptions = (name, options, selected, { finish = false } = {}) 
     return `<label><input type="radio" name="${escapeAttribute(name)}" value="${escapeAttribute(option.id)}"${checked} />${swatch}${i18n("span", option.label)}</label>`;
   }).join("\n              ");
 
-// Placeholder gallery: three framings of the one product photo plus a
-// reference shot from Case 03. Replace with real product photography when
-// available — the markup and animation stay the same.
-const galleryViews = [
-  { id: "full", label: { en: "FULL VIEW", zh: "整体" }, zoom: 1, origin: "50% 50%" },
-  { id: "centre", label: { en: "CENTRE DETAIL", zh: "中心细节" }, zoom: 2.15, origin: "51% 46%" },
-  { id: "rim", label: { en: "RIM EDGE", zh: "轮辋边缘" }, zoom: 2.5, origin: "16% 58%" },
-  {
-    id: "on-car",
-    label: { en: "ON A BUILD · CASE 03 REFERENCE", zh: "装车参考 · 案例 03" },
-    zoom: 1,
-    origin: "50% 50%",
-    image: "assets/images/generated/case-03/case-03-960w.webp",
-    alt: { en: "Reference wheel on a purple BMW build from Case 03", zh: "案例 03 紫色宝马上的轮毂参考" },
-    scene: true,
-  },
-];
+const galleryViewsFor = (product) => product.detail.gallery?.length
+  ? product.detail.gallery
+  : [{ label: product.title, zoom: 1, origin: "50% 50%" }];
 
-const galleryStyle = (view) => `--view-zoom: ${view.zoom}; --view-origin: ${view.origin};`;
+const galleryStyle = (view) => `--view-zoom: ${Number(view.zoom) || 1}; --view-origin: ${escapeAttribute(view.origin ?? "50% 50%")};`;
 
 const renderGalleryViews = (product) =>
-  galleryViews
+  galleryViewsFor(product)
     .map((view, index) => {
       const image = view.image ?? product.image;
-      const alt = view.alt ?? { en: "Forged performance wheel in satin black", zh: "缎面黑锻造性能轮毂" };
+      const alt = view.alt ?? product.alt;
       return `            <figure class="product-view${view.scene ? " is-scene" : ""}${index === 0 ? " is-active" : ""}" data-gallery-view data-label-en="${escapeAttribute(view.label.en)}" data-label-zh="${escapeAttribute(view.label.zh)}" style="${galleryStyle(view)}"${index === 0 ? "" : ' aria-hidden="true"'}>
               <img src="../../${escapeAttribute(image)}" ${i18nAttribute("alt", alt)}${index === 0 ? "" : ' loading="lazy"'} />
             </figure>`;
@@ -169,7 +172,7 @@ const renderGalleryViews = (product) =>
     .join("\n");
 
 const renderGalleryThumbs = (product) =>
-  galleryViews
+  galleryViewsFor(product)
     .map(
       (view, index) =>
         `            <button type="button" data-gallery-thumb="${index}"${index === 0 ? ' aria-current="true"' : ""} ${i18nAttribute("aria-label", view.label)} style="${galleryStyle(view)}"><img src="../../${escapeAttribute(view.image ?? product.image)}" alt="" loading="lazy" /></button>`
@@ -228,7 +231,7 @@ const renderProductInfo = (product, finishSpecification) => {
     },
     {
       title: { en: "CONFIRMED QUOTE", zh: "确认报价" },
-      copy: detail.referencePrice.note,
+      copy: detail.referencePrice?.note ?? { en: "Quoted after fitment confirmation.", zh: "确认车型适配后报价。" },
     },
   ];
 
@@ -315,14 +318,15 @@ const renderRelated = (current) => {
 `;
 };
 
-export const renderForgedWheelPage = (
-  product = shopProducts.find(({ id }) => id === "forged-wheel"),
-) => {
+export const renderConfigurableProductPage = (product) => {
   if (!product?.detail) {
-    throw new Error("forged-wheel detail data is required");
+    throw new Error(`${product?.id ?? "product"} detail data is required`);
   }
 
   const { detail } = product;
+  const hasReferencePrice = Boolean(detail.referencePrice?.display && detail.referencePrice?.note?.en && detail.referencePrice?.note?.zh);
+  const seo = seoForProduct(product);
+  const views = galleryViewsFor(product);
   const defaultVehicle = detail.defaults.vehicle;
   const finishSpecification = {
     en: detail.options.finish.map(({ label }) => label.en).join(" OR "),
@@ -335,16 +339,17 @@ export const renderForgedWheelPage = (
     vehicles: shopVehicles.tuples,
     ...detail,
   };
+  delete productConfig.gallery;
 
   return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Configure a forged wheel direction and request final fitment verification from LONMA DYNAMIC." />
-    <title>Monoblock Forged Wheel | LONMA DYNAMIC</title>
+    <meta name="description" content="${escapeAttribute(seo.description)}" />
+    <title>${escapeText(seo.title)}</title>
     <!-- SEO:START -->
-    ${renderSeoMeta(seoForRoute("/pages/shop/forged-wheel"))}
+    ${renderSeoMeta(seo)}
     <!-- SEO:END -->
     <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
@@ -384,7 +389,7 @@ ${renderGalleryViews(product)}
           </div>
           <div class="product-gallery-bar">
             <button class="product-gallery-arrow" type="button" data-gallery-step="-1" ${i18nAttribute("aria-label", { en: "Previous view", zh: "上一张" })}>←</button>
-            <p class="product-gallery-caption"><b data-gallery-index>01</b> / ${String(galleryViews.length).padStart(2, "0")} ${i18n("span", galleryViews[0].label, " data-gallery-label")}</p>
+            <p class="product-gallery-caption"><b data-gallery-index>01</b> / ${String(views.length).padStart(2, "0")} ${i18n("span", views[0].label, " data-gallery-label")}</p>
             <button class="product-gallery-arrow" type="button" data-gallery-step="1" ${i18nAttribute("aria-label", { en: "Next view", zh: "下一张" })}>→</button>
           </div>
           <div class="product-thumbnails" ${i18nAttribute("aria-label", { en: "Product views", zh: "产品视图" })}>
@@ -400,10 +405,12 @@ ${renderGalleryThumbs(product)}
           ${i18n("p", detail.kicker, ' class="product-kicker"')}
           ${i18n("h1", detail.title, ' id="product-title"')}
           ${i18n("p", detail.summary, ' class="product-summary"')}
-          <p class="product-reference-price">
+          <p class="product-reference-price">${hasReferencePrice ? `
             ${i18n("span", { en: "REFERENCE PACKAGE", zh: "参考套装" })}
             <strong>${escapeText(detail.referencePrice.display)}</strong>
-            ${i18n("small", detail.referencePrice.note)}
+            ${i18n("small", detail.referencePrice.note)}` : `
+            ${i18n("span", { en: "PRICE", zh: "价格" })}
+            ${i18n("strong", { en: "ON REQUEST", zh: "按车型报价" })}`}
           </p>
 
           <fieldset data-product-fitment>
@@ -441,7 +448,7 @@ ${renderGalleryThumbs(product)}
           <p class="product-fitment-message" data-fitment-message aria-live="polite"></p>
 
           <div class="product-actions">
-            <span class="product-action-price">${i18n("small", { en: "REFERENCE PACKAGE", zh: "参考套装" })}<strong>${escapeText(detail.referencePrice.display)}</strong></span>
+            <span class="product-action-price">${i18n("small", hasReferencePrice ? { en: "REFERENCE PACKAGE", zh: "参考套装" } : { en: "PRICE", zh: "价格" })}${hasReferencePrice ? `<strong>${escapeText(detail.referencePrice.display)}</strong>` : i18n("strong", { en: "ON REQUEST", zh: "按车型报价" })}</span>
             ${i18n("a", { en: "ADD TO BUILD", zh: "加入项目" }, " data-add-to-build")}
             ${i18n("a", { en: "REQUEST FITMENT CHECK", zh: "申请适配确认" }, " data-fitment-inquiry")}
           </div>
@@ -465,22 +472,21 @@ ${renderRelated(product)}
 `;
 };
 
-
 // Detail pages for catalogue items that do not have configurable product data
 // yet. Everything shown comes from shop-data.mjs; price and fitment stay
 // "on request" until LONMA DYNAMIC supplies real data.
-const itemGalleryViews = (product) => [
+const itemGalleryViews = (product, inquiry) => [
   { id: "full", label: { en: "FULL VIEW", zh: "整体" }, zoom: 1, origin: "50% 50%" },
   { id: "detail", label: { en: "DETAIL", zh: "细节" }, zoom: 1.9, origin: "50% 45%" },
   { id: "close", label: { en: "CLOSE DETAIL", zh: "近距离细节" }, zoom: 2.5, origin: "30% 62%" },
-  ...(product.inquiry.reference
+  ...(inquiry.reference
     ? [{
         id: "on-car",
-        label: product.inquiry.reference.label,
+        label: inquiry.reference.label,
         zoom: 1,
         origin: "50% 50%",
-        image: product.inquiry.reference.image,
-        alt: product.inquiry.reference.alt,
+        image: inquiry.reference.image,
+        alt: inquiry.reference.alt,
         scene: true,
       }]
     : []),
@@ -493,13 +499,11 @@ const itemUses = [
 ];
 
 export const renderProductItemPage = (product) => {
-  if (!product?.inquiry) {
-    throw new Error(`${product?.id || "product"} needs inquiry data`);
-  }
-
-  const { inquiry } = product;
-  const views = itemGalleryViews(product);
+  const inquiry = inquiryFor(product);
+  const views = itemGalleryViews(product, inquiry);
   const category = categoryLabels[product.category];
+  const compatibility = product.compatibility ?? fitmentUnknown;
+  const seo = seoForProduct(product);
   const defaultVehicle = shopVehicles.tuples[0];
   const confirmCount = String(inquiry.confirm.length).padStart(2, "0");
   const priceCopy = { en: "ON REQUEST", zh: "按车型报价" };
@@ -507,7 +511,7 @@ export const renderProductItemPage = (product) => {
   const itemConfig = {
     id: product.id,
     categories: managedProductCategories,
-    inquirySubject: product.inquirySubject,
+    inquirySubject: inquirySubjectFor(product),
   };
 
   const viewMarkup = views
@@ -521,7 +525,7 @@ export const renderProductItemPage = (product) => {
 
   const figures = [
     { label: { en: "CATEGORY", zh: "分类" }, value: category },
-    { label: { en: "FITMENT", zh: "适配" }, value: product.compatibility },
+    { label: { en: "FITMENT", zh: "适配" }, value: compatibility },
     { label: { en: "PRICE", zh: "价格" }, value: priceCopy },
     { label: { en: "TO CONFIRM", zh: "需确认" }, value: { en: `${confirmCount} ITEMS`, zh: `${confirmCount} 项` } },
   ];
@@ -537,10 +541,10 @@ export const renderProductItemPage = (product) => {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="${escapeAttribute(`${product.title.en.charAt(0)}${product.title.en.slice(1).toLowerCase()} — request vehicle fitment and a confirmed quote from LONMA DYNAMIC.`)}" />
-    <title>${escapeText(product.title.en)} | LONMA DYNAMIC</title>
+    <meta name="description" content="${escapeAttribute(seo.description)}" />
+    <title>${escapeText(seo.title)}</title>
     <!-- SEO:START -->
-    ${renderSeoMeta(seoForRoute(`/pages/shop/${product.id}`))}
+    ${renderSeoMeta(seo)}
     <!-- SEO:END -->
     <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
@@ -619,7 +623,7 @@ ${thumbMarkup}
             </div>
           </fieldset>
 
-          ${i18n("p", product.compatibility, ' class="product-fitment-message" data-fitment-message')}
+          ${i18n("p", compatibility, ' class="product-fitment-message" data-fitment-message')}
 
           <div class="product-actions">
             <span class="product-action-price">${i18n("small", { en: "PRICE", zh: "价格" })}${i18n("strong", priceCopy)}</span>
@@ -688,6 +692,7 @@ ${renderRelated(product)}
 
 const renderFeature = (products) => {
   const first = products[0];
+  const firstIsWheel = first.id === "forged-wheel";
   const picks = products
     .map(
       (product, index) => `
@@ -731,28 +736,28 @@ const renderFeature = (products) => {
             ${i18n("small", { en: "VEHICLE", zh: "车型" })}
             <span><b data-feature-vehicle-line>BMW G80 M3 · 2024</b></span>
           </div>
-          <div class="shop-feature-spec" data-feature-wheel>
+          <div class="shop-feature-spec" data-feature-wheel${firstIsWheel ? "" : " hidden"}>
             ${i18n("small", { en: "DIAMETER", zh: "直径" })}
             <span><b>19″</b><i>20″</i></span>
           </div>
-          <div class="shop-feature-spec" data-feature-wheel>
+          <div class="shop-feature-spec" data-feature-wheel${firstIsWheel ? "" : " hidden"}>
             ${i18n("small", { en: "WIDTH", zh: "宽度" })}
             <span><b>9.5J / 10.5J</b><i>10J / 11J</i></span>
           </div>
-          <div class="shop-feature-spec" data-feature-wheel>
+          <div class="shop-feature-spec" data-feature-wheel${firstIsWheel ? "" : " hidden"}>
             ${i18n("small", { en: "FINISH", zh: "颜色" })}
             <span><b><em class="is-black"></em>${i18n("span", { en: "SATIN BLACK", zh: "缎面黑" })}</b><i><em class="is-silver"></em>${i18n("span", { en: "BRUSHED SILVER", zh: "拉丝银" })}</i></span>
           </div>
-          <div class="shop-feature-spec shop-feature-description" data-feature-other hidden>
+          <div class="shop-feature-spec shop-feature-description" data-feature-other${firstIsWheel ? " hidden" : ""}>
             ${i18n("small", { en: "NOTE", zh: "说明" })}
             ${i18n("span", first.description, " data-feature-description")}
           </div>
-          <div class="shop-feature-spec" data-feature-other hidden>
+          <div class="shop-feature-spec" data-feature-other${firstIsWheel ? " hidden" : ""}>
             ${i18n("small", { en: "FITMENT", zh: "适配" })}
-            <span>${i18n("b", first.compatibility, " data-feature-compatibility")}</span>
+            <span>${i18n("b", first.compatibility ?? fitmentUnknown, " data-feature-compatibility")}</span>
           </div>
           <div class="shop-feature-actions">
-            ${i18n("a", { en: "CONFIGURE", zh: "配置此产品" }, ' class="shop-feature-cta" href="./shop/forged-wheel.html" data-feature-cta')}
+            ${i18n("a", first.detail ? { en: "CONFIGURE", zh: "配置此产品" } : { en: "VIEW DETAILS", zh: "查看详情" }, ` class="shop-feature-cta" href="./shop/${escapeAttribute(first.id)}.html" data-feature-cta`)}
             ${i18n("a", { en: "ASK ABOUT FITMENT", zh: "咨询适配" }, ' class="shop-feature-secondary" href="./contact.html"')}
           </div>
         </div>
@@ -762,6 +767,7 @@ const renderFeature = (products) => {
 
 export const renderShopPage = (products = shopProducts) => {
   const firstProduct = products[0] || shopProducts[0];
+  const productCount = String(products.length).padStart(2, "0");
 
   return `<!doctype html>
 <html lang="en">
@@ -846,7 +852,7 @@ ${renderFeature(products)}      <section class="shop-mobile-intro" aria-labelled
             </fieldset>
             <div class="shop-availability">
               ${i18n("h2", { zh: "状态", en: "AVAILABILITY" })}
-              ${i18n("p", { zh: "仅限咨询 · 06 项示例", en: "INQUIRY ONLY · 06 SAMPLES" })}
+              ${i18n("p", { zh: `仅限咨询 · ${productCount} 项示例`, en: `INQUIRY ONLY · ${productCount} SAMPLES` })}
             </div>
             ${i18n("p", {
               zh: "示例分类仅用于设计预览。车型适配、规格与安装请向 LONMA DYNAMIC 确认。",
@@ -857,7 +863,7 @@ ${renderFeature(products)}      <section class="shop-mobile-intro" aria-labelled
 
         <div class="shop-products">
           <div class="shop-results-bar">
-            ${i18n("p", { zh: "06 项示例结果", en: "06 SAMPLE RESULTS" }, ' data-results-status aria-live="polite"')}
+            ${i18n("p", { zh: `${productCount} 项示例结果`, en: `${productCount} SAMPLE RESULTS` }, ' data-results-status aria-live="polite"')}
             <label class="shop-sort">
               ${i18n("span", { zh: "排序", en: "SORT BY" })}
               <select data-shop-sort>
@@ -887,11 +893,11 @@ ${renderFeature(products)}      <section class="shop-mobile-intro" aria-labelled
           <div class="shop-dialog-copy">
             ${i18n("p", categoryLabels[firstProduct.category], ' data-dialog-category')}
             ${i18n("h2", firstProduct.title, ' id="shop-dialog-title" data-dialog-title')}
-            ${i18n("p", firstProduct.compatibility, ' class="shop-dialog-compatibility" data-dialog-compatibility')}
+            ${i18n("p", firstProduct.compatibility ?? fitmentUnknown, ' class="shop-dialog-compatibility" data-dialog-compatibility')}
             ${i18n("p", firstProduct.description, ' data-dialog-description')}
           </div>
           <div class="shop-dialog-footer">
-            <a data-dialog-inquiry href="${escapeAttribute(`./contact.html?product=${encodeURIComponent(firstProduct.id)}&subject=${encodeURIComponent(firstProduct.inquirySubject.en)}`)}" data-zh="咨询详情 →" data-en="REQUEST DETAILS →">REQUEST DETAILS →</a>
+            <a data-dialog-inquiry href="${escapeAttribute(`./contact.html?product=${encodeURIComponent(firstProduct.id)}&subject=${encodeURIComponent(inquirySubjectFor(firstProduct).en)}`)}" data-zh="咨询详情 →" data-en="REQUEST DETAILS →">REQUEST DETAILS →</a>
           </div>
         </div>
       </dialog>
@@ -909,9 +915,9 @@ export async function writeShopPage() {
   await mkdir(resolve(root, "pages"), { recursive: true });
   await mkdir(resolve(root, "pages/shop"), { recursive: true });
   await writeFile(resolve(root, "pages/shop.html"), renderShopPage());
-  await writeFile(resolve(root, "pages/shop/forged-wheel.html"), renderForgedWheelPage());
-  for (const product of shopProducts.filter((item) => item.inquiry)) {
-    await writeFile(resolve(root, `pages/shop/${product.id}.html`), renderProductItemPage(product));
+  for (const product of shopProducts) {
+    const render = product.detail ? renderConfigurableProductPage : renderProductItemPage;
+    await writeFile(resolve(root, `pages/shop/${product.id}.html`), render(product));
   }
 }
 

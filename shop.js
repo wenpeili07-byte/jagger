@@ -382,6 +382,7 @@
     const categoryNode = card.querySelector(".shop-product-category");
     const link = card.querySelector("a.shop-product-target");
     const isWheel = id === "forged-wheel";
+    const isConfigurable = card.dataset.configurable === "true";
 
     feature.classList.remove("is-changing");
     void feature.offsetWidth;
@@ -410,7 +411,7 @@
       cta.setAttribute("href", `#${id}`);
     }
 
-    if (isWheel) {
+    if (isConfigurable) {
       setCopy(cta, "配置此产品", "CONFIGURE");
     } else {
       setCopy(cta, "查看详情", "VIEW DETAILS");

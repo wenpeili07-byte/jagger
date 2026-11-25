@@ -24,6 +24,35 @@ export const shopVehicles = {
   tuples: shopVehicleTuples,
 };
 
+// Fallback enquiry copy only. These are questions to confirm with the owner,
+// never product specifications or claims of vehicle fitment.
+export const shopCategoryDefaults = {
+  wheels: { label: { en: "WHEELS", zh: "轮毂" }, confirm: [
+    { en: "VEHICLE FITMENT", zh: "车型适配" }, { en: "SIZE", zh: "尺寸" },
+    { en: "OFFSET", zh: "偏距" }, { en: "FINISH", zh: "表面颜色" },
+  ] },
+  intake: { label: { en: "INTAKE", zh: "进气" }, confirm: [
+    { en: "PLATFORM", zh: "车辆平台" }, { en: "ENGINE", zh: "发动机" },
+    { en: "INSTALLATION REQUIREMENTS", zh: "安装需求" },
+  ] },
+  suspension: { label: { en: "SUSPENSION", zh: "悬挂" }, confirm: [
+    { en: "INTENDED USE", zh: "使用场景" }, { en: "RIDE HEIGHT", zh: "车高" },
+    { en: "CHASSIS SETUP", zh: "底盘设定" },
+  ] },
+  brakes: { label: { en: "BRAKES", zh: "刹车" }, confirm: [
+    { en: "ROTOR", zh: "碟盘" }, { en: "CALIPER", zh: "卡钳" },
+    { en: "WHEEL CLEARANCE", zh: "轮毂空间" }, { en: "INTENDED USE", zh: "用途" },
+  ] },
+  aero: { label: { en: "AERO", zh: "空气动力" }, confirm: [
+    { en: "BODY STYLE", zh: "车身版本" }, { en: "FINISH", zh: "表面" },
+    { en: "INSTALLATION", zh: "安装" }, { en: "COMPLETE-CAR DIRECTION", zh: "整车方向" },
+  ] },
+  exhaust: { label: { en: "EXHAUST", zh: "排气" }, confirm: [
+    { en: "SOUND TARGET", zh: "声浪目标" }, { en: "CONFIGURATION", zh: "配置" },
+    { en: "ROAD USE", zh: "道路使用" }, { en: "INSTALLATION", zh: "安装" },
+  ] },
+};
+
 export const shopProducts = [
   {
     id: "forged-wheel",
@@ -39,6 +68,17 @@ export const shopProducts = [
     inquirySubject: { en: "FORGED WHEEL INQUIRY", zh: "锻造轮毂咨询" },
     shopifyProductId: null,
     detail: {
+      gallery: [
+        { label: { en: "FULL VIEW", zh: "整体" }, zoom: 1, origin: "50% 50%" },
+        { label: { en: "CENTRE DETAIL", zh: "中心细节" }, zoom: 2.15, origin: "51% 46%" },
+        { label: { en: "RIM EDGE", zh: "轮辋边缘" }, zoom: 2.5, origin: "16% 58%" },
+        {
+          label: { en: "ON A BUILD · CASE 03 REFERENCE", zh: "装车参考 · 案例 03" },
+          zoom: 1, origin: "50% 50%", scene: true,
+          image: "assets/images/generated/case-03/case-03-960w.webp",
+          alt: { en: "Reference wheel on a purple BMW build from Case 03", zh: "案例 03 紫色宝马上的轮毂参考" },
+        },
+      ],
       kicker: { en: "WHEELS / FORGED", zh: "轮毂 / 锻造" },
       title: { en: "MONOBLOCK FORGED WHEEL", zh: "单片式锻造轮毂" },
       displayName: { en: "Forged Wheel", zh: "锻造轮毂" },

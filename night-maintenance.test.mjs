@@ -4,7 +4,9 @@ import { dirname, extname, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { caseAssets, imagePresets } from "./case-assets.mjs";
-import { publicPages, siteOrigin } from "./seo-data.mjs";
+import { corePages, publicPages, siteOrigin } from "./seo-data.mjs";
+import { shopProducts } from "./shop-data.mjs";
+import { caseDetails, serviceDetails } from "./detail-pages-data.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 
@@ -43,7 +45,7 @@ test("case image preparation tool is non-destructive by default", async () => {
 });
 
 test("every public page exposes canonical and complete social metadata", async () => {
-  assert.equal(publicPages.length, 25);
+  assert.equal(publicPages.length, corePages.length + caseDetails.length + serviceDetails.length + shopProducts.length);
   assert.equal(new Set(publicPages.map(({ route }) => route)).size, publicPages.length);
 
   for (const page of publicPages) {

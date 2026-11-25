@@ -6,7 +6,7 @@ export const siteOrigin = "https://jagger-sage.vercel.app";
 const defaultImage = "/assets/images/%E7%BD%91%E9%A1%B5/%E9%A6%96%E9%A1%B5%E8%83%8C%E6%99%AF.jpg";
 const caseImage = (id) => `/assets/images/%E7%BD%91%E9%A1%B5/optimized/case-${id}.jpg`;
 
-const corePages = [
+export const corePages = [
   {
     file: "index.html",
     route: "/",
@@ -56,13 +56,6 @@ const corePages = [
     description: "Browse sample performance-part categories for a selected vehicle and contact LONMA DYNAMIC for fitment and installation details.",
     image: "/assets/images/shop/forged-wheel.webp",
   },
-  {
-    file: "pages/shop/forged-wheel.html",
-    route: "/pages/shop/forged-wheel",
-    title: "Monoblock Forged Wheel | LONMA DYNAMIC",
-    description: "Configure a forged wheel direction and request final fitment verification from LONMA DYNAMIC.",
-    image: "/assets/images/shop/forged-wheel.webp",
-  },
 ];
 
 const casePages = caseDetails.map((record) => ({
@@ -81,15 +74,15 @@ const servicePages = serviceDetails.map((record) => ({
   image: caseImage(record.number),
 }));
 
-const productPages = shopProducts
-  .filter((product) => product.inquiry)
-  .map((product) => ({
+export const seoForProduct = (product) => ({
     file: `pages/shop/${product.id}.html`,
     route: `/pages/shop/${product.id}`,
-    title: `${product.title.en} | LONMA DYNAMIC`,
-    description: `${product.title.en.charAt(0)}${product.title.en.slice(1).toLowerCase()} — request vehicle fitment and a confirmed quote from LONMA DYNAMIC.`,
-    image: `/${product.image}`,
-  }));
+    title: `${product.detail?.title?.en ?? product.title?.en ?? ""} | LONMA DYNAMIC`,
+    description: product.detail?.summary?.en ?? product.description?.en ?? "",
+    image: `/${product.image ?? ""}`,
+  });
+
+const productPages = shopProducts.map(seoForProduct);
 
 export const publicPages = Object.freeze([
   ...corePages,

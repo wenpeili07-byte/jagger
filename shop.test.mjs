@@ -238,14 +238,14 @@ function createDialogHarness({
   };
 }
 
-test("shop renders six truthful bilingual sample products", () => {
+test("shop renders every truthful bilingual sample product", () => {
   assert.deepEqual(shopVehicles.makes, ["BMW", "AUDI", "MERCEDES-BENZ"]);
-  assert.equal(shopProducts.length, 6);
-  assert.equal((html.match(/data-product-card/g) || []).length, 6);
+  assert.ok(shopProducts.length > 0);
+  assert.equal((html.match(/data-product-card/g) || []).length, shopProducts.length);
   assert.match(html, /SAMPLE VEHICLE/);
   assert.match(html, /data-zh="示例车型" data-en="SAMPLE VEHICLE"/);
   assert.doesNotMatch(html, /\$\s?\d|IN STOCK|data-price|sku|part number/i);
-  assert.equal((html.match(/data-en="INQUIRE"/g) || []).length, 6);
+  assert.equal((html.match(/data-en="INQUIRE"/g) || []).length, shopProducts.length);
 });
 
 test("every product card deep-links to its own detail page", () => {
@@ -255,16 +255,16 @@ test("every product card deep-links to its own detail page", () => {
       new RegExp(`href="\\./shop/${product.id}\\.html"[^>]*data-product-link="${product.id}"`)
     );
   }
-  assert.equal((html.match(/data-product-link=/g) || []).length, 6);
+  assert.equal((html.match(/data-product-link=/g) || []).length, shopProducts.length);
   assert.equal((html.match(/data-product-open/g) || []).length, 0);
 });
 
 test("every shop card exposes one full-card primary target", () => {
-  assert.equal((html.match(/class="shop-product-target"/g) || []).length, 6);
-  assert.equal((html.match(/data-product-link=/g) || []).length, 6);
-  assert.equal((html.match(/class="shop-product-action-copy"/g) || []).length, 6);
+  assert.equal((html.match(/class="shop-product-target"/g) || []).length, shopProducts.length);
+  assert.equal((html.match(/data-product-link=/g) || []).length, shopProducts.length);
+  assert.equal((html.match(/class="shop-product-action-copy"/g) || []).length, shopProducts.length);
   const metaBlocks = [...html.matchAll(/<div class="shop-product-meta">([\s\S]*?)<\/div>/g)];
-  assert.equal(metaBlocks.length, 6);
+  assert.equal(metaBlocks.length, shopProducts.length);
   metaBlocks.forEach(([, markup]) => assert.doesNotMatch(markup, /<(?:a|button)\b/));
 });
 
@@ -362,9 +362,10 @@ test("shop mobile editor synchronizes values and collapses after search", () => 
 });
 
 test("shop initial status and dialog description switch to Chinese", () => {
+  const count = String(shopProducts.length).padStart(2, "0");
   assert.match(
     html,
-    /<p data-results-status aria-live="polite" data-zh="06 项示例结果" data-en="06 SAMPLE RESULTS">06 SAMPLE RESULTS<\/p>/
+    new RegExp(`<p data-results-status aria-live="polite" data-zh="${count} 项示例结果" data-en="${count} SAMPLE RESULTS">${count} SAMPLE RESULTS<\\/p>`)
   );
   assert.match(
     html,
@@ -374,12 +375,11 @@ test("shop initial status and dialog description switch to Chinese", () => {
 
 test("shop records define truthful future-ready dialog fields", () => {
   for (const product of shopProducts) {
-    assert.deepEqual(product.compatibility, {
-      en: "FITMENT NOT CONFIRMED",
-      zh: "适配尚未确认",
+    if (product.compatibility) assert.deepEqual(product.compatibility, {
+      en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认",
     });
-    assert.ok(product.inquirySubject.en && product.inquirySubject.zh);
-    assert.equal(product.shopifyProductId, null);
+    if (product.inquirySubject) assert.ok(product.inquirySubject.en && product.inquirySubject.zh);
+    if (product.shopifyProductId !== undefined) assert.equal(product.shopifyProductId, null);
   }
 });
 
@@ -412,9 +412,9 @@ test("shared shop data owns coherent vehicles and forged-wheel commercial facts"
   );
 });
 
-test("forged wheel checked-in page is generated from the shared product record", () => {
-  assert.equal(typeof shopRenderer.renderForgedWheelPage, "function");
-  assert.equal(productHtml, shopRenderer.renderForgedWheelPage());
+test("configurable product page is generated from the shared product record", () => {
+  assert.equal(typeof shopRenderer.renderConfigurableProductPage, "function");
+  assert.equal(productHtml, shopRenderer.renderConfigurableProductPage(shopProducts.find((product) => product.id === "forged-wheel")));
   assert.match(productHtml, /data-product-config/);
 });
 
@@ -434,7 +434,7 @@ test("forged wheel specifications render finish and fitment copy from shared fac
     zh: "咨询矩阵 · 下单前确认",
   };
 
-  const mutatedHtml = shopRenderer.renderForgedWheelPage(forgedWheel);
+  const mutatedHtml = shopRenderer.renderConfigurableProductPage(forgedWheel);
 
   assert.match(mutatedHtml, /FROZEN BRONZE/);
   assert.match(mutatedHtml, /磨砂古铜/);
@@ -444,9 +444,9 @@ test("forged wheel specifications render finish and fitment copy from shared fac
 });
 
 test("shop renderer carries complete dialog data and a visible action footer", () => {
-  assert.equal((html.match(/data-compatibility-en=/g) || []).length, 6);
-  assert.equal((html.match(/data-inquiry-subject-en=/g) || []).length, 6);
-  assert.equal((html.match(/data-shopify-product-id=/g) || []).length, 6);
+  assert.equal((html.match(/data-compatibility-en=/g) || []).length, shopProducts.length);
+  assert.equal((html.match(/data-inquiry-subject-en=/g) || []).length, shopProducts.length);
+  assert.equal((html.match(/data-shopify-product-id=/g) || []).length, shopProducts.length);
   assert.match(html, /data-dialog-compatibility[^>]*data-en="FITMENT NOT CONFIRMED"/);
   assert.match(html, /class="shop-dialog-footer"/);
   assert.match(css, /\.shop-dialog img\s*\{[^}]*height:\s*min\(42vh,\s*380px\)/s);
@@ -636,7 +636,7 @@ test("shop controller keeps supported vehicle tuples coherent", () => {
     [["RS 5", false], ["2024", false], ["B9.5", false]]
   );
   findButton.listeners.get("click")();
-  assert.equal(resultsStatus.textContent, "06 SAMPLE RESULTS");
+  assert.equal(resultsStatus.textContent, `${String(shopProducts.length).padStart(2, "0")} SAMPLE RESULTS`);
   assert.equal(emptyState.hidden, true);
 
   makeControl.value = "BMW";
@@ -646,7 +646,7 @@ test("shop controller keeps supported vehicle tuples coherent", () => {
     [modelControl, yearControl, chassisControl].map((control) => [control.value, control.disabled]),
     [["G80 M3", false], ["2024", false], ["G8X", false]]
   );
-  assert.equal(resultsStatus.textContent, "06 SAMPLE RESULTS");
+  assert.equal(resultsStatus.textContent, `${String(shopProducts.length).padStart(2, "0")} SAMPLE RESULTS`);
   assert.equal(emptyState.hidden, true);
 });
 
