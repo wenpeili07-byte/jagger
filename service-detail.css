@@ -11,6 +11,7 @@
   display: grid;
   grid-template-columns: minmax(360px, 0.82fr) minmax(0, 1.18fr);
   height: min(calc(100vh - var(--site-header-height)), var(--site-first-screen-max));
+  height: min(calc(100dvh - var(--site-header-height)), var(--site-first-screen-max));
 }
 
 .detail-copy {
@@ -174,5 +175,562 @@
   .detail-contact {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+/* ==========================================================================
+   2026-11 service detail — A (full-bleed cover) + B (service sheet)
+   + C (proof rail and scroll chapters)
+   ========================================================================== */
+.service-label,
+.service-detail-page .case-chapters-head .detail-story-label {
+  display: block;
+  margin: 0;
+  color: var(--accent-bright, #3b8bd0);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+}
+
+.service-number {
+  display: block;
+  color: transparent;
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: clamp(96px, 11vw, 180px);
+  line-height: 0.8;
+  -webkit-text-stroke: 1px rgba(236, 235, 230, 0.4);
+  margin-bottom: 20px;
+}
+
+@media (min-width: 1100px) {
+  .service-detail-page .detail-hero {
+    position: relative;
+    display: block;
+    overflow: hidden;
+  }
+
+  .service-detail-page .detail-hero-media {
+    position: absolute;
+    inset: 0;
+  }
+
+  .service-detail-page .detail-hero-media img {
+    filter: saturate(0.96) contrast(1.06) brightness(0.8);
+    animation: serviceCoverIn 1600ms cubic-bezier(0.22, 0.8, 0.24, 1) both;
+  }
+
+  .service-detail-page .detail-hero-media::after {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(10, 11, 12, 0.82), rgba(10, 11, 12, 0.12) 58%, transparent),
+      linear-gradient(0deg, #111315, transparent 42%);
+    content: "";
+    pointer-events: none;
+  }
+
+  .service-detail-page .detail-copy {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    justify-content: flex-end;
+    max-width: 860px;
+    padding-bottom: clamp(56px, 7vh, 96px);
+    pointer-events: none;
+  }
+
+  .service-detail-page .detail-copy > * {
+    pointer-events: auto;
+  }
+
+  .service-detail-page .detail-index {
+    margin-top: 24px;
+  }
+
+  .service-detail-page .detail-intro {
+    color: rgba(236, 235, 230, 0.78);
+    font-size: 18px;
+  }
+}
+
+/* A — approach statement */
+.service-detail-page .detail-story {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.32fr) minmax(0, 1fr);
+  column-gap: clamp(32px, 6vw, 96px);
+}
+
+.service-detail-page .detail-story > p {
+  grid-column: 2;
+}
+
+.service-story-label {
+  grid-column: 1;
+  grid-row: 1;
+  padding-top: 14px;
+}
+
+.service-detail-page .detail-story p:first-child {
+  font-size: clamp(24px, 2.8vw, 40px);
+  font-weight: 300;
+  line-height: 1.35;
+}
+
+/* B — service sheet */
+.service-sheet {
+  display: grid;
+  grid-template-columns: minmax(280px, 400px) minmax(0, 1fr);
+  gap: clamp(40px, 6vw, 96px);
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(48px, 6vw, 96px) var(--site-gutter) clamp(80px, 9vw, 140px);
+}
+
+.service-sheet-aside {
+  position: sticky;
+  top: calc(var(--site-header-height, 72px) + 40px);
+  display: grid;
+  align-self: start;
+  gap: 20px;
+}
+
+.service-sheet-aside h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: Impact, "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(36px, 3.6vw, 54px);
+  line-height: 0.92;
+}
+
+.service-sheet-aside dl {
+  margin: 4px 0 0;
+  border-top: 1px solid rgba(236, 235, 230, 0.15);
+}
+
+.service-sheet-aside dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(236, 235, 230, 0.1);
+}
+
+.service-sheet-aside dt {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+
+.service-sheet-aside dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  text-align: right;
+}
+
+.service-sheet-cta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding: 18px 22px;
+  color: #0b0c0d;
+  background: #ecebe6;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  transition: background 240ms ease;
+}
+
+.service-sheet-cta:hover,
+.service-sheet-cta:focus-visible {
+  background: #fff;
+}
+
+.service-sheet-link {
+  justify-self: start;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(236, 235, 230, 0.3);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-decoration: none;
+}
+
+.service-sheet-main {
+  display: grid;
+  gap: clamp(56px, 7vw, 96px);
+}
+
+.service-block .service-label {
+  margin-bottom: 24px;
+}
+
+.service-block-note {
+  max-width: 520px;
+  margin: -8px 0 28px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.service-included {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(236, 235, 230, 0.15);
+}
+
+.service-included li {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  padding: 26px 0;
+  border-bottom: 1px solid rgba(236, 235, 230, 0.1);
+}
+
+.service-included-index {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.service-included strong {
+  color: var(--ink);
+  font-size: clamp(18px, 1.6vw, 22px);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+.service-sheet .build-cards {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* C — proof rail */
+.service-proof {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 0 clamp(72px, 8vw, 120px) var(--site-gutter);
+}
+
+.service-proof-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding-right: var(--site-gutter);
+}
+
+.service-proof-head h2 {
+  margin: 14px 0 0;
+  color: var(--ink);
+  font-size: clamp(28px, 3.2vw, 48px);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+.service-proof-all {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+}
+
+.service-proof-track {
+  display: flex;
+  gap: 24px;
+  padding-right: var(--site-gutter);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.service-proof-track::-webkit-scrollbar {
+  display: none;
+}
+
+.service-proof-card {
+  position: relative;
+  flex: 0 0 clamp(260px, 29vw, 420px);
+  overflow: hidden;
+  color: var(--ink);
+  text-decoration: none;
+  scroll-snap-align: start;
+}
+
+.service-proof-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  transition: scale 900ms cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+.service-proof-card:hover img,
+.service-proof-card:focus-visible img {
+  scale: 1.04;
+}
+
+.service-proof-copy {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  gap: 8px;
+  padding: 28px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.86), transparent);
+}
+
+.service-proof-index {
+  color: var(--accent-bright, #3b8bd0);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.service-proof-copy strong {
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+.service-proof-sub {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+/* C — chapters sit on the service background */
+.service-detail-page .case-chapters-frame,
+.service-detail-page .case-chapters-frame figure,
+.service-detail-page .case-chapter .case-step-node {
+  background: #111315;
+}
+
+/* A — ivory contact block */
+.service-detail-page .detail-contact {
+  margin: clamp(24px, 4vw, 48px) var(--site-gutter) clamp(72px, 8vw, 120px);
+  padding: clamp(40px, 5vw, 72px);
+  border: 0;
+  color: #0b0c0d;
+  background: #ecebe6;
+}
+
+@media (min-width: 1441px) {
+  .service-detail-page .detail-contact {
+    margin-right: auto;
+    margin-left: auto;
+    max-width: calc(1440px - 2 * var(--site-gutter));
+  }
+}
+
+.service-contact-index {
+  margin: 0 0 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+}
+
+.service-detail-page .detail-contact h2,
+.service-detail-page .detail-contact a {
+  color: #0b0c0d;
+}
+
+.service-detail-page .detail-contact h2 {
+  font-family: Impact, "Arial Narrow", Arial, sans-serif;
+}
+
+.service-detail-page .detail-contact a {
+  padding-bottom: 6px;
+  border-bottom: 1px solid #0b0c0d;
+}
+
+@keyframes serviceCoverIn {
+  from {
+    opacity: 0;
+    scale: 1.06;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@media (max-width: 1099px) {
+  .service-number {
+    display: none;
+  }
+
+  .service-detail-page .detail-hero-media {
+    position: relative;
+  }
+
+  .service-sheet {
+    grid-template-columns: 1fr;
+  }
+
+  .service-sheet-aside {
+    position: static;
+  }
+
+  .service-sheet .build-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .service-detail-page .detail-story {
+    grid-template-columns: 1fr;
+    row-gap: 18px;
+  }
+
+  .service-detail-page .detail-story > p,
+  .service-story-label {
+    grid-column: 1;
+  }
+
+  .service-story-label {
+    grid-row: 1;
+    padding: 0;
+  }
+
+  .service-detail-page .detail-story p:first-child {
+    font-size: 21px;
+  }
+
+  .service-sheet {
+    padding: 24px 20px 64px;
+  }
+
+  .service-included {
+    grid-template-columns: 1fr;
+  }
+
+  .service-included li {
+    padding: 18px 0;
+  }
+
+  .service-proof {
+    padding-left: 20px;
+  }
+
+  .service-proof-head {
+    padding-right: 20px;
+  }
+
+  .service-proof-track {
+    padding-right: 20px;
+  }
+
+  .service-proof-card {
+    flex-basis: 78vw;
+  }
+
+  .service-detail-page .detail-contact {
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 16px 20px 48px;
+    padding: 32px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-detail-page .detail-hero-media img {
+    animation: none;
+  }
+}
+
+/* Phone: keep service pages short */
+@media (max-width: 767px) {
+  .service-sheet-link,
+  .service-proof-all {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding-inline: 8px;
+  }
+
+  .service-sheet-aside h2 {
+    display: none;
+  }
+
+  .service-sheet-aside {
+    gap: 14px;
+  }
+
+  .service-sheet {
+    padding-top: 8px;
+    padding-bottom: 40px;
+  }
+
+  .service-sheet-main {
+    gap: 40px;
+  }
+
+  .service-included {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+  }
+
+  .service-included li {
+    gap: 12px;
+    padding: 14px 0;
+  }
+
+  .service-included strong {
+    font-size: 14px;
+  }
+
+  .service-detail-page .detail-story {
+    padding-top: 40px;
+    padding-bottom: 32px;
+  }
+
+  .service-proof {
+    padding-bottom: 40px;
+  }
+
+  .service-proof-head h2 {
+    font-size: 24px;
+  }
+
+  .service-proof-card {
+    flex-basis: 58vw;
+  }
+
+  .service-proof-card img {
+    aspect-ratio: 4 / 5;
+  }
+
+  .service-proof-copy {
+    padding: 16px;
+  }
+
+  .service-proof-copy strong {
+    font-size: 16px;
+  }
+
+  .service-detail-page .detail-contact {
+    margin-bottom: 32px;
+    padding: 28px 20px;
+  }
+}
+
+/* Phone: the four-step process is the same on every service page and is
+   already summarised in the approach line, so skip the scroll chapters. */
+@media (max-width: 767px) {
+  .service-detail-page .case-chapters {
+    display: none;
   }
 }

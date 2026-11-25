@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="../styles.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../layout-canvas.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../project.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../pages-2026.css?v=project-hotspot-20261125" />
     <link rel="stylesheet" href="../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="project">
@@ -122,7 +123,24 @@
               fetchpriority="high"
               decoding="async"
             />
+          <div class="project-hotspots" data-project-hotspots hidden>
+            <p class="project-hotspots-hint" data-zh="点选车上的标记，加入改装方向" data-en="TAP A MARKER TO ADD A WORKSTREAM">TAP A MARKER TO ADD A WORKSTREAM</p>
+            <button class="project-hotspot" type="button" data-project-hotspot="build" data-x="86" data-y="52" style="--x: 86%; --y: 52%" aria-pressed="false"><span class="project-hotspot-dot" aria-hidden="true"></span><span class="project-hotspot-label" data-zh="汽车改装" data-en="VEHICLE BUILD">VEHICLE BUILD</span></button>
+            <button class="project-hotspot" type="button" data-project-hotspot="parts" data-x="90" data-y="70" style="--x: 90%; --y: 70%" aria-pressed="false"><span class="project-hotspot-dot" aria-hidden="true"></span><span class="project-hotspot-label" data-zh="汽车配件" data-en="PERFORMANCE PARTS">PERFORMANCE PARTS</span></button>
+            <button class="project-hotspot" type="button" data-project-hotspot="photo" data-x="50" data-y="36" style="--x: 50%; --y: 36%" aria-pressed="false"><span class="project-hotspot-dot" aria-hidden="true"></span><span class="project-hotspot-label" data-zh="汽车摄影" data-en="AUTOMOTIVE MEDIA">AUTOMOTIVE MEDIA</span></button>
+            <button class="project-hotspot" type="button" data-project-hotspot="ecu" data-x="40" data-y="50" style="--x: 40%; --y: 50%" aria-pressed="false"><span class="project-hotspot-dot" aria-hidden="true"></span><span class="project-hotspot-label" data-zh="ECU 特调" data-en="ECU CALIBRATION">ECU CALIBRATION</span></button>
+            <button class="project-hotspot" type="button" data-project-hotspot="chassis" data-x="11" data-y="70" style="--x: 11%; --y: 70%" aria-pressed="false"><span class="project-hotspot-dot" aria-hidden="true"></span><span class="project-hotspot-label" data-zh="底盘设定" data-en="CHASSIS SETUP">CHASSIS SETUP</span></button>
+            <button class="project-hotspot" type="button" data-project-hotspot="exhaust" data-x="34" data-y="64" style="--x: 34%; --y: 64%" aria-pressed="false"><span class="project-hotspot-dot" aria-hidden="true"></span><span class="project-hotspot-label" data-zh="进排气" data-en="INTAKE / EXHAUST">INTAKE / EXHAUST</span></button>
+          </div>
           </figure>
+        </div>
+        <div class="project-summary" data-project-summary aria-live="polite" hidden>
+          <dl>
+            <div><dt data-en="VEHICLE" data-zh="车辆">VEHICLE</dt><dd data-summary-vehicle></dd></div>
+            <div><dt data-en="GOAL" data-zh="目标">GOAL</dt><dd data-summary-goal></dd></div>
+            <div><dt data-en="WORKSTREAMS" data-zh="改装方向">WORKSTREAMS</dt><dd data-summary-directions></dd></div>
+          </dl>
+          <span class="project-summary-count"><strong data-summary-count></strong><span data-en="SELECTED" data-zh="已选">SELECTED</span></span>
         </div>
       </section>
       <footer class="content-footer">
@@ -133,5 +151,6 @@
     </main>
     <script src="../content-pages.js?v=sanity-case-cms-20260801"></script>
     <script src="../project.js?v=sanity-case-cms-20260801"></script>
+    <script src="../project-config.js?v=pages-20261124" defer></script>
   </body>
 </html>

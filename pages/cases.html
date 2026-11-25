@@ -112,7 +112,7 @@
 
       <div class="cases-gap" aria-hidden="true"></div>
 
-      <section class="case-archive" aria-label="36-case archive" data-zh-aria-label="36 个案例库" data-en-aria-label="36-case archive">
+      <section class="case-archive" aria-label="6-case archive" data-zh-aria-label="6 个案例库" data-en-aria-label="6-case archive">
         <div class="archive-layout">
           <aside
             class="archive-filter"
@@ -122,7 +122,7 @@
           >
             <p>FILTER</p>
             <h2 data-zh="筛选" data-en="FILTER">FILTER</h2>
-            <span>36 PERFORMANCE PROJECTS</span>
+            <span>06 PERFORMANCE PROJECTS</span>
             <div class="filter-block">
               <h3 data-zh="车型" data-en="MAKE">MAKE</h3>
               <button class="filter-option is-active" type="button" data-filter="all">
@@ -151,7 +151,7 @@
           <div class="archive-main">
             <div class="archive-heading">
               <div>
-                <p data-zh="36 个改装案例" data-en="36 PERFORMANCE PROJECTS">36 PERFORMANCE PROJECTS</p>
+                <p data-zh="06 个改装案例" data-en="06 PERFORMANCE PROJECTS">06 PERFORMANCE PROJECTS</p>
                 <h2 data-zh="案例档案" data-en="PROJECT ARCHIVE">PROJECT ARCHIVE</h2>
                 <span
                   data-zh="改装案例库 · 支持车型筛选"
@@ -270,6 +270,7 @@
 
         document.querySelectorAll(".mwg_effect060 .slide[data-scene]").forEach((card) => {
           const update = (event) => {
+            if (event.type === "mouseenter" && card.parentElement?.dataset.railStepping) return;
             event.stopImmediatePropagation();
             document.querySelectorAll(".mwg_effect060 .slide[data-scene]").forEach((item) => {
               item.classList.toggle("is-active", item === card);
@@ -283,6 +284,7 @@
         });
         window.addEventListener("lonma:content-updated", syncActiveScene);
         window.addEventListener("lonma:case-scene-restored", syncActiveScene);
+        window.addEventListener("lonma:case-rail-active", syncActiveScene);
         syncActiveScene();
       })();
     </script>

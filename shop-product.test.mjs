@@ -13,6 +13,12 @@ const embeddedProductConfig =
   html.match(/<script type="application\/json" data-product-config>([\s\S]*?)<\/script>/)?.[1]
   ?? "{}";
 
+for (const panel of ["product-specifications-panel", "product-fitment-panel"]) {
+  assert.match(html, new RegExp(`<button[^>]+aria-controls="${panel}"[^>]+aria-expanded="true"`), `${panel} should have a real accessible toggle`);
+  assert.match(html, new RegExp(`<div[^>]+id="${panel}"`), `${panel} should have a controlled panel`);
+}
+assert.match(html, /<script src="\.\.\/\.\.\/product-info\.js/, "product details should load the responsive disclosure controller");
+
 class ProductNode {
   constructor({ checked = false, maxLength = 0, value = "" } = {}) {
     this.attributes = new Map();

@@ -266,8 +266,9 @@
   }
 
   .case02-video-stage > video {
-    height: auto;
-    aspect-ratio: 16 / 9;
+    height: clamp(140px, 38vw, 160px);
+    aspect-ratio: auto;
+    object-fit: cover;
     object-position: center 62%;
   }
 

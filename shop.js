@@ -336,3 +336,201 @@
     lastDialogTrigger = null;
   });
 })();
+
+// Featured product stage (top of the shop page). Reads everything from the
+// existing product cards, so the catalogue stays the single source of truth.
+(() => {
+  const feature = document.querySelector("[data-shop-feature]");
+
+  if (!feature) {
+    return;
+  }
+
+  const cards = [...document.querySelectorAll("[data-product-card]")];
+  const picks = [...feature.querySelectorAll("[data-feature-pick]")];
+  const image = feature.querySelector("[data-feature-image]");
+  const name = feature.querySelector("[data-feature-name]");
+  const category = feature.querySelector("[data-feature-category]");
+  const number = feature.querySelector("[data-feature-number]");
+  const description = feature.querySelector("[data-feature-description]");
+  const compatibility = feature.querySelector("[data-feature-compatibility]");
+  const cta = feature.querySelector("[data-feature-cta]");
+  const wheelRows = [...feature.querySelectorAll("[data-feature-wheel]")];
+  const otherRows = [...feature.querySelectorAll("[data-feature-other]")];
+  const vehicle = feature.querySelector("[data-feature-vehicle]");
+  const vehicleMeta = feature.querySelector("[data-feature-vehicle-meta]");
+  const vehicleLine = feature.querySelector("[data-feature-vehicle-line]");
+  let current = 0;
+
+  const language = () => (document.documentElement.lang.startsWith("zh") ? "zh" : "en");
+
+  const setCopy = (node, zh, en) => {
+    if (!node) {
+      return;
+    }
+
+    node.dataset.zh = zh;
+    node.dataset.en = en;
+    node.textContent = language() === "zh" ? zh : en;
+  };
+
+  const show = (index) => {
+    const count = cards.length;
+    current = (index + count) % count;
+    const card = cards[current];
+    const id = card.dataset.productId;
+    const categoryNode = card.querySelector(".shop-product-category");
+    const link = card.querySelector("a.shop-product-target");
+    const isWheel = Boolean(link);
+
+    feature.classList.remove("is-changing");
+    void feature.offsetWidth;
+    feature.classList.add("is-changing");
+
+    image.src = card.dataset.image;
+    image.alt = language() === "zh" ? card.dataset.altZh : card.dataset.altEn;
+    image.dataset.zhAlt = card.dataset.altZh;
+    image.dataset.enAlt = card.dataset.altEn;
+    setCopy(name, card.dataset.titleZh, card.dataset.titleEn);
+    setCopy(category, categoryNode?.dataset.zh || "", categoryNode?.dataset.en || "");
+    setCopy(description, card.dataset.descriptionZh, card.dataset.descriptionEn);
+    setCopy(compatibility, card.dataset.compatibilityZh, card.dataset.compatibilityEn);
+    number.textContent = String(current + 1).padStart(2, "0");
+
+    wheelRows.forEach((row) => {
+      row.hidden = !isWheel;
+    });
+    otherRows.forEach((row) => {
+      row.hidden = isWheel;
+    });
+
+    if (isWheel) {
+      cta.setAttribute("href", link.getAttribute("href"));
+      setCopy(cta, "配置此产品", "CONFIGURE");
+    } else {
+      cta.setAttribute("href", `#${id}`);
+      setCopy(cta, "查看详情", "VIEW DETAILS");
+    }
+
+    cta.dataset.featureTarget = id;
+    picks.forEach((pick) => {
+      if (pick.dataset.featurePick === id) {
+        pick.setAttribute("aria-current", "true");
+      } else {
+        pick.removeAttribute("aria-current");
+      }
+    });
+  };
+
+  picks.forEach((pick) => {
+    pick.addEventListener("click", () => {
+      const index = cards.findIndex((card) => card.dataset.productId === pick.dataset.featurePick);
+      if (index >= 0) {
+        show(index);
+      }
+    });
+  });
+
+  feature.querySelectorAll("[data-feature-step]").forEach((button) => {
+    button.addEventListener("click", () => show(current + Number(button.dataset.featureStep)));
+  });
+
+  feature.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      show(current - 1);
+    } else if (event.key === "ArrowRight") {
+      show(current + 1);
+    }
+  });
+
+  // Swipe on touch screens.
+  const stage = feature.querySelector(".shop-feature-stage");
+  let touchStartX = null;
+  let touchStartY = null;
+
+  stage?.addEventListener(
+    "touchstart",
+    (event) => {
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+    },
+    { passive: true }
+  );
+
+  stage?.addEventListener(
+    "touchend",
+    (event) => {
+      if (touchStartX === null) {
+        return;
+      }
+
+      const deltaX = event.changedTouches[0].clientX - touchStartX;
+      const deltaY = event.changedTouches[0].clientY - touchStartY;
+      touchStartX = null;
+
+      if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        show(current + (deltaX < 0 ? 1 : -1));
+      }
+    },
+    { passive: true }
+  );
+
+  // Non-wheel products open the existing detail dialog.
+  cta.addEventListener("click", (event) => {
+    const card = cards[current];
+    const dialogTrigger = card.querySelector("button.shop-product-target");
+
+    if (dialogTrigger) {
+      event.preventDefault();
+      dialogTrigger.click();
+    }
+  });
+
+  // Mirror the vehicle selected in the selector below.
+  const syncVehicle = () => {
+    const make = document.querySelector("[data-shop-make]")?.value || "BMW";
+    const model = document.querySelector("[data-shop-model]")?.value || "";
+    const year = document.querySelector("[data-shop-year]")?.value || "";
+    const chassis = document.querySelector("[data-shop-chassis]")?.value || "";
+    vehicle.textContent = `${make} ${model}`.trim();
+    vehicleMeta.textContent = [year, chassis].filter(Boolean).join(" · ");
+    vehicleLine.textContent = [`${make} ${model}`.trim(), year].filter(Boolean).join(" · ");
+  };
+
+  document.querySelectorAll("[data-shop-make], [data-shop-model], [data-shop-year], [data-shop-chassis]").forEach((field) => {
+    field.addEventListener("change", syncVehicle);
+  });
+  syncVehicle();
+})();
+
+// Deep link: shop.html?product=<id> opens that product (used by "complete the build").
+(() => {
+  const requested = new URLSearchParams(window.location.search).get("product");
+
+  if (!requested) {
+    return;
+  }
+
+  const card = [...document.querySelectorAll("[data-product-card]")].find((node) => node.dataset.productId === requested);
+
+  if (!card) {
+    return;
+  }
+
+  const open = () => {
+    card.scrollIntoView({ block: "center" });
+    const trigger = card.querySelector("button.shop-product-target");
+
+    if (trigger) {
+      trigger.click();
+    } else {
+      card.querySelector("a.shop-product-target")?.focus();
+    }
+  };
+
+  if (document.readyState === "complete") {
+    open();
+  } else {
+    window.addEventListener("load", open, { once: true });
+  }
+})();

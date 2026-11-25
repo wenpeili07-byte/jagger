@@ -5,7 +5,7 @@ const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const casesHtml = read("./pages/cases.html");
 const caseIds = ["01", "02", "03", "04", "05", "06"];
 const serviceIds = ["build", "parts", "photo", "ecu", "chassis", "exhaust"];
-const { caseDetails, serviceDetails } = await import("./detail-pages-data.mjs");
+const { caseDetails, serviceDetails, serviceExtras } = await import("./detail-pages-data.mjs");
 const sharedCss = read("./styles.css");
 const contentCss = read("./content-pages.css");
 const rendererUrl = new URL("./scripts/render-detail-pages.mjs", import.meta.url);
@@ -30,6 +30,15 @@ for (const record of caseDetails) {
 
 for (const record of serviceDetails) {
   assert.equal(read(`./pages/services/${record.id}.html`), renderServicePage(record), `${record.id}.html should match renderServicePage output`);
+  const allowed = new Set([...serviceExtras[record.id].keys, ...serviceExtras[record.id].shop]);
+  const output = renderServicePage(record);
+  const firstChapter = output.match(/class="case-chapters-frame">\s*<figure\b([\s\S]*?)<\/figure>/)?.[1] || "";
+  const hero = output.match(/class="detail-hero-media"[\s\S]*?<\/figure>/)?.[0] || "";
+  for (const section of [firstChapter, hero]) {
+    for (const [, key] of section.matchAll(/class="(?:build-tag|build-hotspot)"[^>]*data-build-key="([^"]+)"/g)) {
+      assert.ok(allowed.has(key), `${record.id} should not display off-topic ${key} tags on its cover photo`);
+    }
+  }
 }
 
 function attributeValue(tag, attribute) {

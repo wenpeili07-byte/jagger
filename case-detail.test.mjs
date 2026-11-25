@@ -81,5 +81,5 @@ assert.match(
 
 for (const slug of ["build", "parts", "photo", "ecu", "chassis", "exhaust"]) {
   const html = read(`./pages/services/${slug}.html`);
-  assert.match(html, /service-detail\.css\?v=mobile-spacing-20260722/);
+  assert.match(html, /service-detail\.css\?v=service-touch-20261124/);
 }

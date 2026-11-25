@@ -28,7 +28,7 @@ assert.doesNotMatch(html, /assets\/images\/网页\/案例[1-6]\//, "cases page s
 assert.equal((html.match(/class="slide spacer"/g) || []).length, 4, "effect 060 rail should include spacer slides so five positions stay visible");
 assert.equal((html.match(/class="archive-card/g) || []).length, 6, "archive should use the current six cases as reference content");
 assert.doesNotMatch(html, /<section class="masked-image-rail"/, "archive should not include the old scrolling masked image rail");
-assert.match(html, /36 PERFORMANCE PROJECTS/, "archive should be framed as 36 performance projects");
+assert.match(html, /06 PERFORMANCE PROJECTS/, "archive count should match the six published cases");
 assert.match(html, new RegExp(`styles\\.css\\?v=${sharedAssetVersion}`), "cases page should load the current shared stylesheet cache key");
 assert.match(html, /layout-canvas\.css\?v=sanity-case-cms-20260801/, "cases page should load the current shared canvas cache key");
 assert.match(html, /case-rail\.css\?v=hero-rail-20260721-labels-up-2/, "cases page should load the latest raised-label rail stylesheet separately from the large main stylesheet");
@@ -108,9 +108,12 @@ assert.match(css, /\.filter-option\.is-active/s, "active filter should have its 
 
 assert.match(js, /data-filter/, "cases script should handle brand filter controls");
 assert.match(js, /data-brand/, "cases script should filter archive cards by brand");
-assert.match(js, /function initIndependentRailScroll\(\)/, "cases script should initialize independent rail wheel scrolling");
+assert.match(js, /function initRailScenes\(\)/, "cases script should initialize the rail scene controller");
 assert.match(js, /rail\.addEventListener\("wheel"/, "right case module should own its wheel interaction");
-assert.match(js, /event\.preventDefault\(\)/, "right case module wheel interaction should not leak into page scroll");
+assert.match(js, /event\.preventDefault\(\)/, "rail wheel steps should not scroll the page while cases remain");
+assert.match(js, /atEdge/, "rail should hand scrolling back to the page at the first and last case");
+assert.match(js, /lonma:case-rail-active/, "rail steps should drive the background scene");
+assert.match(html, /addEventListener\("lonma:case-rail-active", syncActiveScene\)/, "scene controller should follow rail steps");
 assert.doesNotMatch(js, /function initEffect060Rail/, "cases script should not initialize scroll-driven rail motion");
 assert.doesNotMatch(js, /requestAnimationFrame/, "right case module should not be driven by page scroll");
 assert.doesNotMatch(js, /window\.addEventListener\("scroll"/, "right case module should not listen to page scroll");

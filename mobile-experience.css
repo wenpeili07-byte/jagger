@@ -1736,3 +1736,508 @@
     -webkit-line-clamp: 4;
   }
 }
+
+/* ==========================================================================
+   2026-11 device polish — desktop / iPad / iPhone
+   Appended last so these rules win without rewriting the per-page sheets.
+   ========================================================================== */
+
+/* Display headlines: balance lines, never split CJK words mid-word.
+   content-pages.js shrinks any headline whose longest word still overflows. */
+.detail-copy h1,
+.services-intro h1,
+.cases-title,
+.archive-card h3 {
+  text-wrap: balance;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+/* Home featured cards now carry the real case names instead of "CAR 0X". */
+.film-card h2 {
+  font-size: clamp(22px, 2.5vw, 36px);
+  line-height: 1;
+  text-align: right;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.film-card div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: 76%;
+  white-space: nowrap;
+}
+
+.detail-panel .detail-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent);
+}
+
+/* Home service tiles: the "REQUEST DETAILS" link was almost invisible. */
+.service-tile .service-cta {
+  color: rgba(232, 231, 226, 0.82);
+}
+
+/* Services index: rows grow with their copy instead of being cut off when the
+   viewport is short (iPad landscape, small laptops). */
+@media (min-width: 768px) {
+  .services-workspace {
+    height: auto;
+    min-height: calc(min(1050px, 100vh) - var(--site-header-height));
+    min-height: calc(min(1050px, 100dvh) - var(--site-header-height));
+  }
+
+  .service-process-rail {
+    grid-template-rows: repeat(6, minmax(min-content, 1fr));
+  }
+
+  /* Photos must not set the row height; only the copy does. */
+  .service-process-media {
+    contain: size;
+  }
+
+  .service-process-copy {
+    padding-bottom: 24px;
+  }
+}
+
+/* Touch tablets: 44px tap targets in the desktop header. */
+@media (min-width: 768px) and (pointer: coarse) {
+  .nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .project-entry,
+  .lang-toggle {
+    min-height: 44px;
+  }
+
+  .roll-row,
+  .filter-option {
+    min-height: 44px;
+  }
+}
+
+/* iPad portrait (768–1024): one clear column instead of the squeezed
+   desktop composition. */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .cover {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    min-height: 0;
+    padding: 48px 40px 40px;
+  }
+
+  .left-panel h1 {
+    font-size: clamp(72px, 11vw, 104px);
+  }
+
+  .left-panel .note {
+    max-width: 520px;
+    font-size: 16px;
+  }
+
+  /* The six-row list repeats the cards directly below it. */
+  .left-panel .roll-table {
+    display: none;
+  }
+
+  .right-panel {
+    padding: 28px;
+    background: rgba(12, 14, 16, 0.78);
+    border: 1px solid var(--line);
+  }
+
+  .strip-heading {
+    justify-content: flex-start;
+  }
+
+  .film-stack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    margin-left: 0;
+    gap: 12px;
+  }
+
+  .film-card,
+  .film-card.is-active {
+    min-height: 176px;
+    transform: none;
+  }
+
+  .film-card h2 {
+    font-size: 24px;
+  }
+
+  .film-card div {
+    white-space: normal;
+  }
+
+  .detail-panel {
+    width: 100%;
+  }
+
+  .service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Services index: intro on top, full-width rows below. */
+  .services-workspace {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .services-intro {
+    padding: 48px 40px 36px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .services-intro h1 {
+    max-width: none;
+    font-size: 64px;
+  }
+
+  .service-process-row {
+    grid-template-columns: minmax(0, 56%) minmax(0, 44%);
+    min-height: 168px;
+  }
+
+  .service-process-media {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .service-process-arrow {
+    left: calc(56% - 22px);
+  }
+
+  /* Case / service detail: stack copy over the image like phones do. */
+  .detail-hero {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .detail-copy {
+    min-height: 0;
+    padding: 56px 40px 40px;
+  }
+
+  .detail-copy h1 {
+    max-width: none;
+    font-size: 88px;
+  }
+
+  .detail-hero-media {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 10;
+  }
+}
+
+/* iPhone: the sticky planner bar plus the bottom nav cover most of a short
+   screen. Keep focused fields clear of both, and let the bar sit in flow on
+   short phones (iPhone SE / mini). */
+@media (max-width: 767px) {
+  html {
+    scroll-padding-bottom: calc(160px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 767px) and (max-height: 700px) {
+  .project-actions {
+    position: static;
+    margin: 24px 0 0;
+    padding: 0;
+    border-top: 0;
+    background: transparent;
+  }
+
+  .project-controls {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+
+.detail-panel .detail-email {
+  display: block;
+  margin-top: 14px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+/* Legibility of card copy over bright photography. */
+.film-card h2,
+.film-card p {
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+}
+
+/* ==========================================================================
+   2026-11 mobile breathing room (≤767px)
+   Inner pages only (the phone home page keeps its original one-screen
+   layout): 11px floor for labels, 13–15px for body copy, one item per row
+   where three were squeezed side by side.
+   ========================================================================== */
+@media (max-width: 767px) {
+  /* Services list */
+  .service-process-label {
+    font-size: 11px;
+  }
+
+  .service-process-row {
+    grid-template-rows: auto;
+    height: auto;
+    min-height: 148px;
+  }
+
+  .service-process-copy {
+    padding-block: 22px;
+  }
+
+  /* Let the copy, not the photo, decide the row height. */
+  .service-process-media {
+    contain: size;
+  }
+
+  /* About: number + title on one line, description underneath */
+  .process-step {
+    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-areas:
+      "num title"
+      ". text";
+    row-gap: 8px;
+    min-height: 0;
+    align-items: baseline;
+    padding: 24px 20px;
+  }
+
+  .process-number {
+    grid-area: num;
+    font-size: 18px;
+  }
+
+  .process-step h2 {
+    grid-area: title;
+    font-size: 22px;
+  }
+
+  .process-step p {
+    grid-area: text;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  /* Shop grid */
+  .shop-product-grid {
+    gap: 30px 14px;
+  }
+
+  .shop-product-copy {
+    min-height: 0;
+    padding-top: 14px;
+  }
+
+  .shop-product-action-copy {
+    font-size: 11px;
+  }
+
+  /* Product detail: price on its own line, two clear buttons below */
+  .forged-wheel-page {
+    padding-bottom: calc(200px + env(safe-area-inset-bottom));
+  }
+
+  .product-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "price price"
+      "add check";
+    gap: 8px;
+    min-height: 0;
+    padding: 12px 16px 14px;
+  }
+
+  .product-action-price {
+    grid-area: price;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .product-action-price small {
+    font-size: 11px;
+  }
+
+  .product-action-price strong {
+    font-size: 17px;
+  }
+
+  .product-actions [data-add-to-build] {
+    grid-area: add;
+  }
+
+  .product-actions [data-fitment-inquiry] {
+    grid-area: check;
+  }
+
+  .product-actions > a {
+    min-height: 48px;
+    font-size: 11px;
+  }
+
+  /* Project planner steps */
+  .project-progress button {
+    font-size: 10.5px;
+  }
+}
+
+/* ==========================================================================
+   2026-11 phone home refinement
+   Same one-screen layout and the same information as the original, tuned
+   for a regular phone (iPhone 15–17, ~390–402 × 844–874): the page fills
+   exactly one screen, the smallest labels go from 7–8.5px to 9–10px, and
+   the hero takes whatever height is left so nothing gets cut on 874px phones.
+   ========================================================================== */
+@media (max-width: 767px) {
+  body[data-section="home"] .mobile-home-journal {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 42px - 81px - env(safe-area-inset-bottom));
+    min-height: calc(100svh - 42px - 81px - env(safe-area-inset-bottom));
+  }
+
+  body[data-section="home"] .nav a,
+  body[data-section="home"] .project-entry {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  /* Hero absorbs the spare height */
+  .mobile-home-hero {
+    flex: 1 1 auto;
+    min-height: 230px;
+  }
+
+  .mobile-home-hero-copy {
+    padding: 12px 24px 18px;
+  }
+
+  .mobile-home-hero h1 {
+    font-size: 32px;
+  }
+
+  .mobile-home-headline {
+    font-size: 10px;
+    letter-spacing: 1.6px;
+  }
+
+  .mobile-home-tagline {
+    max-width: 240px;
+    font-size: 11.5px;
+    line-height: 1.45;
+  }
+
+  /* Featured build: same content, readable sizes */
+  .mobile-home-build {
+    flex: 0 0 auto;
+    grid-template-columns: 16px minmax(0, 40%) 16px minmax(0, 1fr) 16px;
+    grid-template-rows: 92px 46px;
+  }
+
+  .mobile-home-build > img {
+    height: 80px;
+    align-self: center;
+  }
+
+  .mobile-home-build-copy {
+    height: 92px;
+    justify-content: center;
+    gap: 4px;
+    padding: 0;
+  }
+
+  .mobile-home-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+
+  .mobile-home-build-copy strong {
+    font-size: 19px;
+  }
+
+  .mobile-home-build-meta {
+    gap: 2px;
+    font-size: 10px;
+  }
+
+  .mobile-home-specs {
+    min-height: 46px;
+  }
+
+  .mobile-home-specs strong {
+    font-size: 14px;
+  }
+
+  .mobile-home-specs small {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  .mobile-home-view {
+    min-height: 46px;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  /* Destination rows */
+  .mobile-home-entry-list {
+    flex: 0 0 auto;
+  }
+
+  .mobile-home-entry {
+    min-height: 90px;
+  }
+
+  .mobile-home-entry-copy {
+    width: min(50%, 200px);
+    padding: 8px 16px;
+  }
+
+  .mobile-home-entry-number {
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+
+  .mobile-home-entry-copy strong {
+    font-size: 22px;
+  }
+
+  .mobile-home-entry-copy > span:last-child {
+    margin-top: 5px;
+    font-size: 10.5px;
+    line-height: 1.35;
+  }
+
+  .mobile-home-project-cta {
+    flex: 0 0 auto;
+    min-height: 50px;
+    font-size: 11px;
+    letter-spacing: 1.2px;
+  }
+}

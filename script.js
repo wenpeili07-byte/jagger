@@ -44,6 +44,7 @@ const translations = {
     "mobileHome.tagline": "真实改装，真实数据。通过反复测试，让每台车发挥出应有的状态。",
     "mobileHome.featured": "精选案例",
     "mobileHome.viewCase": "查看案例 →",
+    "detail.viewCase": "查看案例 →",
     "mobileHome.specs": "612 马力，760 牛米，0 至 100 公里每小时 3.2 秒",
     "mobileHome.destinations": "精选页面入口",
     "mobileHome.servicesTitle": "业务",
@@ -55,11 +56,11 @@ const translations = {
     "mobileHome.projectCta": "开始你的项目 →",
     "cases.listLabel": "改装车案例列表",
     "cases.panelLabel": "改装车案例模块",
-    "cases.heading": "LONMA-26-R1 · FEATURED BUILDS · 06 OF 36",
-    "detail.status": "● CURRENT SELECTION",
+    "cases.heading": "精选案例 · 06",
+    "detail.status": "● 当前选择",
     "services.sectionLabel": "业务展示模块",
-    "services.heading": "CORE SERVICES",
-    "services.count": "06 SERVICES · 03 × 02",
+    "services.heading": "核心业务",
+    "services.count": "06 项业务",
     "footer.attitude": "龙马态度 · 2026",
     "footer.contact": "开始你的项目 →",
     "lang.next": "Switch to English"
@@ -84,6 +85,7 @@ const translations = {
     "mobileHome.tagline": "Real builds. Real data. Every car refined to perform at its peak.",
     "mobileHome.featured": "FEATURED BUILD",
     "mobileHome.viewCase": "VIEW CASE →",
+    "detail.viewCase": "VIEW CASE →",
     "mobileHome.specs": "612 horsepower, 760 newton-metres, 3.2 seconds from zero to 100 kilometres per hour",
     "mobileHome.destinations": "Featured destinations",
     "mobileHome.servicesTitle": "SERVICES",
@@ -95,7 +97,7 @@ const translations = {
     "mobileHome.projectCta": "START YOUR PROJECT →",
     "cases.listLabel": "Featured build list",
     "cases.panelLabel": "Featured build cards",
-    "cases.heading": "LONMA-26-R1 · FEATURED BUILDS · 06 OF 36",
+    "cases.heading": "FEATURED BUILDS · 06 CASES",
     "detail.status": "● CURRENT SELECTION",
     "services.sectionLabel": "Core services",
     "services.heading": "CORE SERVICES",
@@ -114,7 +116,7 @@ const details = [
     },
     counter: "01",
     subtitle: {
-      zh: "CASE 01 · STREET WIDEBODY",
+      zh: "案例 01 · 街道宽体",
       en: "CASE 01 · STREET WIDEBODY"
     },
     rowName: {
@@ -137,7 +139,7 @@ const details = [
     },
     counter: "02",
     subtitle: {
-      zh: "CASE 02 · TRACK SETUP",
+      zh: "案例 02 · 赛道化升级",
       en: "CASE 02 · TRACK SETUP"
     },
     rowName: {
@@ -160,7 +162,7 @@ const details = [
     },
     counter: "03",
     subtitle: {
-      zh: "CASE 03 · LOW STANCE",
+      zh: "案例 03 · 姿态低趴",
       en: "CASE 03 · LOW STANCE"
     },
     rowName: {
@@ -183,7 +185,7 @@ const details = [
     },
     counter: "04",
     subtitle: {
-      zh: "CASE 04 · TURBO TUNE",
+      zh: "案例 04 · 涡轮特调",
       en: "CASE 04 · TURBO TUNE"
     },
     rowName: {
@@ -206,7 +208,7 @@ const details = [
     },
     counter: "05",
     subtitle: {
-      zh: "CASE 05 · PHOTO FEATURE",
+      zh: "案例 05 · 影像作品车",
       en: "CASE 05 · PHOTO FEATURE"
     },
     rowName: {
@@ -229,7 +231,7 @@ const details = [
     },
     counter: "06",
     subtitle: {
-      zh: "CASE 06 · BLUE PERFORMANCE",
+      zh: "案例 06 · 蓝色性能车",
       en: "CASE 06 · BLUE PERFORMANCE"
     },
     rowName: {
@@ -349,14 +351,19 @@ const rows = [...document.querySelectorAll(".roll-row")];
 const activeLabel = document.querySelector("#activeLabel");
 const detailTitle = document.querySelector("#detailTitle");
 const detailText = document.querySelector("#detailText");
+const detailLink = document.querySelector("#detailLink");
+const detailLinkText = {
+  zh: { case: "查看案例 →", service: "查看业务 →" },
+  en: { case: "VIEW CASE →", service: "VIEW SERVICE →" }
+};
 const stripCount = document.querySelector("#stripCount");
 const langToggle = document.querySelector("[data-lang-toggle]");
 const languageOptions = [...document.querySelectorAll("[data-lang-option]")];
 const shell = document.querySelector(".site-shell");
 const supportedLanguages = ["zh", "en"];
 const serviceCtaText = {
-  zh: "咨询详情 →",
-  en: "REQUEST DETAILS →"
+  zh: "咨询详情",
+  en: "REQUEST DETAILS"
 };
 let activeIndex = 0;
 let currentLanguage = getInitialLanguage();
@@ -432,12 +439,14 @@ function updateCardCopy(language) {
     const text = card.querySelector("[data-card-text]");
     const serviceCta = card.querySelector("[data-service-cta]");
 
+    const isFilmCard = card.classList.contains("film-card") && detail.rowName;
+
     if (subtitle) {
-      subtitle.textContent = detail.subtitle[language];
+      subtitle.textContent = isFilmCard ? getDetailLabel(detail, language) : detail.subtitle[language];
     }
 
     if (title && detail.title) {
-      title.textContent = detail.title[language];
+      title.textContent = isFilmCard ? detail.rowName[language] : detail.title[language];
     }
 
     if (text && detail.text) {
@@ -502,6 +511,23 @@ function setActive(index) {
   detailTitle.textContent = detail.title[currentLanguage];
   detailText.textContent = detail.text[currentLanguage];
   stripCount.textContent = detail.counter;
+  updateDetailLink();
+}
+
+function updateDetailLink() {
+  if (!detailLink) {
+    return;
+  }
+
+  const activeCard = cards.find((card) => Number(card.dataset.index) === activeIndex);
+  const href = activeCard && activeCard.getAttribute("href");
+
+  if (href) {
+    detailLink.setAttribute("href", href);
+  }
+
+  const kind = activeCard && activeCard.classList.contains("service-tile") ? "service" : "case";
+  detailLink.textContent = detailLinkText[currentLanguage][kind];
 }
 
 function previewCaseBackground(card) {

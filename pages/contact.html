@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="../styles.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../layout-canvas.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../content-pages.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../pages-2026.css?v=pages-20261124" />
     <link rel="stylesheet" href="../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body class="content-body" data-section="contact">
@@ -73,7 +74,11 @@
             data-zh="提供基本车辆信息、你现在遇到的问题，以及希望车辆最终呈现的状态。我们会从合适的方向继续沟通。"
             data-en="Share your vehicle details, the issue you want to solve, and the result you want to achieve. We will recommend a direction that fits the car and its intended use."
           >Share your vehicle details, the issue you want to solve, and the result you want to achieve. We will recommend a direction that fits the car and its intended use.</p>
-          <a class="contact-email" href="mailto:lonmadynamic@gmail.com">lonmadynamic@gmail.com</a>
+          <a class="contact-email" href="mailto:lonmadynamic@gmail.com"><span data-zh="电子邮箱" data-en="EMAIL">EMAIL</span>lonmadynamic@gmail.com</a>
+          <div class="contact-ways">
+            <a href="./project.html"><span data-zh="改装规划" data-en="PROJECT PLANNER">PROJECT PLANNER</span><strong data-zh="四步规划完整改装" data-en="Plan a complete build in 4 steps">Plan a complete build in 4 steps</strong><i aria-hidden="true">→</i></a>
+            <a href="./cases.html"><span data-zh="案例" data-en="CASES">CASES</span><strong data-zh="看看做过的车" data-en="See previous builds">See previous builds</strong><i aria-hidden="true">→</i></a>
+          </div>
         </div>
 
         <div class="contact-form-stack">
@@ -84,11 +89,86 @@
             data-zh="已载入你选择的项目资料。"
             hidden
           >PROJECT DETAILS ADDED FROM YOUR SELECTIONS.</p>
+          <ol class="contact-steps" data-contact-steps aria-hidden="true">
+            <li data-contact-progress="1"><span></span><em data-zh="01 车辆" data-en="01 VEHICLE">01 VEHICLE</em></li>
+            <li data-contact-progress="2"><span></span><em data-zh="02 服务" data-en="02 SERVICE">02 SERVICE</em></li>
+            <li data-contact-progress="3"><span></span><em data-zh="03 目标" data-en="03 GOAL">03 GOAL</em></li>
+            <li data-contact-progress="4"><span></span><em data-zh="04 联系方式" data-en="04 YOU">04 YOU</em></li>
+          </ol>
           <form class="contact-form" action="/api/contact" method="post" data-contact-form>
           <label class="contact-honeypot" aria-hidden="true">
             <span>Company</span>
             <input type="text" name="company" tabindex="-1" autocomplete="off" />
           </label>
+          <div class="contact-step-group" data-contact-step="1">
+          <div class="contact-step-head" data-contact-step-head="1">
+            <p class="contact-step-index" data-zh="01 · 车辆" data-en="01 · VEHICLE">01 · VEHICLE</p>
+            <h3 data-zh="先说说是哪一台车。" data-en="Which car are we talking about?">Which car are we talking about?</h3>
+          </div>
+          <label class="contact-field contact-field-wide">
+            <span data-zh="车辆信息" data-en="VEHICLE">VEHICLE</span>
+            <input
+              type="text"
+              name="vehicle"
+              required
+              minlength="2"
+              maxlength="120"
+              data-zh-placeholder="品牌 / 车型 / 年份"
+              data-en-placeholder="Make / model / year"
+              placeholder="Make / model / year"
+            />
+          </label>
+          </div>
+          <div class="contact-step-group" data-contact-step="2">
+          <div class="contact-step-head" data-contact-step-head="2">
+            <p class="contact-step-index" data-zh="02 · 服务" data-en="02 · SERVICE">02 · SERVICE</p>
+            <h3 data-zh="需要我们帮忙的方向？" data-en="What should we help with?">What should we help with?</h3>
+          </div>
+          <label class="contact-field contact-field-wide contact-field-service">
+            <span data-zh="咨询方向" data-en="SERVICE">SERVICE</span>
+            <select name="service" required>
+              <option value="" data-zh="请选择" data-en="Select a service">Select a service</option>
+              <option value="Custom Vehicle Builds" data-zh="汽车改装" data-en="Custom Vehicle Builds">Custom Vehicle Builds</option>
+              <option value="Performance Parts" data-zh="汽车配件" data-en="Performance Parts">Performance Parts</option>
+              <option value="Automotive Photography" data-zh="汽车摄影" data-en="Automotive Photography">Automotive Photography</option>
+              <option value="ECU Calibration" data-zh="ECU 特调" data-en="ECU Calibration">ECU Calibration</option>
+              <option value="Chassis Setup" data-zh="底盘设定" data-en="Chassis Setup">Chassis Setup</option>
+              <option value="Intake &amp; Exhaust" data-zh="进排气" data-en="Intake &amp; Exhaust">Intake & Exhaust</option>
+            </select>
+          </label>
+          <div class="contact-service-chips" role="group" aria-label="Service" data-zh-aria-label="咨询方向" data-en-aria-label="Service" data-contact-chips hidden>
+            <button type="button" data-service-value="Custom Vehicle Builds" aria-pressed="false" data-zh="汽车改装" data-en="Custom Vehicle Builds">Custom Vehicle Builds</button>
+            <button type="button" data-service-value="Performance Parts" aria-pressed="false" data-zh="汽车配件" data-en="Performance Parts">Performance Parts</button>
+            <button type="button" data-service-value="Automotive Photography" aria-pressed="false" data-zh="汽车摄影" data-en="Automotive Photography">Automotive Photography</button>
+            <button type="button" data-service-value="ECU Calibration" aria-pressed="false" data-zh="ECU 特调" data-en="ECU Calibration">ECU Calibration</button>
+            <button type="button" data-service-value="Chassis Setup" aria-pressed="false" data-zh="底盘设定" data-en="Chassis Setup">Chassis Setup</button>
+            <button type="button" data-service-value="Intake &amp; Exhaust" aria-pressed="false" data-zh="进排气" data-en="Intake &amp; Exhaust">Intake &amp; Exhaust</button>
+          </div>
+          </div>
+          <div class="contact-step-group" data-contact-step="3">
+          <div class="contact-step-head" data-contact-step-head="3">
+            <p class="contact-step-index" data-zh="03 · 目标" data-en="03 · GOAL">03 · GOAL</p>
+            <h3 data-zh="你想改变什么？" data-en="What do you want to change?">What do you want to change?</h3>
+          </div>
+          <label class="contact-field contact-field-wide">
+            <span data-zh="你想改变什么" data-en="WHAT DO YOU WANT TO CHANGE?">WHAT DO YOU WANT TO CHANGE?</span>
+            <textarea
+              name="message"
+              rows="5"
+              required
+              minlength="10"
+              maxlength="3000"
+              data-zh-placeholder="描述现在的状态、使用场景与目标"
+              data-en-placeholder="Describe the car's current setup, how you use it, and what you want to achieve"
+              placeholder="Describe the car's current setup, how you use it, and what you want to achieve"
+            ></textarea>
+          </label>
+          </div>
+          <div class="contact-step-group" data-contact-step="4">
+          <div class="contact-step-head" data-contact-step-head="4">
+            <p class="contact-step-index" data-zh="04 · 联系方式" data-en="04 · YOU">04 · YOU</p>
+            <h3 data-zh="我们怎么联系你？" data-en="How do we reach you?">How do we reach you?</h3>
+          </div>
           <label class="contact-field">
             <span data-zh="你的称呼" data-en="YOUR NAME">YOUR NAME</span>
             <input
@@ -117,44 +197,7 @@
               placeholder="Email address"
             />
           </label>
-          <label class="contact-field contact-field-wide">
-            <span data-zh="车辆信息" data-en="VEHICLE">VEHICLE</span>
-            <input
-              type="text"
-              name="vehicle"
-              required
-              minlength="2"
-              maxlength="120"
-              data-zh-placeholder="品牌 / 车型 / 年份"
-              data-en-placeholder="Make / model / year"
-              placeholder="Make / model / year"
-            />
-          </label>
-          <label class="contact-field contact-field-wide">
-            <span data-zh="咨询方向" data-en="SERVICE">SERVICE</span>
-            <select name="service" required>
-              <option value="" data-zh="请选择" data-en="Select a service">Select a service</option>
-              <option value="Custom Vehicle Builds" data-zh="汽车改装" data-en="Custom Vehicle Builds">Custom Vehicle Builds</option>
-              <option value="Performance Parts" data-zh="汽车配件" data-en="Performance Parts">Performance Parts</option>
-              <option value="Automotive Photography" data-zh="汽车摄影" data-en="Automotive Photography">Automotive Photography</option>
-              <option value="ECU Calibration" data-zh="ECU 特调" data-en="ECU Calibration">ECU Calibration</option>
-              <option value="Chassis Setup" data-zh="底盘设定" data-en="Chassis Setup">Chassis Setup</option>
-              <option value="Intake &amp; Exhaust" data-zh="进排气" data-en="Intake &amp; Exhaust">Intake & Exhaust</option>
-            </select>
-          </label>
-          <label class="contact-field contact-field-wide">
-            <span data-zh="你想改变什么" data-en="WHAT DO YOU WANT TO CHANGE?">WHAT DO YOU WANT TO CHANGE?</span>
-            <textarea
-              name="message"
-              rows="5"
-              required
-              minlength="10"
-              maxlength="3000"
-              data-zh-placeholder="描述现在的状态、使用场景与目标"
-              data-en-placeholder="Describe the car's current setup, how you use it, and what you want to achieve"
-              placeholder="Describe the car's current setup, how you use it, and what you want to achieve"
-            ></textarea>
-          </label>
+          </div>
           <div class="contact-submit-row">
             <p
               data-contact-status
@@ -179,5 +222,6 @@
     </main>
     <script src="../content-pages.js?v=sanity-case-cms-20260801"></script>
     <script src="../contact-form.js?v=sanity-case-cms-20260801"></script>
+    <script src="../contact-steps.js?v=pages-20261124" defer></script>
   </body>
 </html>

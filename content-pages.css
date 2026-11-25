@@ -244,6 +244,7 @@
   display: grid;
   grid-template-columns: minmax(320px, 24%) minmax(0, 1fr);
   height: calc(min(1050px, 100vh) - var(--site-header-height));
+  height: calc(min(1050px, 100dvh) - var(--site-header-height));
   min-height: 640px;
   border-bottom: 1px solid var(--line);
   background: #111315;

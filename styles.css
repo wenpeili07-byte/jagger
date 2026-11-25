@@ -23,6 +23,7 @@ html {
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   color: var(--ink);
   background:
@@ -54,6 +55,7 @@ a {
 .site-shell {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   border: 1px solid var(--line);
   isolation: isolate;
   --active-case-scene: image-set(
@@ -379,6 +381,7 @@ a {
   display: grid;
   grid-template-columns: minmax(310px, 0.88fr) minmax(440px, 1.15fr);
   min-height: calc(100vh - 77px);
+  min-height: calc(100dvh - 77px);
   padding: clamp(26px, 4vw, 62px) clamp(20px, 4vw, 64px);
   gap: clamp(18px, 3vw, 42px);
 }
@@ -1194,6 +1197,7 @@ h1 span {
   grid-template-columns: minmax(280px, 0.74fr) minmax(620px, 1.26fr);
   gap: clamp(30px, 4vw, 74px);
   min-height: calc(100vh - 86px);
+  min-height: calc(100dvh - 86px);
   padding: clamp(44px, 6vw, 78px) clamp(24px, 5vw, 98px) clamp(54px, 6vw, 86px);
   border-bottom: 1px solid var(--line);
 }
@@ -1649,4 +1653,13 @@ h1 span {
   .cases-gap {
     height: 70px;
   }
+}
+
+/* 2026-11 device polish: stronger right-side shade so case names stay legible on bright photos. */
+.film-card::before {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.08) 45%, rgba(0, 0, 0, 0.62)),
+    var(--scene);
+  background-size: cover;
+  background-position: center;
 }

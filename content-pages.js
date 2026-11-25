@@ -1,4 +1,5 @@
 (() => {
+  let scheduleFit = () => {};
   const supportedLanguages = ["zh", "en"];
   const langToggle = document.querySelector(".lang-toggle");
   const navLabels = {
@@ -101,6 +102,7 @@
     currentLanguage = supportedLanguages.includes(language) ? language : "en";
     applyLanguage(currentLanguage);
     setStoredLanguage(currentLanguage);
+    scheduleFit();
   }
 
   if (langToggle) {
@@ -114,6 +116,7 @@
   if (typeof window.addEventListener === "function") {
     window.addEventListener("lonma:content-updated", () => {
       applyLanguage(currentLanguage);
+      scheduleFit();
     });
   }
 
@@ -129,4 +132,47 @@
     row.addEventListener("pointerenter", () => setActiveServiceRow(row));
     row.addEventListener("focusin", () => setActiveServiceRow(row));
   });
+
+  // Display headlines use fixed large sizes; on narrower columns (iPad, small
+  // laptops) and with fallback fonts their longest word can overflow into the
+  // neighbouring image. Shrink only the headlines that overflow.
+  const fitSelectors = ".detail-copy h1, .services-intro h1, .cases-title, .archive-filter h2, .archive-card h3";
+  const fitHeadlines = () => {
+    if (typeof document.querySelectorAll !== "function" || typeof getComputedStyle !== "function") {
+      return;
+    }
+
+    document.querySelectorAll(fitSelectors).forEach((headline) => {
+      headline.style.fontSize = "";
+      let size = parseFloat(getComputedStyle(headline).fontSize);
+      let guard = 0;
+
+      while (headline.scrollWidth > headline.clientWidth + 1 && size > 16 && guard < 80) {
+        size -= 2;
+        headline.style.fontSize = `${size}px`;
+        guard += 1;
+      }
+    });
+  };
+
+  let fitFrame = 0;
+  scheduleFit = () => {
+    if (typeof window.requestAnimationFrame !== "function") {
+      fitHeadlines();
+      return;
+    }
+
+    window.cancelAnimationFrame(fitFrame);
+    fitFrame = window.requestAnimationFrame(fitHeadlines);
+  };
+
+  if (typeof window.addEventListener === "function") {
+    scheduleFit();
+    window.addEventListener("resize", scheduleFit);
+    window.addEventListener("load", scheduleFit);
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(scheduleFit);
+    }
+  }
 })();

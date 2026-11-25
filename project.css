@@ -4,6 +4,7 @@
 
 .project-planner {
   min-height: min(calc(100vh - var(--site-header-height)), var(--site-first-screen-max));
+  min-height: min(calc(100dvh - var(--site-header-height)), var(--site-first-screen-max));
   background: #111315;
 }
 

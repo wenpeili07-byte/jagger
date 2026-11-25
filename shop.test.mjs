@@ -513,7 +513,7 @@ test("checked-in Shop page matches its renderer byte for byte", () => {
 });
 
 test("shop controller supports filters, query links, and dialog focus", () => {
-  assert.match(html, /shop\.css\?v=sanity-case-cms-20260801/);
+  assert.match(html, /shop\.css\?v=shop-touch-20261124/);
   assert.match(html, /shop\.js\?v=sanity-case-cms-20260801/);
   assert.match(js, /new URLSearchParams\(window\.location\.search\)/);
   assert.match(js, /querySelectorAll\("\[data-product-card\]"\)/);

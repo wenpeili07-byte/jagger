@@ -233,3 +233,139 @@
     });
   }
 })();
+
+// Live configuration line under the product image.
+(() => {
+  const summary = document.querySelector("[data-selection-summary]");
+
+  if (!summary) {
+    return;
+  }
+
+  const groups = ["diameter", "width", "finish"];
+  const quantity = document.querySelector("[data-product-quantity]");
+
+  const labelFor = (group) => {
+    const input = document.querySelector(`[data-option-group="${group}"] input:checked`);
+    const label = input?.closest("label");
+    const text = label ? [...label.querySelectorAll("span")].map((node) => node.textContent.trim()).filter(Boolean).pop() : "";
+    return text || "";
+  };
+
+  const render = () => {
+    const parts = groups.map(labelFor).filter(Boolean);
+    const count = Number.parseInt(quantity?.value, 10);
+
+    if (Number.isFinite(count) && count > 0) {
+      parts.push(`× ${count}`);
+    }
+
+    summary.textContent = parts.join("  ·  ");
+  };
+
+  document.querySelectorAll("[data-option-group] input, [data-product-quantity]").forEach((control) => {
+    control.addEventListener("change", render);
+    control.addEventListener("input", render);
+  });
+
+  document.querySelector(".lang-toggle")?.addEventListener("click", () => {
+    window.setTimeout(render, 0);
+  });
+
+  render();
+})();
+
+// Gallery: cross-fade + settle zoom between views (arrows, thumbnails, keys, swipe).
+(() => {
+  const gallery = document.querySelector("[data-gallery]");
+
+  if (!gallery) {
+    return;
+  }
+
+  const views = [...gallery.querySelectorAll("[data-gallery-view]")];
+  const thumbs = [...document.querySelectorAll("[data-gallery-thumb]")];
+  const indexNode = document.querySelector("[data-gallery-index]");
+  const labelNode = document.querySelector("[data-gallery-label]");
+  let current = 0;
+  let touchX = null;
+
+  const language = () => (document.documentElement.lang.startsWith("zh") ? "zh" : "en");
+
+  const updateLabel = () => {
+    const view = views[current];
+    labelNode.textContent = language() === "zh" ? view.dataset.labelZh : view.dataset.labelEn;
+  };
+
+  const show = (next, direction = next > current ? 1 : -1) => {
+    const target = (next + views.length) % views.length;
+
+    if (target === current) {
+      return;
+    }
+
+    const previous = views[current];
+    const incoming = views[target];
+    gallery.style.setProperty("--view-direction", String(direction));
+
+    previous.classList.remove("is-active", "is-entering");
+    previous.classList.add("is-leaving");
+    previous.setAttribute("aria-hidden", "true");
+    window.setTimeout(() => previous.classList.remove("is-leaving"), 900);
+
+    incoming.classList.remove("is-leaving");
+    incoming.classList.add("is-active", "is-entering");
+    incoming.removeAttribute("aria-hidden");
+    window.setTimeout(() => incoming.classList.remove("is-entering"), 1100);
+
+    current = target;
+    indexNode.textContent = String(current + 1).padStart(2, "0");
+    updateLabel();
+    thumbs.forEach((thumb, index) => {
+      if (index === current) {
+        thumb.setAttribute("aria-current", "true");
+      } else {
+        thumb.removeAttribute("aria-current");
+      }
+    });
+  };
+
+  document.querySelectorAll("[data-gallery-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const step = Number(button.dataset.galleryStep);
+      show(current + step, step);
+    });
+  });
+
+  thumbs.forEach((thumb) => {
+    thumb.addEventListener("click", () => show(Number(thumb.dataset.galleryThumb)));
+  });
+
+  gallery.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowRight") {
+      show(current + 1, 1);
+    } else if (event.key === "ArrowLeft") {
+      show(current - 1, -1);
+    }
+  });
+
+  gallery.addEventListener("touchstart", (event) => {
+    touchX = event.touches[0].clientX;
+  }, { passive: true });
+
+  gallery.addEventListener("touchend", (event) => {
+    if (touchX === null) {
+      return;
+    }
+
+    const delta = event.changedTouches[0].clientX - touchX;
+    touchX = null;
+
+    if (Math.abs(delta) > 40) {
+      show(current + (delta < 0 ? 1 : -1), delta < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+
+  document.querySelector(".lang-toggle")?.addEventListener("click", () => window.setTimeout(updateLabel, 0));
+  updateLabel();
+})();

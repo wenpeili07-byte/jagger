@@ -181,3 +181,473 @@
     padding: 18px 14px 14px;
   }
 }
+
+/* ==========================================================================
+   2026-11 cases index — editorial archive (rail animation untouched)
+   ========================================================================== */
+.cases-page {
+  --ci-ink: #ecebe6;
+  --ci-quiet: rgba(236, 235, 230, 0.56);
+  --ci-hair: rgba(236, 235, 230, 0.1);
+  --ci-ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+/* Hero: solid CASE, outlined FILES */
+.cases-page .cases-title span:last-child {
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(236, 235, 230, 0.9);
+}
+
+.cases-page .cases-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--accent-bright);
+  letter-spacing: 0.26em;
+}
+
+.cases-page .cases-eyebrow::before {
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+  content: "";
+}
+
+.cases-page .cases-gap {
+  height: 0;
+}
+
+/* Archive shell */
+.cases-page .case-archive {
+  padding: clamp(64px, 7vw, 112px) clamp(24px, 5vw, 96px) clamp(96px, 10vw, 150px);
+  background: #070809;
+}
+
+.cases-page .archive-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.cases-page .archive-main {
+  display: contents;
+}
+
+.cases-page .archive-heading {
+  order: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0;
+  padding: 0 0 26px;
+  border: 0;
+}
+
+.cases-page .archive-heading p {
+  margin: 0 0 12px;
+  color: var(--accent-bright);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+}
+
+.cases-page .archive-heading h2 {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: clamp(34px, 3.6vw, 58px);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: 0.06em;
+}
+
+.cases-page .archive-heading span {
+  display: none;
+}
+
+.cases-page .archive-heading::after,
+.cases-page .archive-heading > div::after {
+  display: none;
+}
+
+.cases-page .archive-heading > a {
+  padding-bottom: 5px;
+  border: 0;
+  border-bottom: 1px solid rgba(236, 235, 230, 0.4);
+  color: var(--ci-ink);
+  background: none;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+}
+
+/* Filter becomes a text row */
+.cases-page .archive-filter {
+  position: static;
+  order: 2;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0 0 clamp(36px, 4vw, 56px);
+  padding: 0;
+  border: 0;
+  border-top: 1px solid var(--ci-hair);
+  border-bottom: 1px solid var(--ci-hair);
+  background: none;
+  box-shadow: none;
+}
+
+.cases-page .archive-filter::before,
+.cases-page .archive-filter::after,
+.cases-page .archive-filter > p,
+.cases-page .archive-filter > h2,
+.cases-page .archive-filter > span,
+.cases-page .archive-filter .filter-block h3 {
+  display: none;
+}
+
+.cases-page .archive-filter .filter-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 clamp(20px, 2.6vw, 40px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.cases-page .archive-filter .filter-option {
+  position: relative;
+  display: inline-flex;
+  min-height: 60px;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  color: var(--ci-quiet);
+  background: none;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  transition: color 240ms var(--ci-ease);
+}
+
+.cases-page .archive-filter .filter-option span {
+  font-family: var(--mono);
+}
+
+.cases-page .archive-filter .filter-option small {
+  color: rgba(236, 235, 230, 0.32);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+.cases-page .archive-filter .filter-option[data-filter="all"] small {
+  display: none;
+}
+
+.cases-page .archive-filter .filter-option::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: var(--ci-ink);
+  content: "";
+  scale: 0 1;
+  transition: scale 320ms var(--ci-ease);
+}
+
+.cases-page .archive-filter .filter-option:hover,
+.cases-page .archive-filter .filter-option.is-active {
+  color: var(--ci-ink);
+}
+
+.cases-page .archive-filter .filter-option.is-active::after {
+  scale: 1 1;
+}
+
+.cases-page .archive-filter .active-filter {
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  color: var(--ci-quiet);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+
+/* Cards: photo first, no frames */
+.cases-page .archive-grid {
+  order: 3;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(48px, 5vw, 80px) clamp(16px, 1.8vw, 32px);
+}
+
+.cases-page .archive-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: start;
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  transform: none;
+  text-decoration: none;
+}
+
+.cases-page .archive-card::before,
+.cases-page .archive-card::after {
+  display: none;
+}
+
+.cases-page .archive-card img {
+  display: block;
+  grid-column: 1 / -1;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  filter: brightness(0.86) saturate(0.9);
+  transition: filter 600ms var(--ci-ease), scale 1100ms var(--ci-ease);
+}
+
+.cases-page .archive-card {
+  isolation: isolate;
+}
+
+.cases-page .archive-card::selection {
+  background: none;
+}
+
+.cases-page .archive-card:hover img,
+.cases-page .archive-card:focus-visible img {
+  filter: brightness(1) saturate(1);
+  scale: 1.03;
+}
+
+.cases-page .archive-card > img {
+  clip-path: inset(0);
+}
+
+.cases-page .archive-number {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 18px;
+  translate: 0 calc(-50% + 0px);
+  aspect-ratio: auto;
+  color: transparent;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: clamp(54px, 5vw, 84px);
+  font-weight: 900;
+  line-height: 1;
+  -webkit-text-stroke: 1.5px rgba(236, 235, 230, 0.85);
+  pointer-events: none;
+}
+
+.cases-page .archive-card p {
+  grid-column: 1;
+  margin: 20px 0 8px;
+  color: var(--accent-bright);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+}
+
+.cases-page .archive-card h3 {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-family: var(--sans);
+  font-size: clamp(20px, 1.6vw, 26px);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.cases-page .archive-card em {
+  display: none;
+}
+
+.cases-page .archive-card div {
+  grid-column: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 12px;
+}
+
+.cases-page .archive-card div span {
+  padding: 0;
+  border: 0;
+  color: var(--ci-quiet);
+  background: none;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+
+.cases-page .archive-card b {
+  grid-column: 2;
+  grid-row: 4;
+  align-self: end;
+  margin: 0;
+  padding-bottom: 4px;
+  color: var(--ci-ink);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  background: linear-gradient(var(--ci-ink), var(--ci-ink)) left bottom / 22px 1px no-repeat;
+  text-shadow: none;
+  transition: background-size 380ms var(--ci-ease);
+}
+
+.cases-page .archive-card:hover b,
+.cases-page .archive-card:focus-visible b {
+  color: var(--ci-ink);
+  background-size: 100% 1px;
+  text-shadow: none;
+}
+
+.cases-page .archive-card[hidden] {
+  display: none;
+}
+
+@media (max-width: 1100px) and (min-width: 768px) {
+  .cases-page .archive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .cases-page .case-archive {
+    padding: 44px 20px 72px;
+  }
+
+  .cases-page .archive-heading {
+    padding-bottom: 18px;
+  }
+
+  .cases-page .archive-heading h2 {
+    font-size: 30px;
+  }
+
+  .cases-page .archive-heading > a {
+    display: none;
+  }
+
+  .cases-page .archive-filter {
+    position: static;
+    overflow-x: auto;
+    margin: 0 -20px 34px;
+    padding: 0 20px;
+    scrollbar-width: none;
+  }
+
+  .cases-page .archive-filter .filter-block {
+    flex-wrap: nowrap;
+    gap: 0 22px;
+    width: max-content;
+  }
+
+  .cases-page .archive-filter .filter-option {
+    min-height: 52px;
+    white-space: nowrap;
+  }
+
+  .cases-page .archive-filter .active-filter {
+    display: none;
+  }
+
+  .cases-page .archive-grid {
+    grid-template-columns: 1fr;
+    gap: 52px;
+  }
+
+  .cases-page .archive-card img {
+    aspect-ratio: 16 / 11;
+  }
+
+  .cases-page .archive-number {
+    font-size: 54px;
+  }
+
+  .cases-page .archive-card h3 {
+    font-size: 20px;
+  }
+}
+
+/* Case 06 source photo is letterboxed; crop the bars where supported */
+.cases-page .archive-card[data-case-slug="case-06"] img {
+  object-view-box: inset(14% 0 14% 0);
+}
+
+/* ==========================================================================
+   2026-11 rail: show five cases (spacers only needed by the old centred
+   layout), plus a step indicator for the active case.
+   ========================================================================== */
+@media (min-width: 1181px) {
+  .mwg_effect060 .slide.spacer {
+    display: none;
+  }
+
+  .mwg_effect060 .slides {
+    scroll-behavior: smooth;
+  }
+
+  .mwg_effect060 .slide-mask {
+    transition: border-color 320ms ease, box-shadow 320ms ease, clip-path 520ms cubic-bezier(0.22, 0.8, 0.24, 1);
+  }
+
+  .mwg_effect060 .slide .media {
+    transition: filter 520ms ease;
+  }
+
+  .mwg_effect060 .slide:not(.is-active) .media {
+    filter: saturate(0.7) contrast(1.05) brightness(0.62);
+  }
+
+  .mwg_effect060 .slide.is-active .slide-label {
+    color: #fff;
+  }
+
+  .mwg_effect060 .slide.is-active .slide-label::before {
+    display: inline-block;
+    width: 18px;
+    height: 1px;
+    margin-right: 10px;
+    vertical-align: middle;
+    background: var(--accent-bright);
+    content: "";
+  }
+}
+
+/* Phone: two-column archive keeps the cases index short. */
+@media (max-width: 767px) {
+  .cases-page .archive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 34px 12px;
+  }
+
+  .cases-page .archive-card img {
+    aspect-ratio: 4 / 5;
+  }
+
+  .cases-page .archive-number {
+    left: 10px;
+    font-size: 36px;
+  }
+
+  .cases-page .archive-card p {
+    margin: 12px 0 4px;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+  }
+
+  .cases-page .archive-card h3 {
+    font-size: 15px;
+    letter-spacing: 0.04em;
+  }
+
+  .cases-page .archive-card div {
+    display: none;
+  }
+}

@@ -40,8 +40,12 @@ test("Case 02 is an image-led bilingual story", () => {
   assert.match(html, /data-en="THE DIRECTION"/);
   assert.match(html, /data-en="TEST, ADJUST, REPEAT"/);
   assert.equal((html.match(/class="case02-story-media/g) || []).length, 3);
-  assert.equal((html.match(/loading="lazy"/g) || []).length, 3);
+  // four chapter photos + the shop-the-build photo + the next-case banner
+  assert.equal((html.match(/loading="lazy"/g) || []).length, 6);
   assert.doesNotMatch(html, /PARTS USED|data-case-marker|data-case-part/);
+  // shop-the-build tags are presented as category references
+  assert.match(html, /class="case-build-stage"/);
+  assert.match(html, /data-en="CATEGORY · SHOP →"/);
 });
 
 test("Case 02 supporting catalog images are labeled as references, not project details", () => {

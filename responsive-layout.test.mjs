@@ -14,6 +14,9 @@ const projectCss = existsSync(new URL("./project.css", import.meta.url))
 const shopProductCss = existsSync(new URL("./shop-product.css", import.meta.url))
   ? read("./shop-product.css")
   : "";
+const caseBuildCss = read("./case-build.css");
+const serviceDetailCss = read("./service-detail.css");
+const pages2026Css = read("./pages-2026.css");
 const mediaBlock = (source, marker, message) => {
   const start = source.indexOf(marker);
   assert.notEqual(start, -1, message);
@@ -43,6 +46,15 @@ const publicPages = [
   "./pages/services/chassis.html",
   "./pages/services/exhaust.html",
 ];
+
+assert.match(shopCss, /\.shop-feature-strip button\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px/s, "mobile feature dots should have 44px targets");
+assert.match(caseBuildCss, /\.build-hotspot\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px/s, "mobile case hotspots should have 44px targets");
+assert.match(pages2026Css, /\.project-hotspot\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px/s, "mobile planner hotspots should have 44px targets");
+assert.match(mediaBlock(caseBuildCss, "@media (max-width: 767px) {", "case hotspot mobile rules missing"), /\.build-hotspot-label\s*\{[^}]*bottom:\s*calc\(100%\s*\+\s*4px\)/s, "mobile case labels should sit above their dots");
+assert.match(pages2026Css, /@media \(max-width: 760px\)[\s\S]*?\.project-hotspot-label\s*\{[^}]*bottom:\s*calc\(100%\s*\+\s*4px\)/s, "mobile planner labels should sit above their dots");
+assert.match(pages2026Css, /\.project-hotspot\[data-project-hotspot="chassis"\] \.project-hotspot-label\s*\{[^}]*top:\s*calc\(100%\s*\+\s*4px\)/s, "the mobile chassis label should sit below its dot to clear the exhaust marker");
+assert.match(serviceDetailCss, /\.service-sheet-link,[\s\S]*?\.service-proof-all\s*\{[^}]*min-height:\s*44px/s, "mobile service text links should have 44px targets");
+assert.match(shopProductCss, /\.product-actions \[data-fitment-inquiry\],[\s\S]*?\.product-related-heading a\s*\{[^}]*min-height:\s*44px/s, "mobile product text links should have 44px targets");
 
 for (const id of ["02", "03", "04", "05", "06"]) {
   publicPages.push(`./pages/cases/case-${id}.html`);
@@ -238,8 +250,8 @@ test("Case 02 mobile moves copy below the poster and keeps useful case links", (
   );
   assert.match(
     case02MobileBlock,
-    /\.case02-video-stage\s*>\s*video\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/s,
-    "the mobile poster should retain its 16:9 frame"
+    /\.case02-video-stage\s*>\s*video\s*\{[^}]*height:\s*clamp\(140px,\s*38vw,\s*160px\)[^}]*object-fit:\s*cover/s,
+    "the mobile poster should use a short cinematic crop while preserving the film stage"
   );
   assert.match(
     case02MobileBlock,
