@@ -117,7 +117,9 @@ These were deliberately **not** invented; they need real data:
 这些默认值是咨询问题，不是商品规格或适配承诺。
 
 如果已有**经确认**的可配置资料，填写 `detail`：双语标题、说明、规格、配置选项、
-默认选项、适配资料和 `gallery`。图库每张可填双语 `label`、`alt`、图片路径及取景参数；
+默认选项、适配资料和 `gallery`。每组 `detail.options` 都需在 `detail.optionLabels`
+填写中英文组名；顶部推荐区会直接显示该组的选项值。`detail.seoTitle` 可选，
+用于单独指定浏览器标题的英文大小写，不影响页面主标题。图库每张可填双语 `label`、`alt`、图片路径及取景参数；
 省略 `gallery` 时只展示商品主图。只有 `detail.referencePrice` 有经确认的资料时才显示价格；
 其他商品统一显示「按车型报价 / ON REQUEST」。勿自行添加价格、型号或案例细节。
 

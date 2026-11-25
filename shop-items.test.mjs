@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { shopProducts, shopCategoryDefaults } from "./shop-data.mjs";
 import { renderProductItemPage, renderShopPage, renderConfigurableProductPage } from "./scripts/render-shop-page.mjs";
+import { seoForProduct } from "./seo-data.mjs";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const root = fileURLToPath(new URL(".", import.meta.url));
@@ -27,6 +28,19 @@ test("every product has complete core data, a page, a card, and a sitemap entry"
     }
     assert.ok(hasText(product.image), `${name}: image`);
     assert.ok(existsSync(resolve(root, product.image)), `${name}: image file ${product.image}`);
+    if (product.detail) {
+      for (const [group, options] of Object.entries(product.detail.options ?? {})) {
+        for (const lang of ["en", "zh"]) {
+          assert.ok(hasText(product.detail.optionLabels?.[group]?.[lang]), `${name}: detail.optionLabels.${group}.${lang}`);
+        }
+        assert.ok(options.length, `${name}: detail.options.${group}`);
+        for (const option of options) {
+          for (const lang of ["en", "zh"]) {
+            assert.ok(hasText(option.label?.[lang]), `${name}: detail.options.${group}.${option.id}.label.${lang}`);
+          }
+        }
+      }
+    }
     const pagePath = `pages/shop/${name}.html`;
     assert.ok(existsSync(resolve(root, pagePath)), `${name}: detail page`);
     const page = read(`./${pagePath}`);
@@ -57,7 +71,7 @@ test("a minimum-data product renders an inquiry page and card without a price", 
   assert.doesNotMatch(html, /US\$\d|\$\s?\d/);
   const shop = renderShopPage([product, ...shopProducts]);
   assert.match(shop, /href="\.\/shop\/sample-part\.html"/);
-  assert.match(shop, /data-feature-wheel hidden/);
+  assert.match(shop, /data-feature-specs-for="forged-wheel" hidden/);
   assert.match(shop, /data-feature-other>/);
 });
 
@@ -85,6 +99,7 @@ test("configurable product page uses its own identity, gallery, route and option
   product.id = "sample-config";
   product.title = { en: "SAMPLE CONFIG", zh: "示例配置" };
   product.detail.title = { en: "CUSTOM CONFIG", zh: "定制配置" };
+  delete product.detail.seoTitle;
   product.detail.gallery = [{ label: { en: "SIDE VIEW", zh: "侧面" }, image: product.image, alt: product.alt }];
   delete product.detail.referencePrice;
   const html = renderConfigurableProductPage(product);
@@ -96,6 +111,32 @@ test("configurable product page uses its own identity, gallery, route and option
   assert.doesNotMatch(html, /Monoblock Forged Wheel|US\$3,200|CASE 03 REFERENCE/);
   product.detail.referencePrice = {};
   assert.match(renderConfigurableProductPage(product), /data-zh="按车型报价" data-en="ON REQUEST"/);
+});
+
+test("forged wheel SEO title keeps the approved display case", () => {
+  const product = shopProducts.find(({ id }) => id === "forged-wheel");
+  assert.equal(seoForProduct(product).title, "Monoblock Forged Wheel | LONMA DYNAMIC");
+  assert.match(read("./pages/shop/forged-wheel.html"), /<title>Monoblock Forged Wheel \| LONMA DYNAMIC<\/title>/);
+});
+
+test("featured specifications follow each configurable product's own options", () => {
+  const wheel = shopProducts.find(({ id }) => id === "forged-wheel");
+  const second = structuredClone(wheel);
+  second.id = "sample-config";
+  second.title = { en: "SAMPLE CONFIG", zh: "示例配置" };
+  second.detail.options = {
+    diameter: [{ id: "18 inch", label: { en: '18"', zh: '18"' } }],
+    width: [{ id: "8J", label: { en: "8J", zh: "8J" } }],
+    finish: [{ id: "Copper", label: { en: "COPPER", zh: "铜色" } }],
+  };
+  const html = renderShopPage([wheel, second]);
+  const secondSpecs = html.match(/data-feature-specs-for="sample-config"[\s\S]*?(?=<div class="shop-feature-spec shop-feature-description")/)?.[0] ?? "";
+  assert.match(secondSpecs, /18&quot;/);
+  assert.match(secondSpecs, /8J/);
+  assert.match(secondSpecs, /COPPER/);
+  assert.doesNotMatch(secondSpecs, /19&quot;|9\.5J|SATIN BLACK/);
+  const firstSpecs = renderShopPage([second, wheel]).match(/data-feature-specs-for="sample-config"[\s\S]*?(?=<div class="shop-feature-spec shop-feature-description")/)?.[0] ?? "";
+  assert.match(firstSpecs, /data-feature-specs-for="sample-config"(?! hidden)/);
 });
 
 test("every catalogue item without configurable data has its own detail page", () => {

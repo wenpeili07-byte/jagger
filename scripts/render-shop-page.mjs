@@ -690,9 +690,27 @@ ${renderRelated(product)}
 `;
 };
 
+const renderFeatureSpecs = (product, activeId) =>
+  Object.entries(product.detail?.options ?? {})
+    .map(([key, options]) => {
+      const label = product.detail.optionLabels?.[key];
+      if (!label || !options.length) return "";
+      const values = options.map((option, index) => {
+        const tag = index === 0 ? "b" : "i";
+        const swatch = /^[a-z-]+$/.test(option.swatch ?? "")
+          ? `<em class="is-${escapeAttribute(option.swatch)}" aria-hidden="true"></em>`
+          : "";
+        return `<${tag}>${swatch}${i18n("span", option.label)}</${tag}>`;
+      }).join("");
+      return `          <div class="shop-feature-spec" data-feature-specs-for="${escapeAttribute(product.id)}"${product.id === activeId ? "" : " hidden"}>
+            ${i18n("small", label)}
+            <span>${values}</span>
+          </div>`;
+    })
+    .join("\n");
+
 const renderFeature = (products) => {
   const first = products[0];
-  const firstIsWheel = first.id === "forged-wheel";
   const picks = products
     .map(
       (product, index) => `
@@ -736,23 +754,12 @@ const renderFeature = (products) => {
             ${i18n("small", { en: "VEHICLE", zh: "车型" })}
             <span><b data-feature-vehicle-line>BMW G80 M3 · 2024</b></span>
           </div>
-          <div class="shop-feature-spec" data-feature-wheel${firstIsWheel ? "" : " hidden"}>
-            ${i18n("small", { en: "DIAMETER", zh: "直径" })}
-            <span><b>19″</b><i>20″</i></span>
-          </div>
-          <div class="shop-feature-spec" data-feature-wheel${firstIsWheel ? "" : " hidden"}>
-            ${i18n("small", { en: "WIDTH", zh: "宽度" })}
-            <span><b>9.5J / 10.5J</b><i>10J / 11J</i></span>
-          </div>
-          <div class="shop-feature-spec" data-feature-wheel${firstIsWheel ? "" : " hidden"}>
-            ${i18n("small", { en: "FINISH", zh: "颜色" })}
-            <span><b><em class="is-black"></em>${i18n("span", { en: "SATIN BLACK", zh: "缎面黑" })}</b><i><em class="is-silver"></em>${i18n("span", { en: "BRUSHED SILVER", zh: "拉丝银" })}</i></span>
-          </div>
-          <div class="shop-feature-spec shop-feature-description" data-feature-other${firstIsWheel ? " hidden" : ""}>
+${products.filter((product) => product.detail).map((product) => renderFeatureSpecs(product, first.id)).join("\n")}
+          <div class="shop-feature-spec shop-feature-description" data-feature-other${first.detail ? " hidden" : ""}>
             ${i18n("small", { en: "NOTE", zh: "说明" })}
             ${i18n("span", first.description, " data-feature-description")}
           </div>
-          <div class="shop-feature-spec" data-feature-other${firstIsWheel ? " hidden" : ""}>
+          <div class="shop-feature-spec" data-feature-other${first.detail ? " hidden" : ""}>
             ${i18n("small", { en: "FITMENT", zh: "适配" })}
             <span>${i18n("b", first.compatibility ?? fitmentUnknown, " data-feature-compatibility")}</span>
           </div>

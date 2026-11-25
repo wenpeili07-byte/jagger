@@ -81,6 +81,7 @@ export const shopProducts = [
       ],
       kicker: { en: "WHEELS / FORGED", zh: "轮毂 / 锻造" },
       title: { en: "MONOBLOCK FORGED WHEEL", zh: "单片式锻造轮毂" },
+      seoTitle: "Monoblock Forged Wheel",
       displayName: { en: "Forged Wheel", zh: "锻造轮毂" },
       summary: {
         en: "A lightweight wheel direction configured around vehicle fitment, brake clearance, and complete-car proportion.",
@@ -125,6 +126,11 @@ export const shopProducts = [
             swatch: "silver",
           },
         ],
+      },
+      optionLabels: {
+        diameter: { en: "DIAMETER", zh: "直径" },
+        width: { en: "WIDTH", zh: "宽度" },
+        finish: { en: "FINISH", zh: "颜色" },
       },
       defaults: {
         vehicle: shopVehicleTuples[0],

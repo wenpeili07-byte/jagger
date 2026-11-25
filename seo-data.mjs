@@ -77,7 +77,7 @@ const servicePages = serviceDetails.map((record) => ({
 export const seoForProduct = (product) => ({
     file: `pages/shop/${product.id}.html`,
     route: `/pages/shop/${product.id}`,
-    title: `${product.detail?.title?.en ?? product.title?.en ?? ""} | LONMA DYNAMIC`,
+    title: `${product.detail?.seoTitle ?? product.detail?.title?.en ?? product.title?.en ?? ""} | LONMA DYNAMIC`,
     description: product.detail?.summary?.en ?? product.description?.en ?? "",
     image: `/${product.image ?? ""}`,
   });

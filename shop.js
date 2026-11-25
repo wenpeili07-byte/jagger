@@ -355,7 +355,7 @@
   const description = feature.querySelector("[data-feature-description]");
   const compatibility = feature.querySelector("[data-feature-compatibility]");
   const cta = feature.querySelector("[data-feature-cta]");
-  const wheelRows = [...feature.querySelectorAll("[data-feature-wheel]")];
+  const specRows = [...feature.querySelectorAll("[data-feature-specs-for]")];
   const otherRows = [...feature.querySelectorAll("[data-feature-other]")];
   const vehicle = feature.querySelector("[data-feature-vehicle]");
   const vehicleMeta = feature.querySelector("[data-feature-vehicle-meta]");
@@ -381,7 +381,6 @@
     const id = card.dataset.productId;
     const categoryNode = card.querySelector(".shop-product-category");
     const link = card.querySelector("a.shop-product-target");
-    const isWheel = id === "forged-wheel";
     const isConfigurable = card.dataset.configurable === "true";
 
     feature.classList.remove("is-changing");
@@ -398,11 +397,11 @@
     setCopy(compatibility, card.dataset.compatibilityZh, card.dataset.compatibilityEn);
     number.textContent = String(current + 1).padStart(2, "0");
 
-    wheelRows.forEach((row) => {
-      row.hidden = !isWheel;
+    specRows.forEach((row) => {
+      row.hidden = row.dataset.featureSpecsFor !== id;
     });
     otherRows.forEach((row) => {
-      row.hidden = isWheel;
+      row.hidden = isConfigurable;
     });
 
     if (link) {

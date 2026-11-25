@@ -1469,13 +1469,14 @@
 
 .shop-feature-spec > span {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 22px;
   min-height: 30px;
   font-family: var(--sans);
   font-size: 15px;
   letter-spacing: 0.05em;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .shop-feature-spec b,
