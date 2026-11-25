@@ -139,6 +139,15 @@ export const shopProducts = [
     compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
     inquirySubject: { en: "CARBON INTAKE SYSTEM INQUIRY", zh: "碳纤维进气系统咨询" },
     shopifyProductId: null,
+    inquiry: {
+      kicker: { en: "INTAKE / CARBON", zh: "进气 / 碳纤维" },
+      confirm: [
+        { en: "PLATFORM", zh: "车辆平台" },
+        { en: "ENGINE", zh: "发动机" },
+        { en: "INSTALLATION REQUIREMENTS", zh: "安装需求" },
+      ],
+      reference: { caseId: "04", image: "assets/images/generated/case-04/case-04-960w.webp", label: { en: "ON A BUILD · CASE 04 REFERENCE", zh: "装车参考 · 案例 04" }, alt: { en: "Intake reference in the Case 04 engine bay", zh: "案例 04 发动机舱中的进气参考" } },
+    },
   },
   {
     id: "coilover-kit",
@@ -153,6 +162,15 @@ export const shopProducts = [
     compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
     inquirySubject: { en: "COILOVER KIT INQUIRY", zh: "绞牙避震套件咨询" },
     shopifyProductId: null,
+    inquiry: {
+      kicker: { en: "SUSPENSION / COILOVER", zh: "悬挂 / 绞牙避震" },
+      confirm: [
+        { en: "INTENDED USE", zh: "使用场景" },
+        { en: "RIDE HEIGHT", zh: "车高" },
+        { en: "CHASSIS SETUP", zh: "底盘设定" },
+      ],
+      reference: { caseId: "03", image: "assets/images/generated/case-03/case-03-960w.webp", label: { en: "ON A BUILD · CASE 03 REFERENCE", zh: "装车参考 · 案例 03" }, alt: { en: "Lowered stance reference from Case 03", zh: "案例 03 的降低车身参考" } },
+    },
   },
   {
     id: "brake-kit",
@@ -167,6 +185,16 @@ export const shopProducts = [
     compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
     inquirySubject: { en: "BIG BRAKE KIT INQUIRY", zh: "高性能刹车套件咨询" },
     shopifyProductId: null,
+    inquiry: {
+      kicker: { en: "BRAKES / BIG BRAKE KIT", zh: "刹车 / 大刹车套件" },
+      confirm: [
+        { en: "ROTOR", zh: "碟盘" },
+        { en: "CALIPER", zh: "卡钳" },
+        { en: "WHEEL CLEARANCE", zh: "轮毂空间" },
+        { en: "INTENDED USE", zh: "用途" },
+      ],
+      reference: { caseId: "02", image: "assets/images/generated/case-02/case-02-960w.webp", label: { en: "ON A BUILD · CASE 02 REFERENCE", zh: "装车参考 · 案例 02" }, alt: { en: "Road and track reference from Case 02", zh: "案例 02 的道路与赛道参考" } },
+    },
   },
   {
     id: "carbon-aero",
@@ -181,6 +209,16 @@ export const shopProducts = [
     compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
     inquirySubject: { en: "CARBON AERO INQUIRY", zh: "碳纤维空气动力套件咨询" },
     shopifyProductId: null,
+    inquiry: {
+      kicker: { en: "AERO / CARBON", zh: "空气动力 / 碳纤维" },
+      confirm: [
+        { en: "BODY STYLE", zh: "车身版本" },
+        { en: "FINISH", zh: "表面" },
+        { en: "INSTALLATION", zh: "安装" },
+        { en: "COMPLETE-CAR DIRECTION", zh: "整车方向" },
+      ],
+      reference: { caseId: "01", image: "assets/images/generated/case-01/case-01-960w.webp", label: { en: "ON A BUILD · CASE 01 REFERENCE", zh: "装车参考 · 案例 01" }, alt: { en: "Widebody lineup reference from Case 01", zh: "案例 01 的宽体车队参考" } },
+    },
   },
   {
     id: "performance-exhaust",
@@ -195,5 +233,15 @@ export const shopProducts = [
     compatibility: { en: "FITMENT NOT CONFIRMED", zh: "适配尚未确认" },
     inquirySubject: { en: "PERFORMANCE EXHAUST INQUIRY", zh: "性能排气系统咨询" },
     shopifyProductId: null,
+    inquiry: {
+      kicker: { en: "EXHAUST / PERFORMANCE", zh: "排气 / 性能" },
+      confirm: [
+        { en: "SOUND TARGET", zh: "声浪目标" },
+        { en: "CONFIGURATION", zh: "配置" },
+        { en: "ROAD USE", zh: "道路使用" },
+        { en: "INSTALLATION", zh: "安装" },
+      ],
+      reference: null,
+    },
   },
 ];

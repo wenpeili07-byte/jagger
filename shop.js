@@ -381,7 +381,7 @@
     const id = card.dataset.productId;
     const categoryNode = card.querySelector(".shop-product-category");
     const link = card.querySelector("a.shop-product-target");
-    const isWheel = Boolean(link);
+    const isWheel = id === "forged-wheel";
 
     feature.classList.remove("is-changing");
     void feature.offsetWidth;
@@ -404,11 +404,15 @@
       row.hidden = isWheel;
     });
 
-    if (isWheel) {
+    if (link) {
       cta.setAttribute("href", link.getAttribute("href"));
-      setCopy(cta, "配置此产品", "CONFIGURE");
     } else {
       cta.setAttribute("href", `#${id}`);
+    }
+
+    if (isWheel) {
+      setCopy(cta, "配置此产品", "CONFIGURE");
+    } else {
       setCopy(cta, "查看详情", "VIEW DETAILS");
     }
 

@@ -43,7 +43,7 @@ test("case image preparation tool is non-destructive by default", async () => {
 });
 
 test("every public page exposes canonical and complete social metadata", async () => {
-  assert.equal(publicPages.length, 20);
+  assert.equal(publicPages.length, 25);
   assert.equal(new Set(publicPages.map(({ route }) => route)).size, publicPages.length);
 
   for (const page of publicPages) {

@@ -248,19 +248,20 @@ test("shop renders six truthful bilingual sample products", () => {
   assert.equal((html.match(/data-en="INQUIRE"/g) || []).length, 6);
 });
 
-test("forged wheel card is the only product deep link", () => {
-  assert.match(
-    html,
-    /href="\.\/shop\/forged-wheel\.html"[^>]*data-product-link="forged-wheel"/
-  );
-  assert.equal((html.match(/data-product-link=/g) || []).length, 1);
-  assert.equal((html.match(/data-product-open/g) || []).length, 5);
+test("every product card deep-links to its own detail page", () => {
+  for (const product of shopProducts) {
+    assert.match(
+      html,
+      new RegExp(`href="\\./shop/${product.id}\\.html"[^>]*data-product-link="${product.id}"`)
+    );
+  }
+  assert.equal((html.match(/data-product-link=/g) || []).length, 6);
+  assert.equal((html.match(/data-product-open/g) || []).length, 0);
 });
 
 test("every shop card exposes one full-card primary target", () => {
   assert.equal((html.match(/class="shop-product-target"/g) || []).length, 6);
-  assert.equal((html.match(/data-product-link=/g) || []).length, 1);
-  assert.equal((html.match(/data-product-open/g) || []).length, 5);
+  assert.equal((html.match(/data-product-link=/g) || []).length, 6);
   assert.equal((html.match(/class="shop-product-action-copy"/g) || []).length, 6);
   const metaBlocks = [...html.matchAll(/<div class="shop-product-meta">([\s\S]*?)<\/div>/g)];
   assert.equal(metaBlocks.length, 6);

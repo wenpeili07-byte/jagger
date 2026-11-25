@@ -64,16 +64,10 @@ const renderProductCard = (product) => {
         en: `View details for ${product.title.en}`,
         zh: `查看${product.title.zh}详情`,
       };
-  const target = product.id === "forged-wheel"
-    ? `<a class="shop-product-target"
-          href="./shop/forged-wheel.html"
-          data-product-link="forged-wheel"
-          ${i18nAttribute("aria-label", accessibleAction)}></a>`
-    : `<button class="shop-product-target"
-             type="button"
-             data-product-open
-             data-product-id="${escapeAttribute(product.id)}"
-             ${i18nAttribute("aria-label", accessibleAction)}></button>`;
+  const target = `<a class="shop-product-target"
+          href="./shop/${escapeAttribute(product.id)}.html"
+          data-product-link="${escapeAttribute(product.id)}"
+          ${i18nAttribute("aria-label", accessibleAction)}></a>`;
 
   return `<article
             class="shop-product-card"
@@ -301,7 +295,7 @@ const renderRelated = (current) => {
   const items = others
     .map(
       (product) => `
-          <a class="product-related-item" href="../shop.html?product=${encodeURIComponent(product.id)}">
+          <a class="product-related-item" href="./${encodeURIComponent(product.id)}.html">
             <img src="../../${escapeAttribute(product.image)}" ${i18nAttribute("alt", product.alt)} loading="lazy" />
             ${i18n("span", categoryLabels[product.category])}
             ${i18n("strong", product.title)}
@@ -354,7 +348,7 @@ export const renderForgedWheelPage = (
     <!-- SEO:END -->
     <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
     <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
-    <link rel="stylesheet" href="../../shop-product.css?v=product-info-20261124" />
+    <link rel="stylesheet" href="../../shop-product.css?v=product-items-20261125" />
     <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
   </head>
   <body data-section="shop">
@@ -471,6 +465,226 @@ ${renderRelated(product)}
 `;
 };
 
+
+// Detail pages for catalogue items that do not have configurable product data
+// yet. Everything shown comes from shop-data.mjs; price and fitment stay
+// "on request" until LONMA DYNAMIC supplies real data.
+const itemGalleryViews = (product) => [
+  { id: "full", label: { en: "FULL VIEW", zh: "整体" }, zoom: 1, origin: "50% 50%" },
+  { id: "detail", label: { en: "DETAIL", zh: "细节" }, zoom: 1.9, origin: "50% 45%" },
+  { id: "close", label: { en: "CLOSE DETAIL", zh: "近距离细节" }, zoom: 2.5, origin: "30% 62%" },
+  ...(product.inquiry.reference
+    ? [{
+        id: "on-car",
+        label: product.inquiry.reference.label,
+        zoom: 1,
+        origin: "50% 50%",
+        image: product.inquiry.reference.image,
+        alt: product.inquiry.reference.alt,
+        scene: true,
+      }]
+    : []),
+];
+
+const itemUses = [
+  { id: "street", label: { en: "STREET", zh: "街道" } },
+  { id: "road-track", label: { en: "ROAD & TRACK", zh: "道路与赛道" } },
+  { id: "show", label: { en: "SHOW", zh: "展示" } },
+];
+
+export const renderProductItemPage = (product) => {
+  if (!product?.inquiry) {
+    throw new Error(`${product?.id || "product"} needs inquiry data`);
+  }
+
+  const { inquiry } = product;
+  const views = itemGalleryViews(product);
+  const category = categoryLabels[product.category];
+  const defaultVehicle = shopVehicles.tuples[0];
+  const confirmCount = String(inquiry.confirm.length).padStart(2, "0");
+  const priceCopy = { en: "ON REQUEST", zh: "按车型报价" };
+  const priceNote = { en: "Quoted after fitment confirmation.", zh: "确认车型适配后报价。" };
+  const itemConfig = {
+    id: product.id,
+    categories: managedProductCategories,
+    inquirySubject: product.inquirySubject,
+  };
+
+  const viewMarkup = views
+    .map((view, index) => `            <figure class="product-view${view.scene ? " is-scene" : ""}${index === 0 ? " is-active" : ""}" data-gallery-view data-label-en="${escapeAttribute(view.label.en)}" data-label-zh="${escapeAttribute(view.label.zh)}" style="${galleryStyle(view)}"${index === 0 ? "" : ' aria-hidden="true"'}>
+              <img src="../../${escapeAttribute(view.image ?? product.image)}" ${i18nAttribute("alt", view.alt ?? product.alt)}${index === 0 ? "" : ' loading="lazy"'} />
+            </figure>`)
+    .join("\n");
+  const thumbMarkup = views
+    .map((view, index) => `            <button type="button" data-gallery-thumb="${index}"${index === 0 ? ' aria-current="true"' : ""} ${i18nAttribute("aria-label", view.label)} style="${galleryStyle(view)}"><img src="../../${escapeAttribute(view.image ?? product.image)}" alt="" loading="lazy" /></button>`)
+    .join("\n");
+
+  const figures = [
+    { label: { en: "CATEGORY", zh: "分类" }, value: category },
+    { label: { en: "FITMENT", zh: "适配" }, value: product.compatibility },
+    { label: { en: "PRICE", zh: "价格" }, value: priceCopy },
+    { label: { en: "TO CONFIRM", zh: "需确认" }, value: { en: `${confirmCount} ITEMS`, zh: `${confirmCount} 项` } },
+  ];
+  const steps = [
+    { title: { en: "YOUR VEHICLE", zh: "填写车型" }, copy: { en: "Enter your vehicle and how you use it above.", zh: "在上方填写车型与使用场景。" } },
+    { title: { en: "FITMENT CHECK", zh: "适配确认" }, copy: { en: "LONMA DYNAMIC confirms the items listed above for your car.", zh: "由 LONMA DYNAMIC 针对你的车辆确认以上项目。" } },
+    { title: { en: "CONFIRMED QUOTE", zh: "确认报价" }, copy: priceNote },
+  ];
+  const reference = inquiry.reference;
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="${escapeAttribute(`${product.title.en.charAt(0)}${product.title.en.slice(1).toLowerCase()} — request vehicle fitment and a confirmed quote from LONMA DYNAMIC.`)}" />
+    <title>${escapeText(product.title.en)} | LONMA DYNAMIC</title>
+    <!-- SEO:START -->
+    ${renderSeoMeta(seoForRoute(`/pages/shop/${product.id}`))}
+    <!-- SEO:END -->
+    <link rel="stylesheet" href="../../styles.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../layout-canvas.css?v=sanity-case-cms-20260801" />
+    <link rel="stylesheet" href="../../shop-product.css?v=product-items-20261125" />
+    <link rel="stylesheet" href="../../mobile-experience.css?v=mobile-coordination-20260728" />
+  </head>
+  <body data-section="shop">
+    <main class="site-shell forged-wheel-page product-item-page" data-product-id="${escapeAttribute(product.id)}">
+      <header class="topbar">
+        <a class="brand" href="../../index.html" ${i18nAttribute("aria-label", { zh: "回到首页", en: "Back to home" })}>LONMA DYNAMIC</a>
+        <nav class="nav" ${i18nAttribute("aria-label", { zh: "主导航", en: "Main navigation" })}>
+          <a href="../about.html">ABOUT</a>
+          <a href="../services.html">SERVICES</a>
+          <a href="../cases.html">CASES</a>
+          <a href="../contact.html">CONTACT</a>
+          <a href="../shop.html" aria-current="page">SHOP</a>
+        </nav>
+        <div class="top-actions">
+          <a class="project-entry" href="../project.html">
+            ${i18n("span", { zh: "开始项目", en: "START PROJECT" }, ' class="project-entry-label-full"')}
+            ${i18n("span", { zh: "规划", en: "BUILD" }, ' class="project-entry-label-compact"')}
+          </a>
+          <button class="lang-toggle" type="button" aria-label="切换到中文">
+            <span class="lang-option" data-lang-option="zh">中</span>
+            <span class="lang-separator" aria-hidden="true">/</span>
+            <span class="lang-option is-current" data-lang-option="en">EN</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="product-detail" aria-labelledby="product-title">
+        <div class="product-stage">
+          ${i18n("a", { en: "← BACK TO SHOP", zh: "← 返回商店" }, ' class="product-back" href="../shop.html" data-product-back')}
+          <span class="product-stage-beam" aria-hidden="true"></span>
+          <div class="product-stage-main" data-gallery tabindex="0" ${i18nAttribute("aria-label", { en: "Product gallery", zh: "产品图集" })}>
+${viewMarkup}
+          </div>
+          <div class="product-gallery-bar">
+            <button class="product-gallery-arrow" type="button" data-gallery-step="-1" ${i18nAttribute("aria-label", { en: "Previous view", zh: "上一张" })}>←</button>
+            <p class="product-gallery-caption"><b data-gallery-index>01</b> / ${String(views.length).padStart(2, "0")} ${i18n("span", views[0].label, " data-gallery-label")}</p>
+            <button class="product-gallery-arrow" type="button" data-gallery-step="1" ${i18nAttribute("aria-label", { en: "Next view", zh: "下一张" })}>→</button>
+          </div>
+          <div class="product-thumbnails" ${i18nAttribute("aria-label", { en: "Product views", zh: "产品视图" })}>
+${thumbMarkup}
+          </div>
+          <p class="product-stage-selection" aria-live="polite">
+            ${i18n("span", { en: "YOUR REQUEST", zh: "当前需求" })}
+            <strong data-item-summary></strong>
+          </p>
+        </div>
+
+        <div class="product-config">
+          ${i18n("p", inquiry.kicker, ' class="product-kicker"')}
+          ${i18n("h1", product.title, ' id="product-title"')}
+          ${i18n("p", product.description, ' class="product-summary"')}
+          <p class="product-reference-price">
+            ${i18n("span", { en: "PRICE", zh: "价格" })}
+            ${i18n("strong", priceCopy)}
+            ${i18n("small", priceNote)}
+          </p>
+
+          <fieldset data-product-fitment>
+            ${i18n("legend", { en: "VEHICLE FITMENT", zh: "车型适配" })}
+            <div class="product-fitment-grid">
+              <label>${i18n("span", { en: "MAKE", zh: "品牌" })}<select data-item-make>${renderOptions(shopVehicles.makes)}</select></label>
+              <label>${i18n("span", { en: "MODEL", zh: "车型" })}<input data-item-model value="${escapeAttribute(defaultVehicle.model)}" maxlength="40" /></label>
+              <label>${i18n("span", { en: "YEAR", zh: "年份" })}<input data-item-year value="${escapeAttribute(defaultVehicle.year)}" maxlength="4" inputmode="numeric" /></label>
+              <label>${i18n("span", { en: "CHASSIS", zh: "底盘" })}<input data-item-chassis value="${escapeAttribute(defaultVehicle.chassis)}" maxlength="20" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset data-option-group="use" data-item-use>
+            ${i18n("legend", { en: "INTENDED USE", zh: "使用场景" })}
+            <div class="product-option-row">
+              ${itemUses.map((use, index) => `<label><input type="radio" name="use" value="${use.id}"${index === 0 ? " checked" : ""} />${i18n("span", use.label)}</label>`).join("\n              ")}
+            </div>
+          </fieldset>
+
+          ${i18n("p", product.compatibility, ' class="product-fitment-message" data-fitment-message')}
+
+          <div class="product-actions">
+            <span class="product-action-price">${i18n("small", { en: "PRICE", zh: "价格" })}${i18n("strong", priceCopy)}</span>
+            ${i18n("a", { en: "ADD TO BUILD", zh: "加入项目" }, ' href="../project.html" data-add-to-build data-item-build')}
+            ${i18n("a", { en: "REQUEST FITMENT CHECK", zh: "申请适配确认" }, ' href="../contact.html" data-fitment-inquiry data-item-inquiry')}
+          </div>
+        </div>
+      </section>
+
+      <section class="product-info" aria-labelledby="product-info-title">
+        <div class="product-info-figures">${figures.map((figure) => `
+          <div>${i18n("span", figure.label)}${i18n("strong", figure.value)}</div>`).join("")}
+        </div>
+        <div class="product-info-body">
+          <div class="product-info-intro">
+            ${i18n("p", { en: "PRODUCT DETAILS", zh: "产品详情" }, ' class="product-kicker"')}
+            ${i18n("h2", product.title, ' id="product-info-title"')}
+            ${i18n("p", { en: "This category is shown for design review. Specification, price and fitment are confirmed for each vehicle.", zh: "此分类用于设计预览。规格、价格与适配都按车辆逐一确认。" }, ' class="product-info-summary"')}
+            ${i18n("a", { en: "TALK TO LONMA DYNAMIC →", zh: "联系 LONMA DYNAMIC →" }, ' class="product-info-contact" href="../contact.html"')}
+          </div>
+          <div class="product-info-sections">
+            <section class="product-info-item is-open" data-product-disclosure data-desktop-open="true">
+              <button class="product-info-toggle" type="button" aria-controls="product-confirm-panel" aria-expanded="true"><span>01</span>${i18n("span", { en: "WHAT WE CONFIRM", zh: "需要确认的项目" })}</button>
+              <div class="product-info-panel" id="product-confirm-panel">
+                <dl class="product-info-specs">${inquiry.confirm.map((item, index) => `
+                <div>${i18n("dt", { en: String(index + 1).padStart(2, "0"), zh: String(index + 1).padStart(2, "0") })}${i18n("dd", item)}</div>`).join("")}
+                </dl>
+              </div>
+            </section>${reference ? `
+            <section class="product-info-item is-open" data-product-disclosure data-desktop-open="true">
+              <button class="product-info-toggle" type="button" aria-controls="product-reference-panel" aria-expanded="true"><span>02</span>${i18n("span", { en: "REFERENCE BUILD", zh: "参考案例" })}</button>
+              <div class="product-info-panel" id="product-reference-panel">
+                <a class="product-info-reference" href="../cases/case-${reference.caseId}.html">
+                  <img src="../../${escapeAttribute(reference.image)}" alt="" loading="lazy" />
+                  ${i18n("span", { en: `CASE ${reference.caseId} · VIEW BUILD →`, zh: `案例 ${reference.caseId} · 查看案例 →` })}
+                </a>
+                ${i18n("p", { en: "Reference photo of a build in this category, not this exact part.", zh: "此分类的装车参考照片，并非此款部件本身。" }, ' class="product-info-note"')}
+              </div>
+            </section>` : ""}
+            <section class="product-info-item" data-product-disclosure data-desktop-open="false">
+              <button class="product-info-toggle" type="button" aria-controls="product-ordering-panel" aria-expanded="false"><span>${reference ? "03" : "02"}</span>${i18n("span", { en: "ORDERING & FITMENT CHECK", zh: "下单与适配流程" })}</button>
+              <div class="product-info-panel" id="product-ordering-panel" hidden>
+                <ol class="product-info-steps">${steps.map((step, index) => `
+                <li><b>${String(index + 1).padStart(2, "0")}</b>${i18n("strong", step.title)}${i18n("span", step.copy)}</li>`).join("")}
+                </ol>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+${renderRelated(product)}
+      <footer class="content-footer">
+        <span>LONMA DYNAMIC</span>
+        <span data-zh="龙马态度 · 2026" data-en="AUTOMOTIVE ATTITUDE · 2026">AUTOMOTIVE ATTITUDE · 2026</span>
+        <a href="../contact.html" data-zh="直接联系 →" data-en="CONTACT DIRECTLY →">CONTACT DIRECTLY →</a>
+      </footer>
+    </main>
+    <script type="application/json" data-item-config>${serializeJson(itemConfig)}</script>
+    <script src="../../content-pages.js?v=sanity-case-cms-20260801"></script>
+    <script src="../../shop-item.js?v=shop-item-20261125"></script>
+    <script src="../../product-info.js?v=product-info-20261124"></script>
+  </body>
+</html>
+`;
+};
 
 const renderFeature = (products) => {
   const first = products[0];
@@ -696,6 +910,9 @@ export async function writeShopPage() {
   await mkdir(resolve(root, "pages/shop"), { recursive: true });
   await writeFile(resolve(root, "pages/shop.html"), renderShopPage());
   await writeFile(resolve(root, "pages/shop/forged-wheel.html"), renderForgedWheelPage());
+  for (const product of shopProducts.filter((item) => item.inquiry)) {
+    await writeFile(resolve(root, `pages/shop/${product.id}.html`), renderProductItemPage(product));
+  }
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

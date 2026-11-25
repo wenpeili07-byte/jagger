@@ -1,4 +1,5 @@
 import { caseDetails, serviceDetails } from "./detail-pages-data.mjs";
+import { shopProducts } from "./shop-data.mjs";
 
 export const siteOrigin = "https://jagger-sage.vercel.app";
 
@@ -80,8 +81,19 @@ const servicePages = serviceDetails.map((record) => ({
   image: caseImage(record.number),
 }));
 
+const productPages = shopProducts
+  .filter((product) => product.inquiry)
+  .map((product) => ({
+    file: `pages/shop/${product.id}.html`,
+    route: `/pages/shop/${product.id}`,
+    title: `${product.title.en} | LONMA DYNAMIC`,
+    description: `${product.title.en.charAt(0)}${product.title.en.slice(1).toLowerCase()} — request vehicle fitment and a confirmed quote from LONMA DYNAMIC.`,
+    image: `/${product.image}`,
+  }));
+
 export const publicPages = Object.freeze([
   ...corePages,
+  ...productPages,
   ...casePages,
   ...servicePages,
 ]);
